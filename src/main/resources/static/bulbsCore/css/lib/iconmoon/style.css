@@ -1,0 +1,58 @@
+@font-face {
+	font-family: 'icomoon';
+	src:url('/bulbsCore/css/lib/iconmoon/fonts/icomoon.eot?9xz5zc');
+	src:url('/bulbsCore/css/lib/iconmoon/fonts/icomoon.eot?#iefix9xz5zc') format('embedded-opentype'),
+		url('/bulbsCore/css/lib/iconmoon/fonts/icomoon.woff?9xz5zc') format('woff'),
+		url('/bulbsCore/css/lib/iconmoon/fonts/icomoon.ttf?9xz5zc') format('truetype'),
+		url('/bulbsCore/css/lib/iconmoon/fonts/icomoon.svg?9xz5zc#icomoon') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+
+[class^="icon-"], [class*=" icon-"] {
+	font-family: 'icomoon';
+	speak: none;
+	font-style: normal;
+	font-weight: normal;
+	font-variant: normal;
+	text-transform: none;
+	line-height: 1;
+
+	/* Better Font Rendering =========== */
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+.icon-bridge:before {
+	content: "\e602";
+}
+.icon-music:before {
+	content: "\e601";
+}
+.icon-preset:before {
+	content: "\e600";
+}
+.icon-brightness-medium:before {
+	content: "\e603";
+}
+.icon-menu:before {
+	content: "\e607";
+}
+.icon-settings:before {
+	content: "\e606";
+}
+.icon-group:before {
+	content: "\e605";
+}
+.icon-spinner:before {
+	content: "\e608";
+}
+.icon-stats:before {
+	content: "\e609";
+}
+.icon-brightness-medium2:before {
+	content: "\e60a";
+}
+.icon-light-bulb:before {
+	content: "\e604";
+}

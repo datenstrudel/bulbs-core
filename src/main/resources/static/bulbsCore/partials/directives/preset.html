@@ -1,0 +1,260 @@
+<div id="{{domIdPreset}}"
+     class="panel-preset col-xs-12 "
+     ng-class="{ 'col-lg-7' : editMode, 'col-lg-3' : !editMode, 'col-sm-3' : !editMode }">
+    <div class="panel panel-info panel-info-entity ">
+        <div class="panel-heading container">
+            <h2 class="panel-title pull-left" 
+                ng-show='!editName' 
+                ng-click="switchEditName()">
+                <span class="icon icon-preset pull-left"></span>
+                
+                <a href='' title="Modify name of '{{preset.name}}'">{{preset.name}}</a>
+            </h2>
+            <div class="input-group pull-right" ng-show="editMode">
+                <button class="btn btn-xs btn-warning"
+                                ng-click="applyPreset(preset, false)"
+                                ng-disabled="!presetEntities.length"
+                                title="Apply Preset now!">
+                            <span class="glyphicon glyphicon-play"></span>
+                </button>&nbsp;
+                <button class="btn btn-xs btn-warning"
+                        ng-click="applyPreset(preset, true)"
+                        ng-disabled="!presetEntities.length || !isLoopable()"
+                        title="Loop preset!">
+                    <span class="glyphicon glyphicon-repeat"></span>
+                </button>
+            </div>
+            
+            <form role="form" class="animate-show" 
+                    name="preset_name" 
+                    ng-show='editName' 
+                    ng-submit="save('name')" 
+                    novalidate >
+                <div class="input-group input-group-sm">
+                    <input ng-model='preset.name' type="text" 
+                           class='form-control' 
+                           placeholder="Enter Preset Name" 
+                           required />
+                           <!--name='group_mod_name_'--> 
+                    <span class="input-group-btn">
+                        <button ng-click="save('name')" 
+                                ng-disabled="preset_name.$invalid || isUnchanged($scope.preset.name)"
+                                type="button" class="btn btn-success">
+                            Save
+                        </button>
+                        <a href="" class="btn" ng-click="switchEditName()" >Cancel</a>  
+                    </span>
+                </div>
+            </form>
+        </div>
+        <div class="animate-show text-center container">
+            <!--panel-body -->
+
+            <div class="" id="pn_entitySelection"
+                 >
+                 <!--ng-class="{ 'col-lg-6' : editMode, 'col-lg-12' : !editMode }"-->
+
+                <div id="pn_presetControl" class="text-center animate-show animate-data" ng-if="!editMode">
+                     <fieldset>
+<!--                        <legend>Control</legend>-->
+                        <div color-set-indicator
+                            ng-click="setEditMode(true)"
+                            ng-show='!editName' 
+                            colors="presetIndicatorColors"
+                            height="24px" > </div>
+                        <div class="pull-left">
+                            <button class="btn btn-sm btn-warning"
+                                    ng-click="applyPreset(preset, false)"
+                                    ng-disabled="!presetEntities.length"
+                                    title="Apply Preset now!">
+                                <span class="glyphicon glyphicon-play"></span>
+                            </button>
+                            <button class="btn btn-sm btn-warning"
+                                    ng-click="applyPreset(preset, true)"
+                                    ng-disabled="!presetEntities.length || !isLoopable()"
+                                    title="Loop preset!">
+                                <span class="glyphicon glyphicon-repeat"></span>
+                            </button>
+                            <button class="btn btn-sm btn-warning"
+                                    ng-click="stopActuation()"
+                                    ng-disabled="!presetEntities.length || !isLoopable()"
+                                    title="Stop actuation on preset member(s)!">
+                                <span class="glyphicon glyphicon-stop"></span>
+                            </button>
+                        </div>
+                        <div class="pull-right">
+                            <button
+                                type="button"
+                                class="btn btn-sm"
+                                ng-click="setEditMode(true)"
+                                title="Switch to edit mode">
+                                <span class="glyphicon glyphicon-edit"></span>
+                            </button>
+                        </div>
+
+                    </fieldset>
+                </div>
+                <fieldset ng-if="editMode">
+                    <legend>Target(s)</legend>
+                    <div ng-if="!presetEntities.length && !editMode"
+                         class="text-center">
+                        <a href="" ng-click="setEditMode(true)"> - This preset is empty -</a>
+                    </div>
+                    <div ng-repeat="d in presetEntities" class="animate-data">
+                        <div class="panel-group-item btn " 
+                                ng-click="selectEntity(d)" 
+                                ng-class="{ 'active' : isEntitySelected(d), 'inactive' : isEntityInactive(d) } " 
+                                ng-style="entityStyle(d).style"
+                        >
+                                <!--ng-style="d.__tmpPresetStyle.style"-->
+                            <span class="icon pull-left" 
+                                  ng-class="{ 'icon-group' : isGroup(d), 'icon-light-bulb' : isBulb(d) }"></span>
+                            <span>{{d.name}}</span>
+                            <button ng-click="removeEntityFromPreset(d, $event)"
+                                    ng-show="editMode"
+                                    type="button" class="btn btn-xs btn-danger">
+                                <span class="glyphicon glyphicon-remove"></span>
+                            </button>
+                        </div>
+                    </div>
+                    <select ng-model="tmpSelectTarget.entity2Add" style="max-width: 100%"
+                            class="form-control lx-group-item-selector animate-show"
+                            ng-change="handleEntityAdd();"
+                            ng-options="e.name for e in actualAvailableEntities"
+                            ng-show="editMode"
+                            ng-disabled="actualAvailableEntities.length < 1"
+                            >
+                        <option value="">
+                            {{actualAvailableEntities.length > 0 ? '-- Add a Preset Member-- ' : '-- All available targets in use --'}}
+                        </option>
+                    </select>
+                </fieldset>
+
+                <fieldset ng-if="entitySelected !== null" >
+                    <legend>Transitions
+                        <div class="align-right pull-right">
+                            <input id="enableTransition" type="checkbox" ng-checked="transitionsEnabled" ng-click="toggleTransitionEnabled()">
+                        </div>
+                    </legend>
+                <div ng-if="transitionsEnabled" class="animate-show animate-data">
+                    <div linechart-selector
+                            widget-id="linechartSelectorID_preset_{{entitySelectionHash}}"
+                            states="presetStateSelected.states"
+                            last-change-src="lastStateChangeSrc"
+                            value-type="hue"
+                            states-updated="updateCurrEntityStates(states, directiveId)"
+                            state-selected="selectPresetState(index)"
+                            enabled="transitionsEnabled"
+                            ng-if="transitionsEnabled"
+                        >
+                        <div class="lcs-settings-time align-right pull-right">
+                            <input id="timeTotal" class="form-control"
+                                   type="number" min="1" value="1"
+                                   name="timeTotal"
+                                   ng-change="setAndApplyNewTotalTime(lcsModel.timeTotal)"
+                                   ng-model="lcsModel.timeTotal"
+                                   millis-to-seconds-converter />
+                            <label for="timeTotal">s</label>
+                        </div>
+
+                        <div class="lcs-body">
+                            <div modeselector class="lcs-value-type modeselector"
+                                 on-mode-change="setValueType(modeSelected)"
+                                mode="valueType">
+                                <!--ng-click="applyPreset(preset, false)"
+                                ng-disabled="!presetEntities.length"-->
+                                <p><button class="btn btn-xs btn-default" title="Hue"
+                                           ng-class="{active : isModeSelected('hue')}"
+                                           ng-click="selectMode('hue')">
+                                    <span class="icon icon-spinner"></span>
+                                </button></p>
+                                <p><button class="btn btn-xs btn-default" title="Saturation"
+                                           ng-class="{active : isModeSelected('saturation')}"
+                                           ng-click="selectMode('saturation')">
+                                    <span class="glyphicon glyphicon-signal"></span>
+                                </button></p>
+                                <p><button class="btn btn-xs btn-default" title="Brightnes"
+                                           ng-class="{active : isModeSelected('brightness')}"
+                                           ng-click="selectMode('brightness')">
+                                    <span class="glyphicon glyphicon-asterisk"></span>
+                                </button></p>
+                            </div>
+                            <div class="lcs-container">
+                                <!-- The actual linechart selector widget will be included here-->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                </fieldset>
+            </div>
+            
+            <div id="pn_entityState" class="col-lg-6 animate-show animate-data"
+                 ng-if="entitySelected !== null">
+                <fieldset >
+                    <legend>On / Off</legend>
+                    <div id="pn_activityEntityState" class="text-center" >
+                        <button type="button" 
+                                ng-click="modifyEntityState_Enabled(entitySelected, !entitySelectedEnabled)" 
+                                ng-class="{ 'active' : entitySelectedEnabled,  
+                                            'inactive' : !entitySelectedEnabled }" 
+                                class="btn-power btn btn-sm" title="Power">
+                                <span class="glyphicon glyphicon-off"></span>
+                        </button>
+                    </div>
+                </fieldset>
+                <fieldset>
+                    <legend>Color State
+                        <span  class="align-right pull-right headline-status-label  ">
+                            <span ng-show="transitionsEnabled" class="label label-info animate-show">{{ presetStateSelected.states[stateSelectedIdx].timeKey | millisToSeconds | number:1}}s</span>
+                        </span>
+                    </legend>
+                    <div id="pn_colorEntityState" class="animate-show text-center">
+                        <div color-selector-circle
+                                new-color-selected="modifyEntityState_Color(entity, colorValue, 'color-sel-circle')"
+                                widget-id="colorChooserID_preset__entitySelected_" 
+                                continuous-trigger="continuousTrigger"
+                                entity="entitySelected"
+                                init-color="entitySelectedColor">
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+        
+        <div class="panel-footer container-fluid min-height2 "
+             ng-hide="!editMode || isUnsaved">
+            <!--<div class="row input-group input-group-sm">-->
+            
+                <div class="input-group-xs col-md-6 col-xs-6 pull-left ">
+                    <div class="input-group-btn ">
+                        <button ng-click="deletePreset()" 
+                                ng-show="editMode && !isUnsaved"
+                                type="button"
+                                class="btn btn-xs btn-danger animate-show" 
+                                title="Delete this preset"
+                        >
+                            <span class="glyphicon glyphicon-trash"></span>
+                        </button>
+                    </div>
+                </div>
+                <div class="input-group col-md-6 col-xs-6 pull-right align-right ">
+                    <span class="input-group-btn input-group-sx "
+                          ng-show="editMode && !isUnsaved" >
+                        <a href="" class="btn btn-xs" ng-click="cancelEdit()" >Cancel</a>  
+                        <button ng-click="save('states')" 
+                                type="button"
+                                class="btn btn-xs btn-success " title="Save changes"
+                                >
+                            Save changes
+                        </button>
+                    </span>
+<!--                    <span class="input-group-btn input-group-xs"
+                          ng-hide="editMode || isUnsaved">
+                        
+                    </span>-->
+                </div>
+            <!--</div>-->
+            
+        </div>
+    </div>
+</div>

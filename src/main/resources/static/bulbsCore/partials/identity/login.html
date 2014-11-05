@@ -1,0 +1,71 @@
+<!-- 
+ Login and Signup Snippet
+-->
+<div class="bg">
+    <img class="front-image" src="assets/bg_sun.jpg" style="">
+</div>
+
+<div class="container loginContainer">
+    
+    <div id="loginOrSignupHeader" class="loginHeader jumbotron" style="">
+        <h1>Bulbs|<small> Core</small></h1>
+    </div>
+        
+    <div class="space5"></div>
+    
+    <form role="form" id="loginForm" name="loginForm" class="form-login animate-show" ng-show="!isSignup" novalidate>
+        <div class="min-height5">
+            <div ng-show="authenticationError != '' " class="alert alert-danger space2"><strong>{{authenticationError}}</strong></div>
+        </div>
+        
+        <div class="text-right form-login-top ">
+            <a href="" ng-click="modeSignup(true)">Signup</a>
+        </div>
+        
+        <div class="input-group">
+            <input ng-model="user.email" type="email" name="email" class="form-control" placeholder="Mail" required tabindex="1">
+        </div>
+        <div class="input-group">
+            <input ng-model="user.password" type="password" name="password" class="form-control " placeholder="Password" required tabindex="1">
+        </div>
+        
+        <button ng-click="signIn(user)"
+                type="submit" class="btn btn-primary btn-lg  btn-block" tabindex="3">Login</button>
+
+    </form>
+
+    <form id="signup_form" name="signup_form" class="form-login animate-show" ng-show="isSignup" novalidate>
+        
+        <div class="min-height5">
+            <div ng-show="signUpError!= '' " class="alert alert-danger space2">
+                SignUp <strong>failed</strong>: {{signUpError}}
+            </div>
+        </div>
+        
+        <div class="text-right form-login-top ">
+            <a href="" ng-click="modeSignup(false)">Login</a>
+        </div>
+        
+        <div class="input-group">
+            <input ng-model="user.nickname" type="text" class="form-control" placeholder="Nick" required>
+        </div>
+        <div class="input-group">
+            <input ng-model="user.email" type="email" class="form-control" placeholder="E-Mail" required>
+        </div>
+        <div class="input-group">
+            <input ng-model="user.password" type="password" name="password" class="form-control " placeholder="Password" required="" signupformpasswordrepitition>
+        </div>
+        <div class="input-group">
+            <input name="password_rep" ng-model="user.passwordRep" type="password" class="form-control " placeholder="Password Repetition" signupformpasswordrepitition="">
+            <span ng-show="signup_form.password_rep.$error.signupformpasswordrepitition">
+                <small>Pw Repitition doesn't match!</small>
+            </span>
+        </div>
+        
+        <button ng-click="signUp(user)" ng-disabled="signup_form.$invalid || isUnchanged(user)"
+                type="button" class="btn btn-primary btn-lg  btn-block">Signup</button>
+
+        <span class="error">{{authenticationError}}</span>
+        
+    </form>
+</div>

@@ -1,0 +1,286 @@
+<!-- Bulbs - View -->
+<ng-include src="'/bulbsCore/partials/global/navbar.html'"></ng-include>
+
+<!-- Sidebar Tools - Menu ////////////////////////////////////////////////// -->
+<div class="content-header container">
+    <div class="row">
+        <div class="col-xs-4">
+            <div class="btn-toolbar">
+                <div class="btn-group btn-group-radio ">
+                    <button ng-click="viewmode='groupControls'" type="button"
+                            class="btn btn-default"
+                            ng-class="{active : viewmode==='groupControls'}"
+                            title="Control mode">
+                        <b><span class="glyphicon glyphicon-th"></span></b>
+                    </button>
+                    <button ng-click="viewmode='groupContents'" type="button"
+                            class="btn btn-default"
+                            ng-class="{active : viewmode==='groupContents'}"
+                            title="Edit mode">
+                        <b><span class="glyphicon glyphicon-edit"></span></b>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-4">
+        </div>
+        <div class="col-xs-4">
+            <div class="btn-toolbar pull-right">
+<!--                <div class="btn-group">
+                    <button ng-click="reloadBulbs()" type="button" class="btn btn-default btn-block" >
+                        <b><span class="glyphicon glyphicon-refresh"></span></b>
+                    </button>
+                </div>-->
+                <div class="btn-group">
+                    <button ng-click="newGroup()" type="button" class="btn btn-default btn-block" >
+                        <b><span class="glyphicon glyphicon-plus"></span></b> New Group
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="vertical-line" ></div>
+
+
+<!-- Sidebar Tools - Menu ////////////////////////////////////////////////// -->
+<div class="pull-left sidebar" >
+    <div class='navbar'>
+        <div class="" >
+            <span class='sidebar-collapse collapse pull-left '><h5>Tools</h5></span>
+            <button type="button" class="btn pull-right btn-toolbar" data-toggle="collapse" data-target=".sidebar-collapse">
+                <span class="glyphicon glyphicon-tasks"></span>
+            </button>
+        </div>
+        <div class="container navbar-default">
+            <div class="pull-left">
+                <ul class="nav nav-pills nav-stacked sidebar-collapse collapse">
+                    <li>
+                        <div class="clearfix">
+                        <input class="pull-left" type="checkbox"
+                                   ng-model="group_opts.continuousTrigger"
+                                   />
+                        <span class="pull-right">Continuous Trigger</span>
+                        </div>
+                    </li>
+                    <li class='nav-divider'></li>
+                    <li>
+                        <div class="clearfix">
+                        <input class="pull-left" type="radio"
+                                   ng-model="viewmode"
+                                   value="groupContents"
+                                   />
+                        <span class="pull-right">Group Contents</span>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="clearfix">
+                        <input class="pull-left" type="radio"
+                                   ng-model="viewmode"
+                                   value="groupControls"
+                                   />
+                        <span class="pull-right">Group Controls</span>
+                        </div>
+                    </li>
+                    <li class='nav-divider'></li>
+<!--                    <li>
+                        <div class=" input-group input-group-sm">
+                            <input class="form-control input-sm" placeholder="Filter bulbs" ng-model="query">
+                        </div>
+                    </li>
+                    <li>
+                        <div class="clearfix">
+                            <div class='pull-left'><small>Sort</small></div>
+                            <select class="pull-right" ng-model="orderProp">
+                                <option value="name">Alphabetical</option>
+                                <option value="location">Location</option>
+                            </select>
+                        </div>
+                    </li>
+                    <li class='nav-divider'></li>
+                    <li ><a href="#">Itm 4</a></li>-->
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container main-content" style="overflow:auto;">
+    <div class="row " >
+        <div  ng-repeat="g in groups | filter:globalOptions.searchQuery" class="animate-data ">
+            <div class="panel-single-bulb col-lg-3 col-md-4 col-sm-6 col-xs-6">
+                <div class="panel panel-info panel-info-entity ">
+                    <div class="panel-heading container">
+                        <h2 class="panel-title pull-left"
+                                ng-show='!groupsUnsaved[g.groupId]["isEditName"]'
+                                ng-click="switchEditOn('name', g )">
+                            <span class="icon icon-group pull-left"></span>
+                            <a href='' title="Modify Name">{{g.name}}</a>
+                        </h2>
+                        <form role="form"  class="animate-show"
+                              name="groupMod_Name_$index"
+                              ng-show='groupsUnsaved[g.groupId].isEditName'
+                              ng-submit="save('name', g)"
+                              novalidate >
+                            <div class="input-group input-group-sm">
+                                <input ng-model='groupsUnsaved[g.groupId].name' type="text"
+                                       class='form-control'
+                                       placeholder="Enter Group Name"
+                                       required />
+                                       <!--name='group_mod_name_'-->
+                                <span class="input-group-btn">
+                                    <button ng-click="save('name', g)"
+                                            ng-disabled="groupMod_Name_$index.$invalid || isUnchanged($scope.groupsUnsaved[g.groupId])"
+                                            type="button" class="btn btn-success">
+                                        Save
+                                    </button>
+                                    <a href="" class="btn" ng-click="cancelEdit('name', g)" >Cancel</a>
+                                </span>
+                            </div>
+                        </form>
+                        <div ng-show="groupsUnsaved[g.groupId].serverError" class="alert alert-danger">
+                            {{groupsUnsaved[g.groupId].serverError}}
+                        </div>
+                    </div>
+                    <div class="panel-body animate-show"
+                         ng-show="viewmode === 'groupContents'" >
+                        <div ng-repeat="b in groupsUnsaved[g.groupId].bulbs | filter:query" class="animate-data"
+                             ng-show="groupsUnsaved[g.groupId].isEditBulbIds" >
+                            <div class="panel-group-item btn"
+                                 ng-style="groupItemStyle(b)">
+                                <span class="icon icon-light-bulb pull-left"></span>
+                                <span >{{b.name}}</span>
+                                <button ng-click="removeBulbFromGroup(g, b.bulbId)"
+                                        ng-disabled="isUnchanged($scope.groupsUnsaved[g.groupId])"
+                                        type="button" class="btn btn-xs btn-danger">
+                                    <span class="glyphicon glyphicon-remove"></span>
+                                </button>
+                            </div>
+                        </div>
+                        <div ng-repeat="b in g.bulbs" class="animate-data "
+                             ng-show="!groupsUnsaved[g.groupId].isEditBulbIds"
+                        >
+                            <div class="panel-group-item btn"
+                                 ng-style="groupItemStyle(b)"
+                                 ng-click="switchEditOn('bulbIds', g)">
+                                <span class="icon icon-light-bulb pull-left"></span>
+                                <span >{{b.name}}</span>
+                            </div>
+                        </div>
+                                <!--ng-show="groupsUnsaved[g.groupId].isEditbulbIds" >-->
+                        <div class="group-item-selector animate-show"
+                             ng-show="groupsUnsaved[g.groupId].isEditBulbIds" >
+                                    <!--ng-options="bo.name for bo in usersBulbs | filterUsedBulbs(bo, groupsUnsaved[g.groupId])"-->
+                            <select ng-model="groupsUnsaved[g.groupId].currBulb" class="form-control" style="max-width: 100%"
+                                    ng-options="bo.name for bo in groupsAvailableBulbs[g.groupId]"
+                                    ng-change="handleBulbSelectionChange(g)"
+                                    ng-disabled="groupsAvailableBulbs[g.groupId].length == 0"
+                            >
+                                <option ng-show="groupsAvailableBulbs[g.groupId].length !== 0" value="">
+                                    {{groupsAvailableBulbs[g.groupId].length != 0 ? '-- Add a bulb-- ' : '-- No more bulbs --'}}
+                                </option>
+                                    <!----Add a Bulb---->
+                                <!--<option ng-show="groupsAvailableBulbs[g.groupId].length == 0" value="">--No more bulbs available--</option>-->
+                                <!--<option ng-value="bo" ng-repeat="bo in usersBulbs">{{bo.name}}</option>-->
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="panel-body animate-show"
+                         ng-show="viewmode === 'groupControls' " >
+                        <div class="">
+                            <div class="clearfix"
+                                color-selector-circle
+                                new-color-selected="modifyGroupColor(colorValue, entity)"
+                                widget-id="colorChooserID_{{$index}}"
+                                entity="g"
+                                init-color="initColorFor(g)"
+                                continuous-trigger="group_opts.continuousTrigger">
+                            </div>
+                        </div>
+                        <div class="input-group-btn align-right">
+                            <span>
+                                <button type="button"
+                                        ng-click="switchEnabledState(g)"
+                                        class="btn btn-xs btn-default" title="Switch group members off">
+                                    <span class="glyphicon glyphicon-off"></span>
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="panel-footer">
+                        <!-- Control UI-Elements -->
+                        <div class=" input-group input-group-xs "
+                             ng-show="!groupsUnsaved[g.groupId].isEditBulbIds && viewmode === 'groupContents'"
+                             style="">
+                            <span class="input-group-btn pull-left" >
+                                <button ng-click="toggleModal_deleteGroup(g)"
+                                        type="button "
+                                        class="btn btn-danger btn-xs " title="Delete this group"
+                                        ng-disabled="groupsUnsaved[g.groupId].isUnsaved"
+                                        >
+                                    <span class="glyphicon glyphicon-trash"></span>
+                                </button>
+                            </span>
+                            <span class="input-group-btn ">
+                                <button ng-disabled="groupsUnsaved[g.groupId].isUnsaved"
+                                        type="button" title="Switch to edit mode"
+                                        class="btn btn-xs"
+                                        ng-click="switchEditOn('bulbIds', g)">
+                                    <span class="glyphicon glyphicon-edit"></span>
+                                </button>
+                            </span>
+                        </div>
+                        <div ng-show="groupsUnsaved[g.groupId].isUnsaved && groupsUnsaved[g.groupId].isEditBulbIds && viewmode === 'groupContents' "
+                             class="input-group-sm ">
+                            <span class="input-group-btn align-right">
+                                <a href="" class="btn" ng-click="cancelEdit('bulbIds', g)" >Cancel</a>
+                                <button ng-click="save('bulbIds', g)"
+                                        ng-disabled="isUnchanged($scope.groupsUnsaved[g.groupId])"
+                                        type="button" class="btn btn-success">
+                                    Save
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> <!-- END GROUP Entity -->
+        <br/>
+    </div><!-- END ROW -->
+    <!-- DELETE GROUP - Confirm Modal Dialog -->
+    <div id="delete-group-modal"
+         ng-show="is_modalDeleteGroup_open"
+         ng-class="{hide: !is_modalDeleteGroup_open, show: is_modalDeleteGroup_open}"
+         class="panel panel-danger modal-dialog blbs-model-dialog animate-show">
+        <div class="panel-heading ">
+            <a class="close" data-dismiss="modal" ng-click="is_modalDeleteGroup_open(g)">×</a>
+            <h3><span class="glyphicon glyphicon-trash"></span> Delete Group</h3>
+        </div>
+        <div class="modal-body">
+            <!--<h4>Text in a modal</h4>-->
+            <h3><strong>WARNING</strong> </h3>
+            <p>The Group <strong>{{group2DelSelected.name}}</strong> will be irreversibly deleted!</p>
+        </div>
+        <div class="modal-footer">
+            <div class="row">
+                <div class="col-md-7 text-left ">
+                    <div class="">
+                        <div ng-show="groupsUnsaved[g.groupId].serverError != null " class="alert alert-danger">
+                            <h4>Server error occurred: </h4>
+                            <p>{{groupsUnsaved[group2DelSelected.groupId].serverError}}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-5 text-left ">
+                    <a href="" class="btn" ng-click="toggleModal_deleteGroup(group2DelSelected)" >Close</a>
+                    <button ng-click="deleteGroup(group2DelSelected)" type="button" class="btn btn-danger ">
+                        DELETE It!
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div ng-class="{hide: !is_modalDeleteGroup_open, show: is_modalDeleteGroup_open}" class="blbs-model-dialog-backdrop hide animate-show"></div>
+</div>

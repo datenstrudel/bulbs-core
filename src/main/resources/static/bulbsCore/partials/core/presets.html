@@ -1,0 +1,105 @@
+<!-- Presets - View -->
+<ng-include src="'/bulbsCore/partials/global/navbar.html'"></ng-include>
+
+<!-- Head Tools - Menu ////////////////////////////////////////////////// -->
+<div class="content-header container">
+    <div class="row">
+        <div class="col-xs-8">
+            <div class="btn-toolbar">
+            </div>
+        </div>
+        <div class="col-xs-4">
+            <div class="btn-toolbar pull-right">
+                <div class="btn-group">
+                    <button ng-click="newPreset()" type="button" class="btn btn-default btn-block" title="Refresh Bulbs">
+                        <b><span class="glyphicon glyphicon-plus"></span></b> New Preset
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="vertical-line" ></div>
+
+
+<!-- Sidebar Tools - Menu ////////////////////////////////////////////////// -->
+<div class="pull-left sidebar">
+    <div class='navbar'>
+        <div class="" >
+            <span class='sidebar-collapse collapse pull-left '><h5>Tools</h5></span>
+            <button type="button" class="btn pull-right btn-toolbar" data-toggle="collapse" data-target=".sidebar-collapse">
+                <span class="glyphicon glyphicon-tasks"></span>
+            </button>
+        </div>
+        <div class="container navbar-default">
+            <div class="pull-left">
+                <ul class="nav nav-pills nav-stacked sidebar-collapse collapse">
+                    <li>
+                        <div class="clearfix">
+                        <input class="pull-left" type="checkbox" 
+                                ng-model="toolsOptions.applyStatesOnMod" />
+                        <span class="pull-right">Apply State changes</span>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="clearfix">
+                        <input class="pull-left" type="checkbox"
+                               ng-model="toolsOptions.continuousTrigger" 
+                               ng-disabled="!toolsOptions.applyStatesOnMod"
+                               />
+                        <span class="pull-right">Continuous Trigger</span>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="clearfix">
+                            <input class="pull-left" type="checkbox"
+                                   ng-model="presetsOptions.orderReverse"
+                                    />
+                            <span class="pull-right">Reverse Order</span>
+                        </div>
+                    </li>
+<!--                    <li class='nav-divider'></li>
+                    <li>
+                        <div class="clearfix">
+                        <input class="pull-left" type="radio" 
+                                   ng-model="viewmode" 
+                                   value="groupContents"
+                                   />
+                        <span class="pull-right">Group Contents</span>
+                        </div>
+                    </li>-->
+                    <li class='nav-divider'></li>
+<!--                    <li>
+                        <div class=" input-group input-group-sm">
+                            <input class="form-control input-sm" placeholder="Filter bulbs" ng-model="query">
+                        </div>
+                    </li>
+                    <li>
+                        <div class="clearfix">
+                            <div class='pull-left'><small>Sort</small></div>
+                            <select class="pull-right" ng-model="orderProp">
+                                <option value="name">Alphabetical</option>
+                                <option value="location">Location</option>
+                            </select>
+                        </div>
+                    </li>
+                    <li class='nav-divider'></li>
+                    <li ><a href="#">Itm 4</a></li>-->
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CONTENT ////////////////////////////////////////////////////////////////-->
+<div class="container-fluid main-content " style="overflow:auto;">
+    <div class="row">
+        <div  ng-repeat="p in presets | filter:globalOptions.searchQuery | orderBy:presetsOptions.orderByExp:presetsOptions.orderReverse"
+              class="animate-show animate-data">
+            <bulb-preset preset="p"
+                         apply-state-immediately="toolsOptions.applyStatesOnMod"
+                         continuous-trigger="toolsOptions.continuousTrigger"
+            />
+        </div>
+    </div>
+</div>

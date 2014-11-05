@@ -1,0 +1,27 @@
+
+
+.form-login{
+    max-width: 300px;
+    margin: 0 auto;
+}
+.form-login input[type="text"]{
+margin-bottom: -1px;
+border-bottom-left-radius: 0;
+border-bottom-right-radius: 0;
+}
+.form-login-top{
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+.form-login .input-group{
+    margin-top: 10px;
+    margin-bottom: 10px;
+    width: 100%;
+}
+input.ng-invalid.ng-dirty {
+    border: 2px solid red;
+    border-radius: calc;
+}
+input.ng-valid.ng-dirty {
+    /*border-color: green;*/
+}

@@ -1,0 +1,179 @@
+<!-- Bulbs - View -->
+<ng-include src="'/bulbsCore/partials/global/navbar.html'"></ng-include>
+
+<!-- Sidebar Tools - Menu ////////////////////////////////////////////////// -->
+<div class="content-header container">
+    <div class="row">
+        <div class="col-xs-12 " ng-show="bridges == null || bridges.length">
+            <div class="btn-toolbar pull-right">
+                <div class="btn-group">
+                    <button ng-click="reloadBulbs()" type="button" class="btn btn-default btn-block" >
+                        <b><span class="glyphicon glyphicon-refresh"></span></b>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="vertical-line" ></div>
+
+
+<!-- Sidebar Tools - Menu ////////////////////////////////////////////////// -->
+<div class="pull-left sidebar" >
+    <div class='navbar'>
+        <div class="" >
+            <span class='sidebar-collapse collapse pull-left '><h5>Tools</h5></span>
+            <button type="button" class="btn pull-right btn-toolbar" data-toggle="collapse" data-target=".sidebar-collapse">
+                <span class="glyphicon glyphicon-tasks"></span>
+            </button>
+        </div>
+        <div class="container navbar-default">
+            <div class="pull-left">
+                <ul class="nav nav-pills nav-stacked sidebar-collapse collapse">
+                    <li>
+                        <div class="clearfix">
+                        <input class="pull-left" type="checkbox" 
+                                   ng-model="bulbs_opts.continuousTrigger" 
+                                   />
+                        <span class="pull-right">Continuous Trigger</span>
+                        </div>
+                    </li>
+                    <li class='nav-divider'></li>
+                    <li>
+                        <div class="input-group input-group-sm">
+                            <input class="form-control input-sm" placeholder="Filter bulbs" ng-model="query">
+                        </div>
+                    </li>
+                    <li>
+                        <div class="clearfix">
+                            <div class='pull-left'><small>Sort</small></div>
+                            <select class="pull-right" ng-model="sortPredicateBulb">
+<!--                                 <option value="name">Alphabetical</option>
+                                <option value="location">Location</option>-->
+<!--                                        ng-change="sortPredicateBulb = 'state.color.brightness' "
+                                        ng-change="sortPredicateBulb = 'name' " -->
+                                <option 
+                                        value="name"
+                                        >Alphabetical</option>
+                                <option 
+                                        value="state.color.brightness"
+                                        >Brightness</option>
+                            </select>
+                        </div>
+                    </li>
+                    <li class='nav-divider'></li>
+                    <li ><a href="#">Itm 4</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+    
+<div class="container main-content" style="overflow:auto;">
+    <div class="row" >
+        <div  ng-repeat="b in bulbs | filter:globalOptions.searchQuery | orderBy: sortPredicateBulb " class="animate-data ">
+            <div class="panel-single-bulb col-lg-3 col-md-4 col-sm-6 col-xs-6 animate-data" >
+                <div class="panel panel-info panel-info-entity ">
+                    <div class="panel-heading container ">
+                        <h2 ng-show='!bulbs_mod[b.bulbId].edit["name"]'
+                            class="panel-title pull-left " 
+                            ng-click="switchEditOn('name', b.bulbId)">
+                            <span class="icon icon-light-bulb pull-left"></span>
+                            <a href='' title="Modify Name">{{b.name}}</a>
+                        </h2>
+                        <button type="button" 
+                                ng-show='!bulbs_mod[b.bulbId].edit["name"]'
+                                ng-click="switchBulbOnOff(b)" 
+                                ng-class="{ 'active' : b.state.enabled,  'pending' : b.state.pending, 'inactive' : !b.state.enabled} " 
+                                class="btn-power btn btn-sm pull-right" title="Power">
+                                <span class="glyphicon glyphicon-off"></span>
+                        </button>
+                        <form class="animate-show"  role="form"
+                              name="bulbs_mod_name_$index" 
+                              ng-show='bulbs_mod[b.bulbId].edit["name"]'
+                              ng-submit="saveEdited('name', b.bulbId)" novalidate>
+                            <div class="input-group input-group-sm">
+                                <input ng-model='bulbs_mod[b.bulbId].name' type="text"
+                                       name='name' class='form-control' placeholder="Bulb Name"required />
+                                <span class="input-group-btn">
+                                    <button ng-click="saveEdited('name', b.bulbId)" 
+                                            ng-disabled="bulbs_mod_name_$index.$invalid || isUnchanged(bulbs_mod[b.bulbId])"
+                                            type="button" class="btn btn-success">
+                                        Save
+                                    </button>
+                                    <a href="" class="btn" ng-click="switchEditOff('name', b.bulbId)" >Cancel</a>  
+                                </span>
+                            </div>
+                        </form>
+                        <div ng-show="bulbs_mod[b.bulbId].edit.serverError" class="alert alert-danger">
+                            {{bulbs_mod[b.bulbId].edit.serverError}}
+                        </div>
+                    </div>
+                    <div class="panel-body ">
+                        <div class="animate-show" ng-show="!bulbs_mod[b.bulbId].edit.details">
+<!--                            <div color-selector-hue-circle-bulb new-color-selected="modifyBulbColor(colorValue, bulb)" 
+                                 widget-id="colorChooserID_{{b.bulbId.localId}}" 
+                                 bulb="b"
+                                 continuous-trigger="{{bulbs_opts.continuousTrigger}}"
+                                 class="clearfix" >
+                            </div>-->
+                            <div color-selector-circle-hsb 
+                                 new-color-selected="modifyBulbColor(colorValue, bulb)" 
+                                 widget-id="colorChooserID_{{b.bulbId}}"
+                                 bulb="b"
+                                 continuous-trigger="{{bulbs_opts.continuousTrigger}}"
+                                 class="clearfix" >
+                            </div>
+                        </div>
+                        <div class="clearfix animate-show" ng-show="bulbs_mod[b.bulbId].edit.details">
+                            <table class="object-attribute-numeration object-attribute-numeration-bulb">
+                                <tr>
+                                    <th></th>
+                                    <td><span class="label" 
+                                              ng-class="{'label-success' : b.online, 'label-danger' : !b.online}">
+                                            {{b.online | commonOnline}}
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>ID</th>
+                                    <td><span><small>{{b.bulbId}} </small> &nbsp;</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Bridge</th>
+                                    <td><span class="label" 
+                                              ng-class="{'label-success' : b.bridge.online, 'label-danger' : !b.bridge.online}">
+                                            {{b.bridge.name}}
+                                        </span> 
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Color</th>
+                                    <td>{{b.state.color | bulbColor_Textual_HSL}}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="pull-right ">
+                            <button ng-click="switchEdit('details', b.bulbId)" type="button "class="btn btn-xs" title="Show Details">
+                                <span class="glyphicon glyphicon-edit"></span></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+<!--        <div class="col-md-6">
+             Body content 
+            <ul class="phones">
+                <li ng-repeat="b in bulbs | filter:query | orderBy:orderProp" class="thumbnail">
+                    <div class="thumb" style="border:1px solid blue; height:100%"></div>
+                    <a href="#/core/bulbs/{{b.bulbId}}" >{{b.name}}</a>
+                    <div>{{b.location}}</div>
+                    <div>Online: {{b.online | bulbOnline}}</div>
+                    <div>Online: {{b.online | bulbOnline2}}</div>
+                    <div>BulbId: {{b.bulbId}}</div>
+                </li>
+            </ul>
+        </div>-->
+    </div>
+</div>

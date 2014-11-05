@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="bulbs_core"  >
+    <head>
+        <title>Bulbs|_Core</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <link rel="stylesheet" href="bulbsCore/css/bulbs-core-styles.css">
+
+        <script src="bulbsCore/js/lib/jquery-2.0.2.min.js"></script>
+        <!-- TODO: Move into minification! -->
+        <script src="bulbsCore/js/lib/bootstrap-tab.min.js"></script>
+
+        <script src="bulbsCore/js/bulbs-core-webApp.min.js"></script>
+
+    </head>
+    <body>
+        <div ng-view class="mainContentWrapper"></div>
+        <div class="footer">
+            <div ng-show="$root.reconnectMessage !== '' " id="reconnectIndocator" class="">
+                 {{$root.reconnectMessage}}
+            </div>
+            <div ng-show="$root.requestCount > 0" class="globalLoadIndicator">
+                <!--<span class="glyphicon glyphicon-transfer"></span>-->
+                <div class="spinner">
+                    <div class="bounce1"></div>
+                    <div class="bounce2"></div>
+                    <div class="bounce3"></div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

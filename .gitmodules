@@ -1,0 +1,18 @@
+[submodule "puppet-manifests/modules/mongodb"]
+	path = puppet-manifests/modules/mongodb
+	url = https://github.com/puppetlabs/puppetlabs-mongodb.git
+[submodule "puppet-manifests/modules/stdlib"]
+	path = puppet-manifests/modules/stdlib
+	url = https://github.com/puppetlabs/puppetlabs-stdlib
+[submodule "puppet-manifests/modules/apt"]
+	path = puppet-manifests/modules/apt
+	url = https://github.com/puppetlabs/puppetlabs-apt
+[submodule "puppet-manifests/modules/rabbitmq"]
+	path = puppet-manifests/modules/rabbitmq
+	url = https://github.com/puppetlabs/puppetlabs-rabbitmq
+[submodule "puppet-manifests/modules/erlang"]
+	path = puppet-manifests/modules/erlang
+	url = https://github.com/garethr/garethr-erlang
+[submodule "puppet-manifests/modules/staging"]
+	path = puppet-manifests/modules/staging
+	url = https://github.com/nanliu/puppet-staging

@@ -1,0 +1,240 @@
+<!-- Bridges - View -->
+<ng-include src="'/bulbsCore/partials/global/navbar.html'"></ng-include>
+<div class="content-header container ">
+    <div class=" row">
+        <div class="col-xs-12">
+            <div class="btn-toolbar">
+                <div class="btn-toolbar pull-right" ng-show="bridges == null || bridges.length">
+                    <div class="btn-group">
+                        <button ng-click="reloadBridges()" type="button" class="btn btn-default btn-block" >
+                            <b><span class="glyphicon glyphicon-refresh"></span></b>
+                        </button>
+                    </div>
+                    <div class="btn-group">
+                        <button ng-click="toggleModal_newBridge()" type="button" class="btn btn-default btn-block" >
+                            <b><span class="glyphicon glyphicon-plus"></span></b> New Bridge
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="vertical-line"></div>
+
+<div class="container main-content">
+    <!-- BRIDGES -->
+    <div ng-hide="bridges == null || bridges.length" class="jumbotron">
+        <p> In order to be able to control your BULBs create a link to the Bridge, e.g. bulb gateway element first. </p>
+        <div class="">
+            <button ng-click="toggleModal_newBridge()" type="button" class="btn btn-lg btn-primary" >
+                <b><span class="glyphicon glyphicon-plus"></span></b> Create a new Bridge now!
+            </button>
+        </div>
+    </div>
+    <div class="row">
+        <div ng-repeat="br in bridges" class="animate-data" >
+            <div class="col-md-5 " >
+                <div class="panel panel-info panel-info-entity">
+                    <div class="panel-heading">
+                        <h2 ng-show='!bridges_mod[br.bridgeId].edit.name' 
+                            class="panel-title" 
+                            ng-click="switchEditOn('name', br)">
+                                <span class="icon icon-bridge pull-left"></span>
+                                <a href='' title="Modify Name">{{br.name}}</a>
+                        </h2>
+                        <form class="animate-show" name="bridge_mod_name_$index" role="form" ng-show='bridges_mod[br.bridgeId].edit.name' ng-submit="saveEdited('name', bridges_mod[br.bridgeId])" novalidate>
+                            <div class="input-group input-group-sm">
+                                <input ng-model='bridges_mod[br.bridgeId].name' type="text" name='name' class='form-control' placeholder="Bridge Name" required />
+                                <span class="input-group-btn">
+                                    <button ng-click="saveEdited('name', bridges_mod[br.bridgeId])" ng-disabled="bridge_mod_name_$index.$invalid || isUnchanged(bridges_mod[br.bridgeId])"
+                                            type="button" class="btn  btn-success">
+                                        Save
+                                    </button>
+                                    <a href="" class="btn " ng-click="switchEditOff('name', br)" >Cancel</a>  
+                                </span>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="panel-body">
+                        <table class="object-attribute-numeration">
+                            <tr>
+                                <th>Status</th>
+                                <td colspan="2">
+                                    <span class="label" ng-class="{'label-success' : bridges[$index].online, 'label-danger' : !bridges[$index].online}">{{br.online | commonOnline}}</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Bulbs Connected</th>
+                                <td>
+                                    <span class="badge badge-bulb">{{br.countBulbs}}</span>
+                                </td>
+                                <td class="pull-right">
+                                    <button type="button" 
+                                        ng-show='!bulbs_mod[br.bridge.bridgeId][b.bulbId].edit["name"]'
+                                        ng-click="performBulbSearch(br)" 
+                                        class="btn btn-xs btn-warning pull-right" title="Search for new bulbs">
+                                        <span class="glyphicon glyphicon-search"></span>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Platform</th>
+                                <td colspan="2">
+                                    <span class="label label-default" >{{br.platform}}</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Address</th>
+                                <td colspan="2">
+                                    <a href='' ng-show="!bridges_mod[br.bridgeId].edit.localAddress" ng-click="switchEditOn('localAddress', br)" title="Change bridge's address">{{br.localAddress.host}}<b> : </b>{{br.localAddress.port}}</a>
+                                    <div style="display: table;">
+                                        <form class="animate-show" name="bridge_mod_localAddress_$index" role="form" ng-show='bridges_mod[br.bridgeId].edit.localAddress' ng-submit="saveEdited('localAddress', bridges_mod[br.bridgeId])" novalidate>
+                                            <div class="input-group input-group-sm">
+                                                <label for="host">Host</label>
+                                                <input class="form-control" ng-model='bridges_mod[br.bridgeId].localAddress.host' type="text" name='localAddress.host' required placeholder="Host"/>
+                                            </div>
+                                            <div class="input-group input-group-sm ">
+                                                <label for="port">Port</label>
+                                                <input class="form-control" ng-model='bridges_mod[br.bridgeId].localAddress.port' type="number" name='localAddress.port' maxlength="6" size="5" required integer placeholder="Port" />
+                                            </div>
+                                            <div class="input-group pull-right">
+                                                <span class="input-group-btn">
+                                                    <button ng-click="saveEdited('localAddress', bridges_mod[br.bridgeId])" ng-disabled="bridge_mod_localAddress_$index.$invalid || isUnchanged(bridges_mod[br.bridgeId])" type="button" class="btn btn-sm btn-success">
+                                                        Save
+                                                    </button>
+                                                    <a href="" class="btn btn-sm" ng-click="switchEditOff('localAddress', br)">Cancel</a>
+                                                </span>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>MAC Address</th>
+                                <td colspan="2">
+                                    {{br.macAddress}}
+                                </td>
+                            </tr>
+                        </table>
+                        
+                        <div class="pull-right ">
+                                <!--ng-class="{ 'active' : b.state.enabled,  'pending' : b.state.pending, 'inactive' : !b.state.enabled} "--> 
+                            <button ng-click="toggleModal_deleteBridge(br)" type="button "class="btn btn-danger btn-xs" title="Delete this bridge">
+                                <span class="glyphicon glyphicon-trash"></span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class='panel-footer'>
+                        <div ng-show="bridges_mod[br.bridgeId].serverError != null " class="alert alert-danger ">
+                            <h4>An error occurred: </h4>
+                            <p>{{bridges_mod[br.bridgeId].serverError}}</p>
+                        </div>
+                        <div ng-show="bulbSearchInProgressForBridges[br.bridgeId]" class="alert alert-info animate-show ">
+                            <h4>Bulb discovery started</h4>
+                            <p>State will update after a minute or so..</p>
+                        </div>
+                        <div ng-show="bulbSearchFinishedForBridges[br.bridgeId]" class="alert alert-success alert-dismissable animate-show ">
+                            <button ng-click="hideBulbSearchFinished(br.bridgeId)" type="button" class="close" aria-hidden="true">&times;</button>
+                            <h4>Bulb discovery Finished</h4>
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- END BRIDGE -->
+        </div>
+<!--        <div class="col-md-4 content-side-control" ng-show="bridges == null || bridges.length">
+        </div>-->
+    </div>
+</div>
+
+<!-- NEW BRIDGE - Modal Dialog -->
+<div id="new-bridge-modal" ng-controller="NewBridgeCtrl" ng-show="is_modalNewBridge_open" ng-class="{hide: !is_modalNewBridge_open, show: is_modalNewBridge_open}" class="panel panel-primary modal-dialog blbs-model-dialog animate-show" style="">  
+    <div class="panel-heading ">  
+        <a class="close" data-dismiss="modal" ng-click="modal_newBridge_close()">×</a>  
+        <h3><span class="glyphicon glyphicon-plus"></span> Add new Bridge</h3>  
+    </div>  
+    <div class="modal-body">  
+        <!--<h4>Text in a modal</h4>-->  
+        <h4>Search the network for a Bridge with given parameters.</h4>   
+        <p>Note that usually the link button on the bridge must be pressed prior invocation of the search!</p>
+
+        <form id="new_bridge_form" name="new_bridge_form" role="form" novalidate>
+            <div class="input-group">
+                <label for="platform">Platform:</label>
+                <select ng-model="bridge_new.platform" name="platform" class="form-control"
+                        ng-disabled="newBridgeResult != ''"
+                        ><!-- Platforms according to type BulbsPlatform -->
+                    <option id="_EMULATED" value="_EMULATED">_EMULATED</option>
+                    <option id="PHILIPS_HUE" value="PHILIPS_HUE">PHILIPS_HUE</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label for="host">Host-Adress:</label>
+                <input ng-model="bridge_new.localAddress.host" type="text" id="host" name="host" class="form-control" placeholder="E.g. 192.168.1.42" required ng-disabled="newBridgeResult != ''"/>
+            </div>
+            <div class="input-group">
+                <label for="port" class="">Port:</label>
+                <input type="number" ng-model="bridge_new.localAddress.port" id="port" name="port" maxlength="6" size="4" class="form-control" placeholder="Eg. 1337" required integer ng-disabled="newBridgeResult != ''"/>
+            </div>
+        </form>
+    </div>  
+    <div class="modal-footer">  
+        <div class="row">
+            <div class="col-md-8 text-left ">
+                <div class="min-height5">
+                    <div ng-show="serverError != '' " class="alert alert-danger ">
+                        <h4>Server error occurred: </h4>
+                        <p>{{serverError}}</p>
+                    </div>
+                    <div ng-show="newBridgeResult != '' " class="alert alert-success ">
+                        <h4>Bridge successfully <strong>created</strong>! </h4>
+                        <p>Name: {{newBridgeResult.name}}</p>
+                        <p>Mac: {{newBridgeResult.macAddress}}</p>
+                        <p>Platform: {{newBridgeResult.platform}}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 text-left ">
+                <button ng-click="createBridge(bridge_new)" 
+                        ng-disabled="(newBridgeResult != '' && !new_bridge_form.$invalid && !isUnchanged(bridge_new) && !requestProcessing) 
+                                    || new_bridge_form.$invalid || isUnchanged(bridge_new) || requestProcessing "
+                        type="button" class="btn btn-success">
+                    Create
+                </button>
+                <a href="" class="btn" ng-click="modal_newBridge_close()" >Close</a>  
+            </div>
+        </div>
+    </div>  
+</div>  
+<div ng-class="{hide: !is_modalNewBridge_open, show: is_modalNewBridge_open}" class="blbs-model-dialog-backdrop hide animate-show"></div>
+<!-- DELETE BRIDGE - Confirm Modal Dialog -->
+<div id="delete-bridge-modal" ng-show="is_modalDeleteBridge_open" ng-class="{hide: !is_modalDeleteBridge_open, show: is_modalDeleteBridge_open}" class="panel panel-danger modal-dialog blbs-model-dialog animate-show" style="">  
+    <div class="panel-heading ">  
+        <a class="close" data-dismiss="modal" ng-click="toggleModal_deleteBridge(null)">×</a>  
+        <h3><span class="glyphicon glyphicon-trash"></span> Delete Bridge</h3>  
+    </div>  
+    <div class="modal-body">  
+        <!--<h4>Text in a modal</h4>-->  
+        <h3><strong>WARNING</strong> </h3>  
+        <p>The Bridge <strong>{{bridge2DelSelected.name}}</strong> with all its bulbs and associated entities will be irreversibly deleted!</p>
+    </div>  
+    <div class="modal-footer">  
+        <div class="row">
+            <div class="col-md-7 text-left ">
+                <div class="">
+                    <div ng-show="bridges_mod[bridge2DelSelected.bridgeId].serverError != null " class="alert alert-danger">
+                        <h4>Server error occurred: </h4>
+                        <p>{{bridges_mod[br.bridgeId].serverError}}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-5 text-left ">
+                <a href="" class="btn" ng-click="toggleModal_deleteBridge()" >Close</a>  
+                <button ng-click="deleteBridge(bridge2DelSelected)" type="button" class="btn btn-danger ">
+                    DELETE It!
+                </button>
+            </div>
+        </div>
+    </div>  
+</div>  
+<div ng-class="{hide: !is_modalDeleteBridge_open, show: is_modalDeleteBridge_open}" class="blbs-model-dialog-backdrop hide animate-show"></div>

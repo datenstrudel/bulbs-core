@@ -1,0 +1,99 @@
+<div class='navbar navbar-default' ng-controller="NavbarCtrl" >
+    <div class='container'>
+        <div class='navbar-header'>
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <span class='navbar-brand'>Bulbs|<small>Core</small></span>
+        </div>
+
+        <div class='navbar-collapse collapse'>
+            <ul class="nav navbar-nav" role="tablist">
+                <!--<li class="active dropdown">-->
+                <li ng-class="{ 'active' : navCategoryActive('/core')}">
+                    <!--<a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>-->
+                    <a ng-click="categoryActive.active='core'" href="">Core</a>
+                </li>
+                <li class="disabled" ng-class="{'active':navCategoryActive('/speech')}" > <!-- class="disabled" -->
+                    <a ng-click="categoryActive.active='speech'" href="">Speech</a>
+                </li>
+                <li class="disabled">
+                    <a href="">Sound</a>
+                </li>
+            </ul>
+
+
+            <!-- <div class='nav navbar-nav navbar-right'>
+                <div class='form-group'>
+                    <span>USER: {{currentUser.nickname}}</span>
+                </div>
+            </div>-->
+
+            <ul class='nav navbar-nav navbar-right '>
+                <li class="">
+                    <a href='/logout' title="Logout">
+                        <span class="glyphicon glyphicon-chevron-right"></span>
+                    </a>
+                </li>
+            </ul>
+            <ul class='nav navbar-nav navbar-right'>
+                <li class="" >
+                    <form class='navbar-form navbar-right' role='search'>
+                        <div class='form-group'>
+                            <input class='form-control' type='text' ng-model="globalOptions.searchQuery" placeholder='Search' />
+                        </div>
+                    </form>
+                </li>
+            </ul>
+            <ul class='nav navbar-nav navbar-right'><!-- Dummy to get it right: BS -> .navbar-nav.navbar-right:last-child --></ul>
+        </div>
+    </div>
+    <!-- navbar-static-top-->
+    <div class="navbar navbar-default navbar-sub"
+         data-spy="affix" bulbs-core-navbar-affix>
+        <div class="container container-navbar-sub ">
+            <div class="tab-content" >
+                <div class="tab-pane" ng-class="{ 'active' : categoryActive['active'] === 'core' }" >
+                    <ul class='nav navbar-nav navbar-nav-sub'>
+                        <li ng-class="{ 'active' : pageActive('/core/bulbs')}">
+                            <a href='#/core/bulbs'>
+                                <span class="icon icon-light-bulb" />
+                                Bulbs</a>
+                        </li>
+                        <li ng-class="{'active': pageActive('/core/groups')}">
+                            <a href='#/core/groups'>
+                                <span class="icon icon-group" />
+                                Groups</a>
+                        </li>
+                        <li ng-class="{'active': pageActive('/core/presets')}">
+                            <a href='#/core/presets'>
+                                <span class="icon icon-preset" />
+                                Presets</a>
+                        </li>
+                        <li ng-class="{'active':pageActive('/core/bridges')}">
+                            <a href='#/core/bridges'>
+                                <span class="icon icon-bridge" />
+                                Bridges</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="tab-pane"  ng-class="{ 'active' : categoryActive['active'] === 'speech' }">
+                    <ul class='nav navbar-nav navbar-nav-sub'>
+                        <li ng-class="{'active':pageActive('/speech/config')}">
+                            <a href='#/speech/config'>
+                                <span class="icon icon-light-bulb" />
+                                Speech config</a>
+                        </li>
+                        <li ng-class="{'active':pageActive('/speech/status')}">
+                            <a href='#/speech/status'>
+                                <span class="icon icon-light-bulb" />
+                                Speech config</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

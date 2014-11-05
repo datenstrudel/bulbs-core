@@ -1,0 +1,53 @@
+/* app css stylesheet */
+@font-face { font-family: 'Montserrat'; src: url('/bulbsCore/css/core/Montserrat-Regular.ttf'); }
+@font-face { font-family: 'Montserrat'; font-weight: bold; src: url('/bulbsCore/css/core/Montserrat-Bold.ttf');}
+@font-face { font-family: 'Electrolize'; src: url('/bulbsCore/css/core/Electrolize-Regular.ttf'); }
+
+/* Override Bootsrap's Glyphicons for paths working with minification */
+@font-face {
+    font-family: 'Glyphicons Halflings';
+    src: url('/bulbsCore/css/lib/bootstrap/fonts/glyphicons-halflings-regular.eot');
+    src: url('/bulbsCore/css/lib/bootstrap/fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'),
+    url('/bulbsCore/css/lib/bootstrap/fonts/glyphicons-halflings-regular.woff') format('woff'),
+    url('/bulbsCore/css/lib/bootstrap/fonts/glyphicons-halflings-regular.ttf') format('truetype'),
+    url('/bulbsCore/css/lib/bootstrap/fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg');
+}
+
+body {
+    /*padding-top: 20px;*/
+    background-color: #444444;
+    font-family: 'Electrolize', sans-serif;
+    color : #082028;
+}
+
+.errorHeader h1{
+    /*border-bottom: 0px solid rgba(0,0,0,0);*/
+    /*font-family: 'Ropa Sans', sans-serif;*/
+    font-family: 'Montserrat Alternates', sans-serif;
+    font-variant: small-caps;
+    font-size: 28px;
+    border: 1px solid #CCCCCC;
+    border-radius: 6px 6px 6px 6px;
+    font-weight: bold;
+    padding : 20px;
+    background : white;
+    margin: 0;
+
+    /*width: auto;*/
+}
+.errorHeader h1 small{
+    font-family: 'Electrolize', sans-serif;
+}
+.errorHeader{
+    width : 14em;
+    margin: 0 auto;
+    margin-top: 20px;
+    margin-bottom:  20px;
+}
+.errorHeader h1{
+    opacity:0.9;
+}
+p{
+    text-align: center;
+    color:#CCCCCC;
+}

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="bulbs_core"  >
+    <head>
+        <title>Bulbs|_Core </title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!--<link rel="stylesheet" href="css/lib/bootstrap/bootstrap-theme.css">-->
+        
+        <link rel="stylesheet" href="/bulbsCore/css/lib/bootstrap/bootstrap.css">
+        <link rel="stylesheet" href="/bulbsCore/css/lib/iconmoon/style.css">
+        <link rel="stylesheet" href="/bulbsCore/css/core/app.css">
+        <link rel="stylesheet" href="/bulbsCore/css/identity/login.css">
+        <!--<link rel="stylesheet" href="bulbsCore/css/bulbs-core-styles.min.css">-->
+
+        <script src="/bulbsCore/js/lib/jquery-2.0.2.min.js"></script>
+        <script src="/bulbsCore/js/lib/d3/d3.v3.js"></script>
+        <script src="/bulbsCore/js/lib/bootstrap.min.js"></script>
+        <script src="/bulbsCore/js/lib/bootstrap-modal.js"></script>
+        <!-- TODO: Move into minification! -->
+        <script src="/bulbsCore/js/lib/bootstrap-affix.min.js"></script>
+
+
+        <script src="/bulbsCore/js/lib/angular.js"></script>
+        <script src="/bulbsCore/js/lib/angular-resource.min.js"></script>
+        <script src="/bulbsCore/js/lib/angular-animate.min.js"></script>
+        <script src="/bulbsCore/js/lib/angular-route.min.js"></script>
+
+        <script src="/bulbsCore/js/lib/3rdparty/stomp/dist/stomp.min.js"></script>
+        <script src="/bulbsCore/js/lib/3rdparty/sockjs/sockjs.js"></script>
+
+        
+        <script src="/bulbsCore/js/appCore/utils/ColorConverter.js"></script>
+        <script src="/bulbsCore/js/appCore/widgets/ColorSelector_Circle.js"></script>
+        <script src="/bulbsCore/js/appCore/widgets/ColorSelector_Circle_Hsb.js"></script>
+        <script src="/bulbsCore/js/appCore/widgets/LinechartSelector.js"></script>
+        <script src="/bulbsCore/js/appCore/widgets/SliderBar.js"></script>
+        <script src="/bulbsCore/js/appCore/appCore.js"></script>
+        <script src="/bulbsCore/js/appCore/controllers.js"></script>
+        <script src="/bulbsCore/js/appCore/filters.js"></script>
+        <script src="/bulbsCore/js/appCore/services.js"></script>
+        <script src="/bulbsCore/js/appCore/directives.js"></script>
+
+        <!--<script src="bulbsCore/js/bulbs-core-webApp.min.js"></script>-->
+        
+        <!--<script src="js/lib/3rdparty/zoomooz/jquery.zoomooz.js"></script>--> 
+    </head>
+    <body>
+        
+<!--        <div class="zoomViewport">
+            <div class="zoomContainer" style="width:200px; height:60px; border:1px dotted yellow;">
+                <div class="zoomTarget" id="blub1" style="width:100px; height:50px; border:1px dashed red;">
+                    Target 1
+                </div>
+                <div class="zoomTarget">
+                    Target 2
+                </div>
+            </div>
+        </div>-->
+        <div ng-view class="mainContentWrapper"></div>
+        
+        <div class="footer">
+            <div ng-show="$root.reconnectMessage !== '' " id="reconnectIndocator" class="">
+                 {{$root.reconnectMessage}}
+            </div>
+            <div ng-show="$root.requestCount > 0" class="globalLoadIndicator">
+                <div class="spinner">
+                    <div class="bounce1"></div>
+                    <div class="bounce2"></div>
+                    <div class="bounce3"></div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
