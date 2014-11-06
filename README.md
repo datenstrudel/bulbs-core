@@ -13,10 +13,10 @@ Currently there is just an adapter implementation for _Philips Hue_. The _LIFX_ 
 This module is supposed to be deployable on __single-board computers__, capable of running a JVM like the [Raspberry Pi](http://www.raspberrypi.org/) or [Banana Pi](bananapi.org) in order 
     to provide a stateful, always-available, local control system with low energy consumption.
 
-It ships with a simple, browser based, API trialing user interface that is mainly based on [AngularJs](https://angularjs.org/) and [D3.js](http://http://d3js.org/).
+It ships with a simple, browser based, API trialing user interface that is mainly based on [AngularJs](https://angularjs.org/), [D3.js](http://http://d3js.org/) and [BootStrap](getbootstrap.com).
 
 ## Overview
-// TODO: Overview picture here! 
+<img width="1024" height="351" src="/doc/presentation/assets/bulbs_bigPic_dark_full.png" alt="Big Pic"/>
 
 ## Purpose
 
@@ -54,6 +54,8 @@ The API is still work in progress. So far some vital functionality has been impl
 After startup of the application, navigating to its root context in the browser will bring up the 
 web application, mentioned above..
 
+<img width="200" height="291" src="/doc/assets/bulbs_hc.png" alt="Big Pic"/>
+
 
 ### Technical
 
@@ -75,7 +77,7 @@ Just check it out and build it using `mvn clean install`
 
  * In order to build this project with all integration tests run `vagrant up`. ([Vagrant](https://www.vagrantup.com) required!)
         This will start a virtual machine, hosting required infrastructure modules, such as running instances of MongoDB and RabbitMq.
- * Run {mvn clean install}
+ * Run `mvn clean install`
  * Run the `Main` class that can be found in package `net.datenstrudel.bulbs.core.main`
  * Browse to `http://localhost:8084`
 
