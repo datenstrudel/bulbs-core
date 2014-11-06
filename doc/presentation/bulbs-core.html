@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>Bulbs|Core - Light Control</title>
+
+		<meta name="description" content="An API for unified domestic light control">
+		<meta name="author" content="Thomas Wendzinski">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<link rel="stylesheet" href="css/reveal.min.css">
+		<link rel="stylesheet" href="css/theme/moon.css" id="theme">
+
+		<!-- For syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- If the query includes 'print-pdf', include the PDF print sheet -->
+		<script>
+			if( window.location.search.match( /print-pdf/gi ) ) {
+				var link = document.createElement( 'link' );
+				link.rel = 'stylesheet';
+				link.type = 'text/css';
+				link.href = 'css/print/pdf.css';
+				document.getElementsByTagName( 'head' )[0].appendChild( link );
+			}
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+        <style>
+            .reveal section img.no-style{
+                border: none;
+                background: none;
+                box-shadow: none;
+            }
+        </style>
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+				<section>
+					<h1>Bulbs| Core</h1>
+					<h3>A Domestic Light Control API</h3>
+					<p>
+						<small>Thomas Wendzinski</small>
+					</p>
+				</section>
+
+				<!-- Example of nested vertical slides -->
+                <!--<section data-transition="none" >-->
+                <section data-transition="none">
+                    <h2>Where to start? Bulbs!</h2>
+                    <img class="no-style" src="assets/bulbs_bigPic__01.png" alt="Big Pic">
+                </section>
+                <section data-transition="none">
+                    <h2>Accessed by a Gateway</h2>
+                    <img class="no-style" src="assets/bulbs_bigPic__02.png" alt="Big Pic">
+                </section>
+                <section data-transition="none">
+                    <h3>Bulbs-Core is a SW adapter to abstract from vendor specific light control interfaces</h3>
+                    <img class="no-style" src="assets/bulbs_bigPic__03.png" alt="Big Pic">
+                </section>
+                <section data-transition="none">
+                    <h2>Communicates over LAN</h2>
+                    <img class="no-style" src="assets/bulbs_bigPic__04.png" alt="Big Pic">
+                </section>
+                <section data-transition="none">
+                    <h2>Provides some basic functionality</h2>
+                    <img class="no-style" src="assets/bulbs_bigPic__05.png" alt="Big Pic">
+                </section>
+                <section data-transition="none">
+                    <h2>Deployable on single-board computers</h2>
+                    <img class="no-style" src="assets/bulbs_bigPic__06.png" alt="Big Pic">
+                </section>
+                <section data-transition="none">
+                    <h3>Providing a vendor independent Restful API</h3>
+                    <img class="no-style" src="assets/bulbs_bigPic__07.png" alt="Big Pic">
+                </section>
+                <section data-transition="none">
+                    <h2>Ships with a helper module...</h2>
+                    <img class="no-style" src="assets/bulbs_bigPic__08.png" alt="Big Pic">
+                </section>
+                <section data-transition="none">
+                    <h2>...that can be used by Java Apps</h2>
+                    <img class="no-style" src="assets/bulbs_bigPic__09.png" alt="Big Pic">
+                </section>
+
+				<!--</section>-->
+				<section data-transition="slide" data-background-transition="slide">
+					<h2>(Architectual) Drivers</h2>
+                    <ul>
+                        <li>Vendor Independence</li>
+                        <li>Deferred, triggering app independent command execution</li>
+                        <li>Maintain States / Single source of truth</li>
+                        <li>Keep clients instantly up-to-date</li>
+                        <li class="fragment current-visible">Learning and fun</li>
+                    </ul>
+				</section>
+
+                <section>
+                    <section>
+                        <h1>Features</h1>
+                    </section>
+                    <section>
+                        <h2>Supported Vendors</h2>
+                        <uk>
+                            <li>Not many yet</li>
+                            <li class="fragment"> <a href="http://meethue.com">Philips Hue</a></li>
+                            <li class="fragment"> Following soon: <a href="http://lifx.co">LIFX</a></li>
+                        </uk>
+                    </section>
+                    <section>
+                        <h2>API</h2>
+                        <p>
+                            Intended to be <strong>used by ..</strong>
+                            <ul>
+                                <li>Web Apps</li>
+                                <li>Mobile Apps</li>
+                                <li>Desktop Apps</li>
+                                <li class="fragment current-visible">&Rightarrow; Micro Services</li>
+                            </ul>
+                        </p>
+                        <p>
+                            <b>End user:</b> Client service developer
+                        </p>
+                    </section>
+                    <section>
+                        <h2>API - Resources</h2>
+                        <p><ul>
+                            <li><strong><code>/core/**/actuation</code></strong> <small><code>**</code>&Rightarrow;<code>[bulbs | groups | presets]</code></small>
+                                    <br/><small>Supports common HTTP as well as HTTP-Websocket light control commands</small></li>
+                            <li><strong><code>/core/bridges</code></strong><br/><small>Denotes Hardware Gateway resources (e.g. for linking HW and B-Core)</small></li>
+                            <li><strong><code>/core/bulbs</code></strong><br/><small>Access bulbs</small></li>
+                            <li><strong><code>/core/groups</code></strong><br/><small>Group bulbs</small></li>
+                            <li><strong><code>/core/presets</code></strong><br/><small>Define, save and execute favorite light settings and transitions</small></li>
+                            <li><strong><code>/core/schedules</code></strong><br/><small>Define scheduled actuations of bulbs, groups, presets</small></li>
+                            <li><strong><code>/core/identity</code></strong><br/><small>Manage user settings, sign-in and registration</small></li>
+                        </ul></p>
+                    </section>
+                    <section>
+                        <h2>API - Actuation <small> - an example</small></h2>
+                        <h6>Headers:</h6>
+                        <pre><code data-trim contenteditable>
+POST /core/bulbs/actuation/ HTTP/1.1
+Host: 192.168.1.25
+Auth: 689BB327-5BF3-4SEF-9837-54E45635AD973
+                        </code></pre>
+                        <h6>Content:</h6>
+                        <pre><code data-trim contenteditable>
+{
+    "type": "BULB",
+    "bulbId": "2d2d33d2-32d23d-23d2-asdas3d2-3asdd2-3d23d23d2d",
+    "appId": "APP_TYPE__BULBS_CORE", // Sth. unique for priority coordination
+    "loop": false,
+    "states": [
+        {   "color": {
+                COLOR_SCHEME : "HSB" // alt. "RGB" | "TEMP" in future
+                hue : 360
+                saturation : 255
+                brightness : 125
+            },
+            "enabled": true
+            "transitionDelay": 0,
+        }// , { ... } further states
+    ]
+}
+                        </code></pre>
+                    </section>
+                    <section>
+                        <h2>API - Authentication</h2>
+                        <ul>
+                            <li>By authentication header<br/> <code>Auth : &lt;Api-Key&gt; </code></li>
+                            <li>By Cookie / Remember-Me Token</li>
+                            <li>.. but how to optain an API key? ...</li>
+                        </ul>
+
+                    </section>
+                    <section>
+                        <h2>API - Sign In / ~Up</h2>
+                        <p>
+                            By signing in or up with credentials at endpoints <br/>
+                            <code>/core/identity/signIn</code> or <br/>
+                            <code>/core/identity/signUp</code> <br/>
+                            you get necessary authentication info
+                        </p>
+                        <h5>Request Body</h5>
+                        <pre><code data-trim contenteditable>
+{
+    "email": "birnenfan@meineBirnenfarm.de"
+    "password": "geheim"
+}
+                        </code></pre>
+                        <h5>Response</h5>
+                        <pre><code data-trim contenteditable>
+{
+    "nickname": "Birnenmaster",
+    "apiKey": "123123asaAasdasd122asdas",
+    "email": "birnenfan@meineBirnenfarm.de"
+}
+                        </code></pre>
+                    </section>
+                    <section>
+                        <h2>Swagger</h2>
+                        <p>Get an overview using the included <a href="http://swagger.io/">Swagger</a> UI</p>
+                        <small><p><b>NOTE:</b> Polimorphism doesn't seem to be supported well.</p> </small>
+                        <img  src="assets/swagger_hc.png" alt="Big Pic">
+                    </section>
+                    <section>
+                        <h2>Websockets</h2>
+                        <ul>
+                            <li>Implemented Server side using <a href="https://github.com/spring-projects/spring-framework"> Spring Websocket</a> </li>
+                            <li>Tested with <a href="http://jmesnil.net/stomp-websocket/doc/">Stomp</a> over
+                                <a href="https://github.com/sockjs/sockjs-client">SockJs</a>  </li>
+                            <li>Allows for high-frequency command exchange</li>
+                            <li>Allows for high-frequency state updates in client apps</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h2>Angular App</h2>
+                            <h4>&curvearrowright; Showcase</h4>
+                        <tabke>
+                            <tr>
+                                <td>
+                                    <img width="800" src="assets/angularApp_presets_hc.png"/>
+                                </td>
+                                <td>
+                                </td>
+                            </tr>
+                        </tabke>
+                    </section>
+                    <section>
+                        <h2>Roadmap Core</h2>
+                        <ul>
+                            <li>Integrate <a href="https://lifx.co">LIFX</a> bulbs</li>
+                            <li>Refactoring of Data repository layer - use Spring Data appropriately</li>
+                            <li>Better handling of absent hardware</li>
+                            <li>ACLs & Method security for multi user rights managemnt</li>
+                            <li>Bulbs|Shared - Implement a restful Java client</li>
+                            <li>Track last executed (looping) commands for activity indication</li>
+                            <li>...</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h2>Roadmap Angular App</h2>
+                        <ul>
+                            <li>Make <code>scheduler</code> features available</li>
+                            <li>Implement a global message display service for info and <br/>status messages</li>
+                            <li>Simplify Preset display</li>
+                            <li>WYSIWYG color management</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h2>Apps in Mind</h2>
+                        <ul>
+                            <li>Using <a href="http://developer.echonest.com/docs/v4/">The Echo Nest</a> API
+                            to find a lighting atmosphere for a song by its moods
+                            </li>
+                            <li>Speech control</li>
+                            <li>Environment sound level indication (e.g. large offices)</li>
+                            <li>Shaking mobile</li>
+                            <li>...</li>
+                        </ul>
+                    </section>
+                </section>
+
+                <section>
+                    <section>
+                        <h1>Architecture / <br/> Implementation</h1>
+                        <ul>
+                            <li>Work in progress</li>
+                            <li>Expect changes of the API!</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h2>Paradigm</h2>
+                        <p style="color : green; font-weight: bolder;">Domain Driven Design</p>
+                        <blockquote cite="http://dddcommunity.org/learning-ddd/what_is_ddd/"><small>
+                            &ldquo;Domain-driven design is not a technology or a methodology. It is a way of thinking and
+                            a set of priorities, aimed at accelerating software projects that have to deal with complicated domains.&rdquo;
+                            &nbsp; by <a href="http://dddcommunity.org/learning-ddd/what_is_ddd/">dddcommunity.org</a>
+                        </small></blockquote>
+                        <br/>
+                        <small>
+                        <p>
+                            From <a href="http://en.wikipedia.org/wiki/Domain-driven_design">DDD Wiki article</a> these priorities are:
+                            <ul>
+                                <li>Placing the project's primary focus on the core domain and domain logic.</li>
+                                <li>Basing complex designs on a model of the domain.</li>
+                                <li>Initiating a creative collaboration between technical and domain experts to iteratively refine a conceptual model that addresses particular domain problems.</li>
+                            </ul>
+                        </p></small>
+                    </section>
+                    <section>
+                        <h2>Model</h2>
+                        <p>A specimen of the (simplified) core domain model:</p>
+                        <img src="assets/simple_Class_model_fi.png" alt="Class model specimen">
+                    </section>
+                    <section>
+                        <h2>Overall (Hexagonal) Architecture</h2>
+                        <img class="no-style" src="assets/hex_model.png" alt="Hexagonal Architecture">
+                    </section>
+                    <section>
+                        <h2>App-Integration</h2>
+                        <ul>
+                            <li>Not crystal clear yet; Input welcome!</li>
+                            <li>Currently authentication over API-Key possible <br/>&Rightarrow; Alternatives/Extensions?</li>
+                            <li>(Non mandatory) App linking for unified dashboard?</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h2>Framework/Tool Selection</h2>
+                        <ul>
+                            <li>Spring Framework - <small>Boot, Security, ...</small></li>
+                            <li>Quartz Scheduler</li>
+                            <li>MongoDB</li>
+                            <li>RabbitMq</li>
+                            <li>AngularJS</li>
+                            <li>D3 - Data Driven Documents</li>
+                            <li>...</li>
+                        </ul>
+                    </section>
+                </section>
+
+                <section>
+                    <section>
+                        <h1>Development</h1>
+                    </section>
+                    <section>
+                        <h2>Checkout</h2>
+                        <p>... from <a href="#">Github</a></p>
+
+                        <p>and <code style="background-color: #0F6AB4; font-weight: bold; color: #64000C">vagrant up</code>
+                            <small> .. which will provide a virtual Linux Environment serving:
+                                <ul style="">
+                                    <li>a MongoDB instance</li>
+                                    <li>a RabbitMq instance</li>
+                                </ul>
+                            </small><br/>
+                            Run <code>mvn clean install</code> ...<br/>
+                            ... and finally start the app with its embedded Tomcat by running the <code>Main</code> class.
+                        </p>
+
+                    </section>
+                    <section>
+                        <h2>Maven Profiles</h2>
+                        <p>
+                            <h5><code>debug</code></h5>
+                            <ul>
+                                <li>Provides <code><a href="https://github.com/spring-projects/spring-loaded">Spring-Loaded</a></code> agent</li>
+                                and JVM-Debug settings to integrate IDE Remote Debug capabilities
+                                <li>Deactivates (long running) integration tests</li>
+                            </ul>
+                        </p>
+                        <br/>
+                        <p>
+                            <h5><code>compile-and-minify</code></h5>
+                            <ul>
+                                <li>Minifies Angular app JS and CSS resources</li>
+                            </ul>
+                        </p>
+                    </section>
+                    <section>
+                        <h2>Spring Profiles</h2>
+                        <p>
+                            <h5><code>development</code></h5>
+                            <ul>
+                                <li>Activates Swagger support <small>(Not enabled in <code>production</code>)</small></li>
+                                <li>Doesn't enforce usage of minified Angular App resources</li>
+                            </ul>
+                        </p>
+                        <br/>
+                        <p>
+                            <h5><code>production</code></h5>
+                            <ul>
+                                <li>Enforce TLS communication by <code>Spring Security</code></li>
+                                <li>Configure embedded ServletContainer to use standard ports and apply SSL configuration</li>
+                                <li>Load production logging properties</li>
+                                <li>Load minified resources for Angular App by default</code></li>
+                            </ul>
+                        </p>
+                    </section>
+                    <section>
+                        <h2>Emulated Hardware</h2>
+                        <ul>
+                            <li>Ships with mocking hardware module to test and play </li>
+                            <li>State is kept in memory &Rightarrow; <span style="color:red;">after application restart persisted domain model is obsolete!</span></li>
+                        </ul>
+                    </section>
+                </section>
+
+                <section>
+                    <h2>Questions?</h2>
+                </section>
+                <!-- END //// END //// END //// END //// END //// END //// END //// END //// END //// END //// END  -->
+			</div>
+
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.min.js"></script>
+
+		<script>
+
+			// Full list of configuration options available here:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+//                slideNumber : true,
+//
+				theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+				transition: Reveal.getQueryHash().transition || 'fade', // default/cube/page/concave/zoom/linear/fade/none
+
+				// Parallax scrolling
+				// parallaxBackgroundImage: 'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg',
+				// parallaxBackgroundSize: '2100px 900px',
+
+				// Optional libraries used to extend on reveal.js
+				dependencies: [
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+					{ src: 'plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+				]
+			});
+
+		</script>
+
+	</body>
+</html>
