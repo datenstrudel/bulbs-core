@@ -15,7 +15,6 @@ import java.util.Collection;
 @Service(value="bulbActuatorServiceImpl")
 public class ActuatorServiceImpl implements ActuatorService{
     //~ Member(s) //////////////////////////////////////////////////////////////
-    private static final Logger log = LoggerFactory.getLogger(BulbsContextUserServiceImpl.class);
     @Autowired
     private ActuatorDomainService actuatorDomainService;
     

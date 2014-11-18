@@ -24,7 +24,7 @@ import java.util.List;
         "net.datenstrudel.bulbs.core.web"
         
 })
-@PropertySource("classpath:META-INF/applicationContext/bulbs-core-config.properties")
+@PropertySource("classpath:/bulbs-core-config.properties")
 public class WebConfig extends WebMvcConfigurerAdapter{
     
     //~ Member(s) //////////////////////////////////////////////////////////////

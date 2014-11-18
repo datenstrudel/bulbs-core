@@ -26,7 +26,7 @@ import java.util.List;
 @Import({ 
     SerializerConfig.class
 })
-@PropertySource("classpath:/META-INF/applicationContext/bulbs-core-config.properties")
+@PropertySource("classpath:/bulbs-core-config.properties")
 @ComponentScan(basePackages = {
         "net.datenstrudel.bulbs.core.infrastructure.persistence"
 }, excludeFilters = @ComponentScan.Filter(Configuration.class))
