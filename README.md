@@ -1,4 +1,6 @@
-# Bulbs-Core 
+![Build Status](https://api.travis-ci.org/datenstrudel/bulbs-core.svg?branch=master)
+
+# Bulbs-Core
 
 Bulbs-Core is a __domestic lighting control middleware__ written in Java.
 
@@ -71,18 +73,26 @@ a brief API description will be given here..
 
 ## Development
 ### Build and start the application
-__Note__ that first of all the module [bulbs-shared](https://github.com/datenstrudel/bulbs-shared) has to be built locally in order to be able to build this project.
-Just check it out and build it using `mvn clean install`
-(A proper release process and public repository integration will make this obsolete in the future.)
 
- * In order to build this project with all integration tests run `vagrant up`. ([Vagrant](https://www.vagrantup.com) required!)
+ * In order to build and start this project run `vagrant up`. ([Vagrant](https://www.vagrantup.com) required!)
         This will start a virtual machine, hosting required infrastructure modules, such as running instances of MongoDB and RabbitMq.
  * Run `mvn clean install`
+ * Alternatively run `mvn clean install -Pdebug` to skip integration tests. For building and unit tests only, no vagrant box is required.
  * Run the `Main` class that can be found in package `net.datenstrudel.bulbs.core.main`
- * Browse to `http://localhost:8084`
+ * Browse to `http://localhost:8084`, create an account and an emulated gateway to play around. If you already have Philips Hue bulbs, you can of course start directly with these.
 
 ### Debug with usage of [Spring-Loaded](https://github.com/spring-projects/spring-loaded)
-// TODO
+Working with spring-loaded allows you to make changes to the code at runtime, recompile and have them ultimatively available without the
+ need to restart the application.
+
+ By running
+
+ `mvn spring-boot:run -Pdebug`
+ 
+ the application starts in debug mode, waiting for a debugger connection on port 5005.
+ Within your IDE you might find the spring-boot plugin somewhere along the build plugins and just start it from there (The mvn profile 'debug' must be active!).
+ Now, within your IDE you can connect a debugger (e.g. remote runner in IntelliJ f.ex.) against that port 5005. When connected the application fully starts.
+ Now breakpoints and immediate code changes should work in your debug session.
 
 ## Deployment
 // TODO
