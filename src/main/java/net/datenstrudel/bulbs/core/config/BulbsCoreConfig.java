@@ -19,7 +19,7 @@ import javax.annotation.PostConstruct;
  */
 @Configuration
 @EnableScheduling
-@PropertySource("classpath:/META-INF/applicationContext/bulbs-core-config.properties")
+@PropertySource("classpath:/bulbs-core-config.properties")
 @Import({ 
     PersistenceConfig.class,
     SerializerConfig.class,

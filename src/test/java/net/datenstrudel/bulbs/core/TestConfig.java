@@ -23,7 +23,7 @@ public class TestConfig
     //~ Member(s) //////////////////////////////////////////////////////////////
     private static final Logger log = LoggerFactory.getLogger(TestConfig.class);
     private static final String TEST_PROPERTIES_PATH = 
-            "classpath:/META-INF/applicationContext/bulbs-core-config-test.properties";
+            "classpath:/bulbs-core-config-test.properties";
     
     //~ Construction ///////////////////////////////////////////////////////////
     

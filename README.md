@@ -16,7 +16,7 @@ This module is supposed to be deployable on __single-board computers__, capable 
 It ships with a simple, browser based, API trialing user interface that is mainly based on [AngularJs](https://angularjs.org/), [D3.js](http://http://d3js.org/) and [BootStrap](getbootstrap.com).
 
 ## Overview
-<img width="1024" height="351" src="/doc/presentation/assets/bulbs_bigPic_dark_full.png" alt="Big Pic"/>
+<img width="800" height="274" src="/doc/presentation/assets/bulbs_bigPic_dark_full.png" alt="Big Pic"/>
 
 ## Purpose
 
