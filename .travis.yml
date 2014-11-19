@@ -9,4 +9,5 @@ services:
   - mongodb
   - rabbitmq
 
-install: mvn clean install -Dspring.profiles.active=travisci
+install: true
+script: mvn clean install -Dspring.profiles.active=travisci
