@@ -1,6 +1,5 @@
-package net.datenstrudel.bulbs.core.infrastructure.persistence.converter;
+package net.datenstrudel.bulbs.core.infrastructure.persistence.converters_old;
 
-import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import net.datenstrudel.bulbs.core.application.messaging.eventStore.PublishedMessageTracker;
 import net.datenstrudel.bulbs.core.infrastructure.persistence.MongoConverter;
@@ -12,25 +11,21 @@ import org.springframework.core.convert.converter.Converter;
  * @author Thomas Wendzinski
  */
 @MongoConverter
-public class PublishedMessageTrackerConverterWrite 
-        implements Converter<PublishedMessageTracker, DBObject> {
-
+public class PublishedMessageTrackerConverterRead 
+        implements Converter<DBObject, PublishedMessageTracker> {
 
     //~ Member(s) //////////////////////////////////////////////////////////////
     //~ Construction ///////////////////////////////////////////////////////////
     //~ Method(s) //////////////////////////////////////////////////////////////
     @Override
-    public DBObject convert(PublishedMessageTracker source) {
-        DBObject dbo = new BasicDBObject();
-        dbo.put("_id", source.getId() != null 
-                ? new ObjectId( source.getId() )
-                : new ObjectId() );
-        dbo.put("type", source.getType());
-        dbo.put("mostRecentPublishedStoredEventId", source.getMostRecentPublishedStoredEventId());
-        
-        return dbo;
+    public PublishedMessageTracker convert(DBObject source) {
+        return new PublishedMessageTracker(
+                ((ObjectId) source.get("_id")).toString(),
+                (String) source.get("type"),
+                (Long) source.get("mostRecentPublishedStoredEventId")
+        );
     }
-    
+
     //~ Private Artifact(s) ////////////////////////////////////////////////////
 
 }

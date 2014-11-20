@@ -1,0 +1,15 @@
+package net.datenstrudel.bulbs.core.infrastructure.persistence.repository;
+
+import net.datenstrudel.bulbs.core.domain.model.identity.BulbsContextUser;
+import net.datenstrudel.bulbs.core.domain.model.identity.BulbsContextUserId;
+
+/**
+ * Created by Thomas Wendzinski.
+ */
+public interface BulbsContextUserRepository
+        extends BCoreRepository<BulbsContextUser, BulbsContextUserId>, BulbsContextUserRepositoryExtension {
+
+
+    public BulbsContextUser findByEmail(String email);
+
+}

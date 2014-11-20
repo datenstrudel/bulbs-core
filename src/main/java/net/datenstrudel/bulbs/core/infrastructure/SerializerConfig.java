@@ -3,7 +3,7 @@ package net.datenstrudel.bulbs.core.infrastructure;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.datenstrudel.bulbs.core.domain.model.bulb.AbstractActuatorCmd;
-import net.datenstrudel.bulbs.core.infrastructure.persistence.converter.json.GenericTypeConverter;
+import net.datenstrudel.bulbs.core.infrastructure.persistence.converters_old.json.GenericTypeConverter;
 import net.datenstrudel.bulbs.shared.commonTypeConverters.TypeConverterDate;
 import net.datenstrudel.bulbs.shared.domain.model.color.Color;
 import net.datenstrudel.bulbs.shared.domain.model.scheduling.Trigger;

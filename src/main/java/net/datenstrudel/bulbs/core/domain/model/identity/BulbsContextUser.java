@@ -2,6 +2,7 @@ package net.datenstrudel.bulbs.core.domain.model.identity;
 
 import net.datenstrudel.bulbs.core.domain.model.bulb.BulbBridgeId;
 import net.datenstrudel.bulbs.shared.domain.model.Entity;
+import org.springframework.data.annotation.Id;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.StringUtils;
@@ -19,6 +20,7 @@ public class BulbsContextUser extends Entity<BulbsContextUser, String>
         implements  UserDetails{
 
     //~ Member(s) //////////////////////////////////////////////////////////////
+    @Id
 	private BulbsContextUserId bulbsContextUserId;
 	/**
 	 * Unique Identifier

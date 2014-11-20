@@ -10,19 +10,20 @@
         <appender-ref ref="STDOUT" />
     </root>
 
+    <logger name="org.aspectj" level="INFO" />
     <logger name="net.datenstrudel.bulbs.core" level="DEBUG" />
     <logger name="net.datenstrudel.bulbs.core.web.filter" level="INFO" />
     <logger name="net.datenstrudel.bulbs.core.domain.model.messaging" level="info" />
     <logger name="net.datenstrudel.bulbs.core.application.messaging.notification" level="info" />
     <logger name="net.datenstrudel.bulbs.core.application.messaging.notification.infrastructure.NotificationServiceRabbitMq" level="debug" />
     <logger name="net.datenstrudel.bulbs.core.application.messaging.notification.handling" level="info" />
-    <logger name="org.aspectj" level="INFO" />
     <logger name="org.springframework" level="INFO" />
     <logger name="org.springframework.beans" level="INFO" />
+    <logger name="org.springframework.data" level="info" />
+    <!--<logger name="org.springframework.data.mongodb.core.mapping.event" level="warn" />-->
     <logger name="org.springframework.messaging" level="INFO" />
     <logger name="org.springframework.messaging.simp.stomp" level="INFO" />
     <logger name="org.springframework.web.socket" level="INFO" />
-    <logger name="org.springframework.data.mongodb.core.mapping.event" level="warn" />
     <logger name="org.validation" level="trace" />
     <logger name="org.hibernate.validator" level="debug" />
 

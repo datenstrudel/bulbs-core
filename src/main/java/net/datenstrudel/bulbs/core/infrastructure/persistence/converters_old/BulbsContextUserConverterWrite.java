@@ -1,4 +1,4 @@
-package net.datenstrudel.bulbs.core.infrastructure.persistence.converter;
+package net.datenstrudel.bulbs.core.infrastructure.persistence.converters_old;
 
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;

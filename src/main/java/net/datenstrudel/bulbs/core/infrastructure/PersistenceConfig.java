@@ -2,6 +2,8 @@ package net.datenstrudel.bulbs.core.infrastructure;
 
 import com.mongodb.*;
 import net.datenstrudel.bulbs.core.infrastructure.persistence.MongoConverter;
+import net.datenstrudel.bulbs.core.infrastructure.persistence.converters.BulbsContextUserIdConverterRead;
+import net.datenstrudel.bulbs.core.infrastructure.persistence.converters.BulbsContextUserIdConverterWrite;
 import org.slf4j.Logger; import org.slf4j.LoggerFactory;import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -28,9 +30,9 @@ import java.util.List;
 })
 @PropertySource("classpath:/bulbs-core-config.properties")
 @ComponentScan(basePackages = {
-        "net.datenstrudel.bulbs.core.infrastructure.persistence"
+        "net.datenstrudel.bulbs.core.infrastructure.persistence.repository"
 }, excludeFilters = @ComponentScan.Filter(Configuration.class))
-@EnableMongoRepositories()
+@EnableMongoRepositories("net.datenstrudel.bulbs.core.infrastructure.persistence.repository")
 public class PersistenceConfig extends AbstractMongoConfiguration{
 
     //~ Member(s) //////////////////////////////////////////////////////////////
@@ -94,7 +96,10 @@ public class PersistenceConfig extends AbstractMongoConfiguration{
     @Override
     public CustomConversions customConversions() {
         final List converters = new ArrayList<>();
-        converters.addAll(appCtx.getBeansWithAnnotation(MongoConverter.class).values());
+//        converters.addAll(appCtx.getBeansWithAnnotation(MongoConverter.class).values());
+        //TODO: Check: Doesn't seem to be necessary
+//        converters.add(new BulbsContextUserIdConverterRead());
+//        converters.add(new BulbsContextUserIdConverterWrite());
         final CustomConversions res = new CustomConversions(converters);
         log.info("Found and applied persistence converters: " + converters.size());
         return res;

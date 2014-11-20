@@ -5,6 +5,7 @@ import net.datenstrudel.bulbs.core.domain.model.identity.BulbsContextUserId;
 import net.datenstrudel.bulbs.core.domain.model.identity.BulbsContextUserRepository;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.IndexOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.index.Index;
@@ -17,7 +18,6 @@ import javax.annotation.PostConstruct;
 
 /**
  *
- * @param <T> Type a specific repository is supposed to serve
  * @author Thomas Wendzinski
  */
 @Component(value = "bulbsContextUserRepository")
@@ -31,8 +31,8 @@ public class BulbsContextUserRepositoryImpl implements BulbsContextUserRepositor
     @PostConstruct
     public void init(){
         IndexOperations iOps = mongo.indexOps(BulbsContextUser.class);
-        iOps.ensureIndex(new Index().on("email", Order.ASCENDING).unique(Index.Duplicates.RETAIN));
-        iOps.ensureIndex(new Index().on("apiKey", Order.ASCENDING).unique(Index.Duplicates.RETAIN));
+        iOps.ensureIndex(new Index().on("email", Sort.Direction.ASC).unique(Index.Duplicates.RETAIN));
+        iOps.ensureIndex(new Index().on("apiKey", Sort.Direction.ASC).unique(Index.Duplicates.RETAIN));
     }
     
     //~ Method(s) //////////////////////////////////////////////////////////////
