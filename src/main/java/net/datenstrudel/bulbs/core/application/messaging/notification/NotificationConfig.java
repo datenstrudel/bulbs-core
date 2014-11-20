@@ -10,6 +10,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+import javax.annotation.PreDestroy;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -24,6 +25,8 @@ public class NotificationConfig {
 
     //~ Member(s) //////////////////////////////////////////////////////////////
     private static final Logger log = LoggerFactory.getLogger(NotificationConfig.class);
+
+    private CachingConnectionFactory connectionFactory;
     //~ Construction ///////////////////////////////////////////////////////////
     @Bean
     public ConnectionFactory rabbitConnectionFactory(
@@ -42,13 +45,19 @@ public class NotificationConfig {
                 (channel, transactional) -> log.info("Channel created; Number:  " + channel.getChannelNumber())
         );
         connectionFactory.setChannelListeners(listeners);
-        
+        this.connectionFactory = connectionFactory;
         return connectionFactory;
     }
     
     @Bean 
     public NotificationServiceRabbitMq coreInternalNotificationService(){
         return new NotificationServiceRabbitMq(Exchanges.EXCHANGE_TOPIC__BUBLS_CORE);
+    }
+
+    @PreDestroy
+    public void destroy(){
+        log.info("Going to destroy AMQP connection factory..");
+        this.connectionFactory.destroy();
     }
 
     //~ Method(s) //////////////////////////////////////////////////////////////

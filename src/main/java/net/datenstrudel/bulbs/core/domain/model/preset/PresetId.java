@@ -3,6 +3,7 @@ import net.datenstrudel.bulbs.core.domain.model.identity.BulbsContextUserId;
 import net.datenstrudel.bulbs.shared.domain.model.ValueObject;
 
 import javax.validation.ValidationException;
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
@@ -10,26 +11,26 @@ import java.util.Objects;
  * @version 1.0
  * @created 08-Jun-2013 22:51:42
  */
-public class PresetId implements ValueObject<PresetId> {
+public class PresetId implements ValueObject<PresetId>, Serializable {
 
     private String presetUuid;
-    private BulbsContextUserId userId;
+    private BulbsContextUserId creator;
 
 	private PresetId(){}
-    public PresetId(String presetUuid, BulbsContextUserId userId) {
+    public PresetId(String presetUuid, BulbsContextUserId creator) {
         this.presetUuid = presetUuid;
-        this.userId = userId;
+        this.creator = creator;
     }
 
     public String getPresetUuid() {
         return presetUuid;
     }
-    public BulbsContextUserId getUserId() {
-        return userId;
+    public BulbsContextUserId getCreator() {
+        return creator;
     }
 
     public String serialize(){
-        return presetUuid + userId.getUuid();
+        return presetUuid + creator.getUuid();
     }
     public static PresetId fromSerialized(String in){
         if(in.length() < 37)throw new ValidationException("Id was too short");
@@ -42,14 +43,14 @@ public class PresetId implements ValueObject<PresetId> {
     public boolean sameValueAs(PresetId other) {
         if(other == null)return false;
         if(!this.presetUuid.equals(other.presetUuid))return false;
-        if(!this.userId.equals(other.userId))return false;
+        if(!this.creator.equals(other.creator))return false;
         return true;
     }
     @Override
     public int hashCode() {
         int hash = 3;
         hash = 41 * hash + Objects.hashCode(this.presetUuid);
-        hash = 41 * hash + Objects.hashCode(this.userId);
+        hash = 41 * hash + Objects.hashCode(this.creator);
         return hash;
     }
     @Override
@@ -65,6 +66,6 @@ public class PresetId implements ValueObject<PresetId> {
     }
     @Override
     public String toString() {
-        return "PresetId{" + "presetUuid=" + presetUuid + ", userId=" + userId + '}';
+        return "PresetId{" + "presetUuid=" + presetUuid + ", creator=" + creator + '}';
     }
 }

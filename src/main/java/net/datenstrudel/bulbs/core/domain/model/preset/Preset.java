@@ -2,6 +2,7 @@ package net.datenstrudel.bulbs.core.domain.model.preset;
 
 import net.datenstrudel.bulbs.core.domain.model.bulb.AbstractActuatorCmd;
 import net.datenstrudel.bulbs.shared.domain.model.Entity;
+import org.springframework.data.annotation.Id;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
@@ -16,24 +17,19 @@ import java.util.Objects;
  * @version 1.0
  * @updated 08-Jun-2013 22:54:59
  */
-public class Preset extends Entity<Preset, String> {
+public class Preset extends Entity<Preset, PresetId> {
 
     //~ Member(s) //////////////////////////////////////////////////////////////
-	private PresetId presetId;
     private String name;
 	private List<AbstractActuatorCmd> states = new ArrayList<>();
 
     //~ Construction ///////////////////////////////////////////////////////////
 	private Preset(){}
-    public Preset(PresetId presetId, String presetName ) {
-        setPresetId(presetId);
+    public Preset(PresetId id, String presetName ) {
+        setId(id);
         setName(presetName);
     }
     //~ Method(s) //////////////////////////////////////////////////////////////
-    public PresetId getPresetId() {
-        return presetId;
-    }
-    
     public String getName() {
         return name;
     }
@@ -43,7 +39,7 @@ public class Preset extends Entity<Preset, String> {
             PresetRepository presetRepository){
         setName(newName);
         validateExisting(notificationHandler, presetRepository);
-//        DomainEventPublisher.instance().publish(new PresetUpdated(presetId));
+//        DomainEventPublisher.instance().publish(new PresetUpdated(id));
     }
 
     public List<AbstractActuatorCmd> getStates() {
@@ -78,13 +74,13 @@ public class Preset extends Entity<Preset, String> {
     @Override
     public boolean sameIdentityAs(Preset other) {
         if(other == null)return false;
-        if(!this.presetId.sameValueAs(other.getPresetId()))return false;
+        if(!this.id.sameValueAs(other.getId()))return false;
         return true;
     }
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 89 * hash + Objects.hashCode(this.presetId);
+        hash = 89 * hash + Objects.hashCode(this.id);
         return hash;
     }
     @Override
@@ -100,16 +96,6 @@ public class Preset extends Entity<Preset, String> {
     }
 
     //~ Private Artifact(s) ////////////////////////////////////////////////////
-    private void setPresetId(PresetId presetId) {
-        if(!StringUtils.hasText(presetId.getPresetUuid()) ){
-            throw new IllegalArgumentException("PresetId member 'presetUuid' must be set.");
-        }
-        if(presetId.getUserId() == null ){
-            throw new IllegalArgumentException("PresetId member 'userId' must be set.");
-        }
-        this.presetId = presetId;
-    }
-
     private void setStates(List<AbstractActuatorCmd> states) {
         this.states = states;
     }

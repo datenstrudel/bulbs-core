@@ -18,29 +18,28 @@ import java.util.Set;
  * @version 1.0
  * @updated 08-Jun-2013 22:54:59
  */
-public class BulbGroup extends Entity<BulbGroup, String> {
+public class BulbGroup extends Entity<BulbGroup, BulbGroupId> {
 
     //~ Member(s) //////////////////////////////////////////////////////////////
-    private BulbGroupId groupId;
     private String name;
 	private Set<BulbId> bulbs = new HashSet<>();
 
     //~ Construction ///////////////////////////////////////////////////////////
 	private BulbGroup(){}
-    public BulbGroup(BulbGroupId groupId, String name) {
-        setGroupId(groupId);
+    public BulbGroup(BulbGroupId id, String name) {
+        setId(id);
         setName(name);
     }
     
     //~ Method(s) //////////////////////////////////////////////////////////////
-    public BulbGroupId getGroupId() {
-        return groupId;
+    public BulbGroupId getId() {
+        return id;
     }
 	public String getName(){
 		return this.name;
 	}
     public BulbsContextUserId userId(){
-        return groupId.getUserId();
+        return id.getCreator();
     }
     public Set<BulbId> getBulbs() {
         return bulbs;
@@ -50,7 +49,7 @@ public class BulbGroup extends Entity<BulbGroup, String> {
     public void addBulb(BulbId bulbId){
         if(this.bulbs.contains(bulbId)){
             throw new IllegalArgumentException("Bulb[" + bulbId
-                    +"] already assigned to group[" + groupId + "]");
+                    +"] already assigned to group[" + id + "]");
         }
         this.bulbs.add(bulbId);
     }
@@ -64,13 +63,13 @@ public class BulbGroup extends Entity<BulbGroup, String> {
         setName(newName);
         validateExisting(notificationHandler, groupRepository);
         
-        DomainEventPublisher.instance().publish(new BulbGroupUpdated(groupId));
+        DomainEventPublisher.instance().publish(new BulbGroupUpdated(id));
     }
     public void updateAllBulbs(Collection<BulbId> allMembers){
         this.bulbs.clear();
         this.bulbs.addAll(allMembers);
         DomainEventPublisher.instance().publish(
-                new BulbGroupUpdated(groupId)
+                new BulbGroupUpdated(id)
         );
     }
     //~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -91,7 +90,7 @@ public class BulbGroup extends Entity<BulbGroup, String> {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 47 * hash + Objects.hashCode(this.groupId);
+        hash = 47 * hash + Objects.hashCode(this.id);
         return hash;
     }
     @Override
@@ -103,7 +102,7 @@ public class BulbGroup extends Entity<BulbGroup, String> {
             return false;
         }
         final BulbGroup other = (BulbGroup) obj;
-        if (!Objects.equals(this.groupId, other.groupId)) {
+        if (!Objects.equals(this.id, other.id)) {
             return false;
         }
         return true;
@@ -111,19 +110,16 @@ public class BulbGroup extends Entity<BulbGroup, String> {
     @Override
     public boolean sameIdentityAs(BulbGroup other) {
         if(other == null) return false;
-        return this.groupId.sameValueAs(other.getGroupId());
+        return this.id.sameValueAs(other.getId());
     }
     @Override
     public String toString() {
         return "BulbGroup{" 
-                + "groupId=" + groupId 
+                + "id=" + id
                 + ", bulbs=" + bulbs + '}';
     }
 
     //~ Private Artifact(s) ////////////////////////////////////////////////////
-    private void setGroupId(BulbGroupId groupId) {
-        this.groupId = groupId;
-    }
     private void setName(String name) {
         if(StringUtils.isEmpty(name))throw new IllegalArgumentException(
                 "Member 'name' must not be empty");

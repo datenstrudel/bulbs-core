@@ -10,7 +10,7 @@ import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Denotes a converter for Objects and MongoDBs {@link DBObject}s.
+ * Denotes a converters_old for Objects and MongoDBs {@link DBObject}s.
  * A class annotated with this type will be automatically used for object transformations.
  * @author Thomas Wendzinski
  */

@@ -50,14 +50,4 @@ public class DomainServiceLocatorTest {
         assertNotNull(result);
     }
 
-//    @Test
-    public void testSetApplicationContext() {
-        System.out.println("setApplicationContext");
-        ApplicationContext ac = null;
-        DomainServiceLocator instance = new DomainServiceLocator();
-        instance.setApplicationContext(ac);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-    
 }

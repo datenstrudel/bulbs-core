@@ -1,6 +1,5 @@
-package net.datenstrudel.bulbs.core.infrastructure.persistence;
+package net.datenstrudel.bulbs.core.infrastructure.persistence.repository;
 
-import net.datenstrudel.bulbs.core.IntegrationTest;
 import net.datenstrudel.bulbs.core.TestConfig;
 import net.datenstrudel.bulbs.core.domain.model.bulb.AbstractActuatorCmd;
 import net.datenstrudel.bulbs.core.domain.model.bulb.BulbActuatorCommand;
@@ -11,15 +10,15 @@ import net.datenstrudel.bulbs.core.domain.model.identity.BulbsContextUserId;
 import net.datenstrudel.bulbs.core.domain.model.scheduling.JobCoordinator;
 import net.datenstrudel.bulbs.core.domain.model.scheduling.ScheduledActuation;
 import net.datenstrudel.bulbs.core.domain.model.scheduling.ScheduledActuationId;
+import net.datenstrudel.bulbs.core.domain.model.scheduling.ScheduledActuationRepository;
 import net.datenstrudel.bulbs.core.infrastructure.PersistenceConfig;
 import net.datenstrudel.bulbs.core.infrastructure.services.InfrastructureServicesConfig;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.CommandPriority;
 import net.datenstrudel.bulbs.shared.domain.model.scheduling.PointInTimeTrigger;
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;import org.easymock.EasyMock;
+import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -27,10 +26,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -46,20 +42,16 @@ import static org.junit.Assert.*;
             PersistenceConfig.class,
             InfrastructureServicesConfig.class
     })
-//@ComponentScan(excludeFilters = @ComponentScan.Filter(Configuration.class) )
-@Category(IntegrationTest.class)
-public class ScheduledActuationRepositoryImplTest {
-    
-    private static final Logger log = LoggerFactory.getLogger(PresetRepositoryImplTest.class);
+public class ScheduledActuationRepositoryImplIT {
     
     @Autowired
-    ScheduledActuationRepositoryImpl instance;
+    ScheduledActuationRepository instance;
     @Autowired
     private MongoTemplate mongo;
     
     JobCoordinator mk_jobCoordinator;
     
-    public ScheduledActuationRepositoryImplTest() {
+    public ScheduledActuationRepositoryImplIT() {
     }
     
     @BeforeClass
@@ -72,23 +64,23 @@ public class ScheduledActuationRepositoryImplTest {
     }
 
     @Test
-    public void testNextIdentity() {
+    public void nextIdentity() {
         System.out.println("nextIdentity");
         BulbsContextUserId creator = new BulbsContextUserId("testNextId__userId");
         ScheduledActuationId result = instance.nextIdentity(creator);
-        assertEquals(creator, result.getUserId() );
+        assertEquals(creator, result.getCreator() );
         assertTrue(!StringUtils.isEmpty(result.getUuid()));
     }
 
     @Test
-    public void testLoadById() {
-        System.out.println("loadById");
-        BulbsContextUserId creator = new BulbsContextUserId("testLoadById__userId");
+    public void findOne() {
+        System.out.println("findOne");
+        BulbsContextUserId creator = new BulbsContextUserId("findById__userId");
         ScheduledActuationId id = instance.nextIdentity(creator);
         ScheduledActuation expResult = newTestInstance(id, true, true);
         
-        instance.store(expResult);
-        ScheduledActuation result = instance.loadById(id);
+        instance.save(expResult);
+        ScheduledActuation result = instance.findOne(id);
         
         assertEquals(expResult, result);
         assertEquals(expResult.getTrigger(), result.getTrigger());
@@ -100,14 +92,30 @@ public class ScheduledActuationRepositoryImplTest {
     }
 
     @Test
-    public void testLoadByName() {
-        System.out.println("loadByName");
+    public void findByNameAndScheduleId_Creator() {
+        System.out.println("findByName");
         BulbsContextUserId creator = new BulbsContextUserId("testLoadById__userId");
         ScheduledActuationId id = instance.nextIdentity(creator);
         ScheduledActuation expResult = newTestInstance(id, false, false);
         
-        instance.store(expResult);
-        ScheduledActuation result = instance.loadByName(creator, expResult.getName());
+        instance.save(expResult);
+        ScheduledActuation result = instance.findByNameAndId_Creator(expResult.getName(), creator);
+        assertEquals(expResult, result);
+    }
+    @Test
+    public void findByScheduleId_Owner(){
+        System.out.println("findByScheduleId_Owner");
+        BulbsContextUserId userXp = new BulbsContextUserId("test_UserUuid_exp");
+        BulbsContextUserId userUXp = new BulbsContextUserId("test_UserUuid_unExp");
+        ScheduledActuation xp1 = newTestInstance(instance.nextIdentity(userXp), false, false);
+        ScheduledActuation xp2 = newTestInstance(instance.nextIdentity(userXp), false, false);
+        ScheduledActuation uxp1 = newTestInstance(instance.nextIdentity(userUXp), false, false);
+        Set<ScheduledActuation> expResult = new HashSet<>();
+        expResult.add(xp1);
+        expResult.add(xp2);
+
+        instance.save(Arrays.asList(uxp1, xp1, xp2));
+        Set<ScheduledActuation> result = instance.findById_Creator(userXp);
         assertEquals(expResult, result);
     }
 
@@ -116,17 +124,17 @@ public class ScheduledActuationRepositoryImplTest {
     }
 
     @Test
-    public void testRemove() {
-        System.out.println("remove");
+    public void delete() {
+        System.out.println("delete");
         BulbsContextUserId creator = new BulbsContextUserId("testLoadById__userId");
         ScheduledActuationId id = instance.nextIdentity(creator);
         ScheduledActuation expResult = newTestInstance(id, true, true);
         
-        instance.store(expResult);
-        ScheduledActuation res = instance.loadById(id);
+        instance.save(expResult);
+        ScheduledActuation res = instance.findOne(id);
         assertNotNull(res);
-        instance.remove(id);
-        res = instance.loadById(id);
+        instance.delete(id);
+        res = instance.findOne(id);
         assertNull(res);
     }
     

@@ -59,13 +59,13 @@ public class ScheduledActuationServiceImpl implements ScheduledActuationService{
     //~ Method(s) //////////////////////////////////////////////////////////////
     @Override
     public Set<ScheduledActuation> loadAllByUser(BulbsContextUserId userId) {
-        Set<ScheduledActuation> res = schedRepo.loadByOwner(userId);
+        Set<ScheduledActuation> res = schedRepo.findById_Creator(userId);
         outPort.write(res);
         return res;
     }
     @Override
     public ScheduledActuation loadById(BulbsContextUserId userId, ScheduledActuationId id) {
-        ScheduledActuation res = schedRepo.loadById(id);
+        ScheduledActuation res = schedRepo.findOne(id);
         outPort.write(res);
         return res;
     }
@@ -75,7 +75,7 @@ public class ScheduledActuationServiceImpl implements ScheduledActuationService{
     public ScheduledActuation create(BulbsContextUserId userId, String name, boolean removeAfterExecution) {
         ScheduledActuation res = new ScheduledActuation(
                 schedRepo.nextIdentity(userId), name, removeAfterExecution);
-        schedRepo.store(res);
+        schedRepo.save(res);
         outPort.write(res);
         //TODO: Fire created event        
         return res;
@@ -85,7 +85,7 @@ public class ScheduledActuationServiceImpl implements ScheduledActuationService{
         ScheduledActuation res = new ScheduledActuation(
                 schedRepo.nextIdentity(userId), name, removeAfterExecution);
         res.defineTrigger(trigger, jobCoordinator);
-        schedRepo.store(res);
+        schedRepo.save(res);
         outPort.write(res);
         //TODO: Fire created event        
         return res;
@@ -104,7 +104,7 @@ public class ScheduledActuationServiceImpl implements ScheduledActuationService{
         res.defineTrigger(trigger, jobCoordinator);
         res.setNewStates(states, jobCoordinator);
         res.activate(jobCoordinator);
-        schedRepo.store(res);
+        schedRepo.save(res);
         outPort.write(res);
         //TODO: Fire created event        
         return res;
@@ -112,30 +112,30 @@ public class ScheduledActuationServiceImpl implements ScheduledActuationService{
     
     @Override
     public void remove(BulbsContextUserId userId, ScheduledActuationId actId) {
-        ScheduledActuation entity2Del = schedRepo.loadById(actId);
+        ScheduledActuation entity2Del = schedRepo.findOne(actId);
         if(entity2Del == null){
             throw new IllegalArgumentException("error.scheduledActuation.notFound");
         }
         entity2Del.deActivate(jobCoordinator);
-        schedRepo.remove(actId);
+        schedRepo.delete(actId);
     }
     @Override
     public void activate(BulbsContextUserId userId, ScheduledActuationId actId) {
-        ScheduledActuation entity = schedRepo.loadById(actId);
+        ScheduledActuation entity = schedRepo.findOne(actId);
         if(entity == null){
             throw new IllegalArgumentException("error.scheduledActuation.notFound");
         }
         entity.activate(jobCoordinator);
-        schedRepo.store(entity);
+        schedRepo.save(entity);
     }
     @Override
     public void deactivate(BulbsContextUserId userId, ScheduledActuationId actId) {
-        ScheduledActuation entity = schedRepo.loadById(actId);
+        ScheduledActuation entity = schedRepo.findOne(actId);
         if(entity == null){
             throw new IllegalArgumentException("error.scheduledActuation.notFound");
         }
         entity.deActivate(jobCoordinator);
-        schedRepo.store(entity);
+        schedRepo.save(entity);
     }
     
     @Override
@@ -150,11 +150,11 @@ public class ScheduledActuationServiceImpl implements ScheduledActuationService{
     
     @Override
     public void execute(BulbsContextUserId userId, ScheduledActuationId actId) {
-        ScheduledActuation schedAct = schedRepo.loadById(actId);
+        ScheduledActuation schedAct = schedRepo.findOne(actId);
         if(schedAct == null)
             throw new IllegalArgumentExceptionNotRepeatable("error.scheduledActuation.notFound");
         
-        final String userApiKey = userRepository.loadById(userId).getApiKey();
+        final String userApiKey = userRepository.findOne(userId).getApiKey();
         final List<AbstractActuatorCmd> states = schedAct.getStates();
         for (AbstractActuatorCmd cmd : states) {
             cmd.setUserApiKey(userApiKey);

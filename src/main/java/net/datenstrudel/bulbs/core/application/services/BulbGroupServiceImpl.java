@@ -38,28 +38,28 @@ public class BulbGroupServiceImpl implements BulbGroupService{
     //~ Method(s) //////////////////////////////////////////////////////////////
     @Override
     public BulbGroup loadById(BulbsContextUserId userId, BulbGroupId groupId) {
-        BulbGroup res = groupRepository.loadById(groupId);
+        BulbGroup res = groupRepository.findOne(groupId);
         outPort.write(res);
         return res;
     }
     @Override
     public void remove(BulbsContextUserId userId, BulbGroupId groupId) {
-        BulbGroup res = groupRepository.loadById(groupId);
+        BulbGroup res = groupRepository.findOne(groupId);
         if(res == null)throw new IllegalArgumentExceptionNotRepeatable("Group["
                 +groupId+"] for deletion doesn't exist!");
-        groupRepository.remove(groupId);
+        groupRepository.delete(groupId);
         DomainEventPublisher.instance().publish(new BulbGroupDeleted(groupId));
     }
     @Override
     public Set<BulbGroup> loadAllByUser(BulbsContextUserId userId) {
-        Set<BulbGroup> res = groupRepository.loadByOwner(userId);
+        Set<BulbGroup> res = groupRepository.findById_Creator(userId);
         outPort.write(res);
         return res;
     }
     @Override
     public BulbGroup loadByName(BulbsContextUserId userId, String groupName) {
-        BulbGroup res = groupRepository.loadByName(userId, groupName);
-        if(!res.getGroupId().getUserId().sameValueAs(userId)){
+        BulbGroup res = groupRepository.findByNameAndId_Creator(groupName, userId);
+        if(!res.getId().getCreator().sameValueAs(userId)){
             throw new NotAuthorizedException("Not allowed to access group by name!");
         }
         outPort.write(res);
@@ -74,9 +74,9 @@ public class BulbGroupServiceImpl implements BulbGroupService{
         log.info("Creating new BulbGroup '"+uniqueGroupname+"' by user " + creatorId);
         BulbGroup res = new BulbGroup(groupRepository.nextIdentity(creatorId), uniqueGroupname);
         res.validateNew(validationNotifier, groupRepository);
-        groupRepository.store(res);
+        groupRepository.save(res);
         outPort.write(res);
-        DomainEventPublisher.instance().publish(new BulbGroupCreated(res.getGroupId()));
+        DomainEventPublisher.instance().publish(new BulbGroupCreated(res.getId()));
         return res;
     }
     @Override
@@ -86,12 +86,12 @@ public class BulbGroupServiceImpl implements BulbGroupService{
             String newUniqueGroupname, 
             ValidatorBulbGroup.NotificationHandlerBulbGroup validationNotifier) {
         
-        BulbGroup group = groupRepository.loadById(groupId);
-        if(!group.getGroupId().getUserId().sameValueAs(userId)){
+        BulbGroup group = groupRepository.findOne(groupId);
+        if(!group.getId().getCreator().sameValueAs(userId)){
             throw new NotAuthorizedException("Illegal attempt to modify group's name!");
         }
         group.modifyName(newUniqueGroupname, validationNotifier, groupRepository);
-        groupRepository.store(group);
+        groupRepository.save(group);
         outPort.write(group);
         return group;
     }
@@ -101,18 +101,13 @@ public class BulbGroupServiceImpl implements BulbGroupService{
             BulbGroupId groupId, 
             Collection<BulbId> allBulbIds) {
         
-        BulbGroup group = groupRepository.loadById(groupId);
-        if(!group.getGroupId().getUserId().sameValueAs(userId)){
+        BulbGroup group = groupRepository.findOne(groupId);
+        if(!group.getId().getCreator().sameValueAs(userId)){
             throw new NotAuthorizedException("Illegal attempt to modify group's name!");
         }
         group.updateAllBulbs(allBulbIds);
-        groupRepository.store(group);
+        groupRepository.save(group);
         outPort.write(group);
         return group;
     }
-
-
-    //~ Actuation ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
-    //~ Private Artifact(s) ////////////////////////////////////////////////////
 }

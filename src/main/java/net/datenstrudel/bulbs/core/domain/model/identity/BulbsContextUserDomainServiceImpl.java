@@ -1,9 +1,10 @@
 package net.datenstrudel.bulbs.core.domain.model.identity;
 
 import net.datenstrudel.bulbs.core.domain.model.bulb.BulbBridgeId;
-import net.datenstrudel.bulbs.core.domain.model.bulb.BulbBridgeRepository;
 import net.datenstrudel.bulbs.shared.domain.model.identity.AppId;
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -19,14 +20,13 @@ public class BulbsContextUserDomainServiceImpl implements BulbsContextUserDomain
     private static final Logger log = LoggerFactory.getLogger(BulbsContextUserDomainServiceImpl.class);
     @Autowired
     private BulbsContextUserRepository userRepository;
-    @Autowired
-    private BulbBridgeRepository bulbBrideRepository;
+
     //~ Construction ///////////////////////////////////////////////////////////
     //~ Method(s) //////////////////////////////////////////////////////////////
     @Override
     public BulbsPrincipal loadPrincipalByUserApiKey(
             String userApiKey, AppId appId, BulbBridgeId bridgeId){
-        BulbsContextUser user = userRepository.loadByApiKey(userApiKey);
+        BulbsContextUser user = userRepository.findByApiKey(userApiKey);
         if(user == null)throw new IllegalArgumentException("No user for apiKey["+userApiKey+"]");
         BulbsPrincipal principal = user.principalFrom(bridgeId);
         if(principal == null)throw new IllegalArgumentException("User with apiKey["+userApiKey+"] not linked with app["+appId+"]");

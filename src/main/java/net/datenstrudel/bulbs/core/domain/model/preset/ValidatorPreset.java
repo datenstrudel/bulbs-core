@@ -1,9 +1,8 @@
 package net.datenstrudel.bulbs.core.domain.model.preset;
 
+import net.datenstrudel.bulbs.core.domain.model.preset.ValidatorPreset.NotificationHandlerPreset;
 import net.datenstrudel.bulbs.shared.domain.validation.ValidationException;
 import net.datenstrudel.bulbs.shared.domain.validation.Validator;
-import net.datenstrudel.bulbs.shared.domain.validation.Validator.ValidationNotificationHandler;
-import net.datenstrudel.bulbs.core.domain.model.preset.ValidatorPreset.NotificationHandlerPreset;
 /**
  *
  * @author Thomas Wendzinski
@@ -27,8 +26,8 @@ public class ValidatorPreset extends Validator<NotificationHandlerPreset> {
     //~ Method(s) //////////////////////////////////////////////////////////////
     @Override
     public void validateNew() {
-        Preset preset = presetRepository.loadByName(
-                preset2Validate.getPresetId().getUserId(), preset2Validate.getName());
+        Preset preset = presetRepository.findByNameAndId_Creator(
+                preset2Validate.getName(), preset2Validate.getId().getCreator());
         if(preset != null){
             notificationHandler().handleDuplicatePresetName();
             throw new ValidationException("Preset with given name already exists!");
@@ -36,8 +35,8 @@ public class ValidatorPreset extends Validator<NotificationHandlerPreset> {
     }
     @Override
     public void validateExisting() {
-        Preset grp = presetRepository.loadByName(
-                preset2Validate.getPresetId().getUserId(), preset2Validate.getName());
+        Preset grp = presetRepository.findByNameAndId_Creator(
+                preset2Validate.getName(), preset2Validate.getId().getCreator());
         if(grp != null && !grp.sameIdentityAs(preset2Validate)){
             notificationHandler().handleDuplicatePresetName();
             throw new ValidationException("Preset with given name already exists!");
@@ -46,7 +45,7 @@ public class ValidatorPreset extends Validator<NotificationHandlerPreset> {
     
     //~ Private Artifact(s) ////////////////////////////////////////////////////
     //~ Additional Artifact(s) ////////////////////////////////////////////////////
-    public static interface NotificationHandlerPreset extends ValidationNotificationHandler{
+    public static interface NotificationHandlerPreset extends Validator.ValidationNotificationHandler{
         void handleDuplicatePresetName();
     }
 

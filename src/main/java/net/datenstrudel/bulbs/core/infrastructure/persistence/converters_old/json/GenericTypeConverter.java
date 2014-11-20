@@ -1,4 +1,4 @@
-package net.datenstrudel.bulbs.core.infrastructure.persistence.converter.json;
+package net.datenstrudel.bulbs.core.infrastructure.persistence.converters_old.json;
 
 import com.google.gson.*;
 import org.springframework.stereotype.Component;

@@ -2,6 +2,7 @@ package net.datenstrudel.bulbs.core.domain.model.bulb;
 
 import net.datenstrudel.bulbs.shared.domain.model.ValueObject;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
@@ -9,7 +10,7 @@ import java.util.Objects;
  * @version 1.0
  * @created 08-Jun-2013 22:51:41
  */
-public class BulbBridgeId implements ValueObject<BulbBridgeId> {
+public class BulbBridgeId implements ValueObject<BulbBridgeId>, Serializable {
 
 	private String uuId;
 

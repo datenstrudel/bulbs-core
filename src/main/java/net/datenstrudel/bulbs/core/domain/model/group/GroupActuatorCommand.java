@@ -93,7 +93,7 @@ public class GroupActuatorCommand  extends AbstractActuatorCmd<GroupActuatorComm
     }
     
     public List<BulbActuatorCommand> toBSingleBulbCommands(BulbGroup group){
-        Assert.isTrue(this.groupId.equals(group.getGroupId()));
+        Assert.isTrue(this.groupId.equals(group.getId()));
         List<BulbActuatorCommand> res = new ArrayList<>(group.getBulbs().size());
 
         for (BulbId bulbId : group.getBulbs()) {

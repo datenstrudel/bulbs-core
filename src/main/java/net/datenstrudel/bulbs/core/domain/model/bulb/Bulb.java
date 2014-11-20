@@ -6,7 +6,10 @@ import net.datenstrudel.bulbs.shared.domain.model.Entity;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbBridgeHwException;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbState;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbsPlatform;
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;import org.springframework.util.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.annotation.Transient;
+import org.springframework.util.Assert;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -15,24 +18,23 @@ import java.util.Map;
 /**
  * A representation of a bulb. Bulb is acore entity to be controlled by this
  * framework.
- * @author derTom
  */
-public class Bulb extends Entity<Bulb, String> implements Serializable{
+public class Bulb extends Entity<Bulb, BulbId> implements Serializable{
 
     //~ Member(s) //////////////////////////////////////////////////////////////
     private static final Logger log = LoggerFactory.getLogger(Bulb.class);
-    
-	private BulbId bulbId;
     private BulbsPlatform platform;
     private String name;
 	private Map<String, Object> bulbAttributes = new HashMap<>();
 	private BulbState state;
-	private BulbBridge bridge;
+	@Transient
+    private BulbBridge bridge;
     private Boolean online;
     
     private PriorityCoordinator priorityCoordinator = new PriorityCoordinator();
 
     //~ Service stuff
+    @Transient
     private final BulbsHwService bulbsHwService;
     
     //~ Construction ///////////////////////////////////////////////////////////
@@ -40,7 +42,7 @@ public class Bulb extends Entity<Bulb, String> implements Serializable{
         this.bulbsHwService = DomainServiceLocator.getBean(BulbsHwService.class);
     }
     public Bulb(
-            BulbId bulbId, 
+            BulbId id,
             BulbsPlatform platform, 
             String name, 
             BulbBridge bridge,
@@ -48,7 +50,7 @@ public class Bulb extends Entity<Bulb, String> implements Serializable{
             boolean online,
             Map<String,Object> attributes){
         this();
-        this.bulbId = bulbId;
+        this.id = id;
         this.platform = platform;
         this.name = name;
         this.bridge = bridge;
@@ -57,7 +59,7 @@ public class Bulb extends Entity<Bulb, String> implements Serializable{
         this.bulbAttributes = attributes;
     }
     public Bulb(
-            BulbId bulbId, 
+            BulbId id,
             BulbsPlatform platform, 
             String name, 
             BulbBridge bridge,
@@ -66,7 +68,7 @@ public class Bulb extends Entity<Bulb, String> implements Serializable{
             Map<String,Object> attributes,
             PriorityCoordinator priorityCoordinator){
         this();
-        this.bulbId = bulbId;
+        this.id = id;
         this.platform = platform;
         this.name = name;
         this.bridge = bridge;
@@ -76,18 +78,10 @@ public class Bulb extends Entity<Bulb, String> implements Serializable{
         this.priorityCoordinator = priorityCoordinator;
     }
     public Bulb copy(){
-        return new Bulb(bulbId, platform, name, bridge, state, online, bulbAttributes, priorityCoordinator);
+        return new Bulb(id, platform, name, bridge, state, online, bulbAttributes, priorityCoordinator);
     }
     
     //~ Method(s) //////////////////////////////////////////////////////////////
-    /**
-	 * @return The bridge dependent ID of <code>this</code>. Thus, the ID returned is unique
-	 * within the aggregate only. The aggregate root is represented by the bridge the bulb
-	 * belongs to.
-      */
-	public BulbId getBulbId(){
-		return bulbId;
-	}
     public BulbBridge getBridge() {
         return bridge;
     }
@@ -141,7 +135,7 @@ public class Bulb extends Entity<Bulb, String> implements Serializable{
         attrMap.put(key, value);
         
         bulbsHwService.modifyBulbAttributes(
-                bulbId, bridge.getLocalAddress(), principal, attrMap, platform);
+                id, bridge.getLocalAddress(), principal, attrMap, platform);
         
         //ToDo: Publish event (propably not here, but in concrete upstream business rule/ requirement.. )!
 	}
@@ -156,7 +150,7 @@ public class Bulb extends Entity<Bulb, String> implements Serializable{
         attrMap.put("name", name);
         
         bulbsHwService.modifyBulbAttributes(
-                bulbId, bridge.getLocalAddress(), principal, attrMap, platform);
+                id, bridge.getLocalAddress(), principal, attrMap, platform);
         setName(name);
         
         //ToDo: Publish event!
@@ -180,7 +174,7 @@ public class Bulb extends Entity<Bulb, String> implements Serializable{
      */
     protected void cancelActuation(ActuationCancelCommand cmd){
         if(!this.priorityCoordinator.executionAllowedFor(cmd)) return;
-        bulbsHwService.cancelActuation(this.bulbId);
+        bulbsHwService.cancelActuation(this.id);
     }
     /**
      * Set <code>this</code>' state from <code>refBulb</code> that was derived from
@@ -194,7 +188,7 @@ public class Bulb extends Entity<Bulb, String> implements Serializable{
         getBulbAttributes().putAll(refBulb.getBulbAttributes());
         setOnline(refBulb.getOnline());
         if(log.isDebugEnabled()){
-            log.debug("Bulb["+ this.bulbId +"] state synched from HW: " + refBulb.getState());
+            log.debug("Bulb["+ this.id +"] state synched from HW: " + refBulb.getState());
         }
     }
     
@@ -202,13 +196,13 @@ public class Bulb extends Entity<Bulb, String> implements Serializable{
     @Override
     public boolean sameIdentityAs(Bulb other) {
         if(other == null ) return false;
-        if( !this.bulbId.sameValueAs(other.bulbId) )return false;
+        if( !this.id.sameValueAs(other.id) )return false;
         return true;
     }
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 37 * hash + (this.bulbId != null ? this.bulbId.hashCode() : 0);
+        hash = 37 * hash + (this.id != null ? this.id.hashCode() : 0);
         return hash;
     }
     @Override
@@ -220,7 +214,7 @@ public class Bulb extends Entity<Bulb, String> implements Serializable{
             return false;
         }
         final Bulb other = (Bulb) obj;
-        if (this.bulbId != other.bulbId && (this.bulbId == null || !this.bulbId.equals(other.bulbId))) {
+        if (this.id != other.id && (this.id == null || !this.id.equals(other.id))) {
             return false;
         }
         return true;

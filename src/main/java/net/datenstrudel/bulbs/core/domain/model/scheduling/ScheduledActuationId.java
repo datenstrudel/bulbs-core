@@ -4,36 +4,37 @@ import net.datenstrudel.bulbs.core.domain.model.identity.BulbsContextUserId;
 import net.datenstrudel.bulbs.shared.domain.model.ValueObject;
 
 import javax.validation.ValidationException;
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
  *
  * @author Thomas Wendzinski
  */
-public class ScheduledActuationId implements ValueObject<ScheduledActuationId>{
+public class ScheduledActuationId implements ValueObject<ScheduledActuationId>, Serializable{
 
     //~ Member(s) //////////////////////////////////////////////////////////////
     private String uuid;
-    private BulbsContextUserId userId;
+    private BulbsContextUserId creator;
     
     //~ Construction ///////////////////////////////////////////////////////////
     private ScheduledActuationId() {
     }
-    public ScheduledActuationId(String uuid, BulbsContextUserId userId) {
+    public ScheduledActuationId(String uuid, BulbsContextUserId creator) {
         this.uuid = uuid;
-        this.userId = userId;
+        this.creator = creator;
     }
 
     //~ Method(s) //////////////////////////////////////////////////////////////
     public String getUuid() {
         return uuid;
     }
-    public BulbsContextUserId getUserId() {
-        return userId;
+    public BulbsContextUserId getCreator() {
+        return creator;
     }
 
     public String serialize(){
-        return uuid + userId.getUuid();
+        return uuid + creator.getUuid();
     }
     public static ScheduledActuationId fromSerialized(String in){
         if(in.length() < 37) throw new ValidationException("Id was too short");
@@ -46,7 +47,7 @@ public class ScheduledActuationId implements ValueObject<ScheduledActuationId>{
     public int hashCode() {
         int hash = 3;
         hash = 89 * hash + Objects.hashCode(this.uuid);
-        hash = 89 * hash + Objects.hashCode(this.userId);
+        hash = 89 * hash + Objects.hashCode(this.creator);
         return hash;
     }
     @Override
@@ -62,7 +63,7 @@ public class ScheduledActuationId implements ValueObject<ScheduledActuationId>{
         if (!Objects.equals(this.uuid, other.uuid)) {
             return false;
         }
-        if (!Objects.equals(this.userId, other.userId)) {
+        if (!Objects.equals(this.creator, other.creator)) {
             return false;
         }
         return true;
@@ -77,8 +78,8 @@ public class ScheduledActuationId implements ValueObject<ScheduledActuationId>{
     }
 
     //~ Private Artifact(s) ////////////////////////////////////////////////////
-    private void setUserId(BulbsContextUserId userId) {
-        this.userId = userId;
+    private void setCreator(BulbsContextUserId creator) {
+        this.creator = creator;
     }
     private void setUuid(String uuid) {
         this.uuid = uuid;

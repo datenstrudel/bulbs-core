@@ -1,6 +1,5 @@
-package net.datenstrudel.bulbs.core.infrastructure.persistence;
+package net.datenstrudel.bulbs.core.infrastructure.persistence.repository;
 
-import net.datenstrudel.bulbs.core.IntegrationTest;
 import net.datenstrudel.bulbs.core.TestConfig;
 import net.datenstrudel.bulbs.core.domain.model.bulb.BulbActuatorCommand;
 import net.datenstrudel.bulbs.core.domain.model.bulb.BulbBridgeId;
@@ -11,13 +10,16 @@ import net.datenstrudel.bulbs.core.domain.model.identity.AppIdCore;
 import net.datenstrudel.bulbs.core.domain.model.identity.BulbsContextUserId;
 import net.datenstrudel.bulbs.core.domain.model.preset.Preset;
 import net.datenstrudel.bulbs.core.domain.model.preset.PresetId;
+import net.datenstrudel.bulbs.core.domain.model.preset.PresetRepository;
 import net.datenstrudel.bulbs.core.infrastructure.PersistenceConfig;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbState;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.CommandPriority;
 import net.datenstrudel.bulbs.shared.domain.model.color.ColorRGB;
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;import org.junit.Before;
+import org.hamcrest.Matchers;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -30,6 +32,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -44,24 +47,23 @@ import static org.junit.Assert.assertNotNull;
         TestConfig.class
     })
 @RunWith(SpringJUnit4ClassRunner.class)
-@Category(IntegrationTest.class)
-public class PresetRepositoryImplTest {
+public class PresetRepositoryImplIT {
     
-    private static final Logger log = LoggerFactory.getLogger(PresetRepositoryImplTest.class);
+    private static final Logger log = LoggerFactory.getLogger(PresetRepositoryImplIT.class);
     
     @Autowired
-    PresetRepositoryImpl instance;
+    PresetRepository instance;
     @Autowired
     private MongoTemplate mongo;
     private static boolean initialized = false;
     
-    public PresetRepositoryImplTest() {
+    public PresetRepositoryImplIT() {
     }
     
     @Before
     public void setUp() {
-        if(PresetRepositoryImplTest.initialized) return ;
-        PresetRepositoryImplTest.initialized = true;
+        if(PresetRepositoryImplIT.initialized) return ;
+        PresetRepositoryImplIT.initialized = true;
         mongo.dropCollection(Preset.class);
     }
 
@@ -70,77 +72,73 @@ public class PresetRepositoryImplTest {
         System.out.println("nextIdentity");
         BulbsContextUserId userId = new BulbsContextUserId("testPresets__userUuid");
         PresetId result = instance.nextIdentity(userId);
-        assertEquals(userId, result.getUserId());
+        assertEquals(userId, result.getCreator());
         assertNotNull(result.getPresetUuid());
     }
     @Test
-    public void testLoadById() {
-        System.out.println("loadById");
+    public void findOne() {
+        System.out.println("findOne");
         Preset expResult = newTestPreset();
-        PresetId presetId = expResult.getPresetId();
+        PresetId presetId = expResult.getId();
         
-        instance.store(expResult);
-        Preset result = instance.loadById(presetId);
+        instance.save(expResult);
+        Preset result = instance.findOne(presetId);
         assertEquals(expResult, result);
         assertEquals(expResult.getName(), result.getName());
         assertEquals(expResult.getStates(), result.getStates());
         expResult.getStates().get(0).equals(result.getStates().get(0));
     }
     @Test
-    public void testLoadByName() {
-        System.out.println("loadByName");
+    public void findByNameAndPresetId_Creator() {
+        System.out.println("findByName");
         Preset expResult = newTestPreset();
         Preset unExpResult = newTestPreset();
-        BulbsContextUserId userId = expResult.getPresetId().getUserId();
+        BulbsContextUserId userId = expResult.getId().getCreator();
         String presetName = expResult.getName();
-
-        instance.store(expResult);
-        instance.store(unExpResult);
-        Preset result = instance.loadByName(userId, presetName);
+        assertThat(instance.findAll().size(), Matchers.greaterThan(1));
+        instance.save(expResult);
+        instance.save(unExpResult);
+        Preset result = instance.findByNameAndId_Creator(presetName, userId);
         
         assertEquals(expResult, result);
     }
     @Test
-    public void testLoadByOwner() {
-        System.out.println("loadByOwner");
+    public void findByPresetId_Creator() {
+        System.out.println("findById_Creator");
         Preset xp1 = newTestPreset();
         Preset xp2 = newTestPreset();
         ReflectionTestUtils.setField(
-                xp2.getPresetId().getUserId(), 
+                xp2.getId().getCreator(),
                 "uuid", 
-                xp1.getPresetId().getUserId().getUuid());
+                xp1.getId().getCreator().getUuid());
         Preset uxp1 = newTestPreset();
         Set<Preset> expResult = new HashSet<>();
         expResult.add(xp1);
         expResult.add(xp2);
-        BulbsContextUserId userId = xp1.getPresetId().getUserId();
+        BulbsContextUserId userId = xp1.getId().getCreator();
         
-        instance.store(uxp1);
-        instance.store(xp1);
-        instance.store(xp2);
-        Set<Preset> result = instance.loadByOwner(userId);
+        instance.save(uxp1);
+        instance.save(xp1);
+        instance.save(xp2);
+        Set<Preset> result = instance.findById_Creator(userId);
         assertEquals(expResult, result);
     }
     @Test
     public void testRemove() {
-        System.out.println("remove");
+        System.out.println("delete");
         
         Preset o1 = newTestPreset();
         Preset o2 = newTestPreset();
-        PresetId presetId = o1.getPresetId();
+        PresetId presetId = o1.getId();
         
-        instance.store(o1);
-        instance.store(o2);
+        instance.save(o1);
+        instance.save(o2);
         
-        instance.remove(presetId);
+        instance.delete(presetId);
         
-        assertNotNull(instance.loadById(o2.getPresetId()));
+        assertNotNull(instance.findOne(o2.getId()));
     }
-//    @Test
-    public void testStore() {
-        // see testloadById() 
-    }
-    
+
     private Preset newTestPreset(){
         PresetId presetId = instance.nextIdentity(
                 new BulbsContextUserId("testPresets__testUserUuid" + UUID.randomUUID().toString()));

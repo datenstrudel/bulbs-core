@@ -2,16 +2,22 @@ package net.datenstrudel.bulbs.core.infrastructure;
 
 import com.mongodb.*;
 import net.datenstrudel.bulbs.core.infrastructure.persistence.MongoConverter;
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;import org.springframework.beans.factory.annotation.Autowired;
+import org.mongeez.Mongeez;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.Environment;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.mongodb.config.AbstractMongoConfiguration;
 import org.springframework.data.mongodb.core.convert.CustomConversions;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,17 +26,20 @@ import java.util.List;
  * @author Thomas Wendzinski
  */
 @Configuration
-//@EnableSpringConfigured
-//@EnableLoadTimeWeaving
-//@EnableAspectJAutoProxy
-@Import({ 
+@Import({
     SerializerConfig.class
 })
 @PropertySource("classpath:/bulbs-core-config.properties")
 @ComponentScan(basePackages = {
-        "net.datenstrudel.bulbs.core.infrastructure.persistence"
+        "net.datenstrudel.bulbs.core.infrastructure.persistence.repository"
 }, excludeFilters = @ComponentScan.Filter(Configuration.class))
-@EnableMongoRepositories()
+@EnableMongoRepositories(
+        basePackages = {
+            "net.datenstrudel.bulbs.core.infrastructure.persistence.repository",
+            "net.datenstrudel.bulbs.core.domain.model",
+            "net.datenstrudel.bulbs.core.application.messaging"
+        }
+)
 public class PersistenceConfig extends AbstractMongoConfiguration{
 
     //~ Member(s) //////////////////////////////////////////////////////////////
@@ -68,6 +77,18 @@ public class PersistenceConfig extends AbstractMongoConfiguration{
     Environment env;
     @Autowired
     ApplicationContext appCtx;
+    private Mongo mongo;
+
+    @PostConstruct
+    private void init() throws Exception {
+        //~ Execute database changeset(s)
+        log.info("Attempt to execute mongodb changesets..");
+        Mongeez mongeez = new Mongeez();
+        mongeez.setFile(new ClassPathResource("/mongodb-changesets/mongeez.xml"));
+        mongeez.setMongo(mongo());
+        mongeez.setDbName(this.dbName);
+        mongeez.process();
+    }
 
     @Override
     public Mongo mongo() throws Exception {env.getProperty("dbname");
@@ -82,11 +103,10 @@ public class PersistenceConfig extends AbstractMongoConfiguration{
                 .socketTimeout(socketTimeout)
 //                .writeConcern(WriteConcern.ACKNOWLEDGED).build();
                 .writeConcern(WriteConcern.UNACKNOWLEDGED).build();
-        MongoClient res = new MongoClient(new ServerAddress(host, port ), opts);
-        return res;
+        this.mongo = new MongoClient(new ServerAddress(host, port ), opts);
+        return this.mongo;
     }
     
-    //~ Private Artifact(s) ////////////////////////////////////////////////////
     @Bean
     public static PropertySourcesPlaceholderConfigurer propertyPlaceholderConfigurer() {
         return new PropertySourcesPlaceholderConfigurer();
@@ -95,9 +115,16 @@ public class PersistenceConfig extends AbstractMongoConfiguration{
     public CustomConversions customConversions() {
         final List converters = new ArrayList<>();
         converters.addAll(appCtx.getBeansWithAnnotation(MongoConverter.class).values());
+
         final CustomConversions res = new CustomConversions(converters);
         log.info("Found and applied persistence converters: " + converters.size());
         return res;
+    }
+
+    @PreDestroy
+    public void shutdown(){
+        log.info("Going to close Mongo connection(s)..");
+        this.mongo.close();
     }
 
 

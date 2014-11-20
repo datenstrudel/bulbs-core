@@ -2,6 +2,7 @@ package net.datenstrudel.bulbs.core.domain.model.identity;
 
 import net.datenstrudel.bulbs.core.domain.model.bulb.BulbBridgeId;
 import net.datenstrudel.bulbs.shared.domain.model.Entity;
+import org.springframework.data.annotation.Id;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.StringUtils;
@@ -15,11 +16,10 @@ import java.util.*;
  * @author Thomas Wendzinski
  * @version 1.0
  */
-public class BulbsContextUser extends Entity<BulbsContextUser, String> 
+public class BulbsContextUser extends Entity<BulbsContextUser, BulbsContextUserId>
         implements  UserDetails{
 
     //~ Member(s) //////////////////////////////////////////////////////////////
-	private BulbsContextUserId bulbsContextUserId;
 	/**
 	 * Unique Identifier
 	 */
@@ -43,7 +43,7 @@ public class BulbsContextUser extends Entity<BulbsContextUser, String>
             String credentials, 
             String nickname,
             String apiKey) {
-        setBulbsContextUserId(userId);
+        setId(userId);
         setEmail(email);
         setCredentials(credentials);
         setNickname(nickname);
@@ -52,7 +52,7 @@ public class BulbsContextUser extends Entity<BulbsContextUser, String>
     
     //~ Method(s) //////////////////////////////////////////////////////////////
     public BulbsContextUserId getBulbsContextUserlId() {
-        return bulbsContextUserId;
+        return id;
     }
     public String getEmail() {
         return email;
@@ -117,13 +117,13 @@ public class BulbsContextUser extends Entity<BulbsContextUser, String>
     @Override
     public boolean sameIdentityAs(BulbsContextUser other) {
         if(other == null)return false;
-        if(!this.bulbsContextUserId.sameValueAs(bulbsContextUserId))return false;
+        if(!this.id.sameValueAs(other.getId()))return false;
         return true;
     }
     @Override
     public int hashCode() {
         int hash = 5;
-        hash = 67 * hash + Objects.hashCode(this.bulbsContextUserId);
+        hash = 67 * hash + Objects.hashCode(this.id);
         return hash;
     }
     @Override
@@ -140,7 +140,7 @@ public class BulbsContextUser extends Entity<BulbsContextUser, String>
     @Override
     public String toString() {
         return "BulbsContextUser{" 
-                + "bulbsContextUserId=" + bulbsContextUserId 
+                + "id=" + id
                 + ", email=" + email 
                 + ", credentials= [PROTECTED]" 
                 + ", nickname=" + nickname 
@@ -178,9 +178,6 @@ public class BulbsContextUser extends Entity<BulbsContextUser, String>
     }
     
     //~ Private Artifact(s) ////////////////////////////////////////////////////
-    private void setBulbsContextUserId(BulbsContextUserId bulbsPrincipalId) {
-        this.bulbsContextUserId = bulbsPrincipalId;
-    }
     private void setEmail(String email) {
         if(email == null || email.isEmpty())throw new IllegalArgumentException("Empty field 'email' not allowed.");
         this.email = email;

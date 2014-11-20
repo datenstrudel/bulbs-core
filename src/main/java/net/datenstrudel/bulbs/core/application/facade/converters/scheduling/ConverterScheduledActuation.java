@@ -36,7 +36,7 @@ public class ConverterScheduledActuation implements DtoConverter<ScheduledActuat
         res.setScheduledActuationId(
                 (String) DtoConverterRegistry.instance()
                         .converterForDomain(ScheduledActuationId.class)
-                        .convert(src.getScheduleId()));
+                        .convert(src.getId()));
         res.setCreated(src.getCreated());
         res.setDeleteAfterExecution(src.isDeleteAfterExecution());
         res.setName(src.getName());

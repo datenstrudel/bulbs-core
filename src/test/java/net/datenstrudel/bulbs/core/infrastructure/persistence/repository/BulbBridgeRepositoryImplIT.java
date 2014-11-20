@@ -1,4 +1,4 @@
-package net.datenstrudel.bulbs.core.infrastructure.persistence;
+package net.datenstrudel.bulbs.core.infrastructure.persistence.repository;
 
 import net.datenstrudel.bulbs.core.TestConfig;
 import net.datenstrudel.bulbs.core.domain.model.bulb.*;
@@ -13,18 +13,15 @@ import org.slf4j.Logger; import org.slf4j.LoggerFactory;import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.IntegrationTest;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 
 /**
@@ -37,14 +34,13 @@ import static org.junit.Assert.*;
             PersistenceConfig.class,
     })
 @RunWith(SpringJUnit4ClassRunner.class)
-@IntegrationTest
 @DirtiesContext
 public class BulbBridgeRepositoryImplIT {
     
     private static final Logger log = LoggerFactory.getLogger(BulbBridgeRepositoryImplIT.class);
     
     @Autowired
-    BulbBridgeRepositoryImpl instance;
+    BulbBridgeRepository instance;
     @Autowired
     private MongoTemplate mongo;
     private static boolean initialized = false;
@@ -67,14 +63,14 @@ public class BulbBridgeRepositoryImplIT {
         BulbsContextUserId userId = new BulbsContextUserId("__SPEC_USER_ID__testLoadByUser");
         ReflectionTestUtils.setField(bulbBridge_0, "owner", userId);
         ReflectionTestUtils.setField(bulbBridge_1, "owner", userId);
-        instance.store(bulbBridge_0);
-        instance.store(bulbBridge_1);
+        instance.save(bulbBridge_0);
+        instance.save(bulbBridge_1);
         Set expResult = new HashSet<BulbBridge>(){{
           add(bulbBridge_0);
           add(bulbBridge_1);
         }};
         
-        Set result = instance.loadByOwner(userId);
+        Set result = instance.findByOwner(userId);
         assertEquals(expResult, result);
     }
     @Test
@@ -86,14 +82,15 @@ public class BulbBridgeRepositoryImplIT {
         ReflectionTestUtils.setField(bulbBridge_0, "owner", userId);
         ReflectionTestUtils.setField(bulbBridge_1, "owner", userId);
 
-        instance.store(bulbBridge_0);
-        instance.store(bulbBridge_1);
+        instance.save(bulbBridge_1);
+        instance.save(bulbBridge_0);
+        assertThat(instance.findAll().containsAll(Arrays.asList(bulbBridge_0, bulbBridge_1)), is(Boolean.TRUE));
         Set expResult = new HashSet<BulbBridge>(){{
           add(bulbBridge_0);
           add(bulbBridge_1);
         }};
         
-        Set result = instance.loadByOwnerAndBulbname(userId, "testBulb_1");
+        Set result = instance.findByOwnerAndBulbs_Name(userId, "testBulb_1");
         assertEquals(expResult, result);
     }
     
@@ -101,39 +98,39 @@ public class BulbBridgeRepositoryImplIT {
     public void testRemove() {
         final BulbBridge bulbBridge = aTestBridge(2);
         
-        instance.store(bulbBridge);
-        instance.remove(bulbBridge.getBridgeId());
+        instance.save(bulbBridge);
+        instance.delete(bulbBridge.getId());
         
-        BulbBridge res = instance.loadById(bulbBridge.getBridgeId());
+        BulbBridge res = instance.findOne(bulbBridge.getId());
         assertNull(res);
     }
     @Test
-    public void testStore() throws Exception {
-        System.out.println("testStore");
+    public void save() throws Exception {
+        System.out.println("save");
         final BulbBridge bulbBridge = aTestBridge(1);
         final Bulb firstBulb = bulbBridge.getBulbs().iterator().next();
         
-        instance.store(bulbBridge);
+        instance.save(bulbBridge);
         
-        BulbBridge res = instance.loadById(bulbBridge.getBridgeId());
+        BulbBridge res = instance.findOne(bulbBridge.getId());
         assertBulbBridge(bulbBridge, res, firstBulb);
     }
     @Test
-    public void testStoreMany()throws Exception{
-        System.out.println("testStoreMany");
+    public void save_many()throws Exception{
+        System.out.println("save_many");
         int numBulbs = 100;
         final BulbBridge bulbBridge = aTestBridge(numBulbs);
-        final Bulb firstBulb = bulbBridge.bulbById(new BulbId(bulbBridge.getBridgeId(), 1));
+        final Bulb firstBulb = bulbBridge.bulbById(new BulbId(bulbBridge.getId(), 1));
         Long start;
         BulbBridge res;
         
         for (int i = 0; i < 50; i++) {
             start = System.currentTimeMillis();
-            instance.store(bulbBridge);
+            instance.save(bulbBridge);
             log.info("StoreTime of " + numBulbs + " bulbs (ms): " + (System.currentTimeMillis() - start) );
             
             start = System.currentTimeMillis();
-            res = instance.loadById(bulbBridge.getBridgeId());
+            res = instance.findOne(bulbBridge.getId());
             log.info("Restore time of " + numBulbs + " (ms): " + (System.currentTimeMillis() - start));
             
             assertBulbBridge(bulbBridge, res, firstBulb);
@@ -145,12 +142,12 @@ public class BulbBridgeRepositoryImplIT {
 //        System.out.println("testStoreDuplicate");
 //        final BulbBridge bulbBridge = aTestBridge(1);
 //        final BulbBridge bulbBridge_dup = aTestBridge(1);
-//        ReflectionTestUtils.setField(bulbBridge_dup.getBridgeId(), "macAddress", bulbBridge.getBridgeId().getMacAddress());
+//        ReflectionTestUtils.setField(bulbBridge_dup.getId(), "macAddress", bulbBridge.getId().getMacAddress());
 //        ReflectionTestUtils.setField(bulbBridge_dup, "name", "nameDup");
 //        
 //        
-//        instance.store(bulbBridge);
-//        instance.store(bulbBridge_dup);
+//        instance.save(bulbBridge);
+//        instance.save(bulbBridge_dup);
 //    }
     
     public void testLoadById() {
@@ -161,10 +158,9 @@ public class BulbBridgeRepositoryImplIT {
             throws Exception{
         
         assertEquals(expResult, result);
-        assertNotNull(result.getId());
-        
-        Bulb el = result.bulbById(new BulbId(result.getBridgeId(), 1));
-        assertEquals(firstBulb.getBulbId(), el.getBulbId());
+
+        Bulb el = result.bulbById(new BulbId(result.getId(), 1));
+        assertEquals(firstBulb.getId(), el.getId());
         assertEquals(firstBulb.getBulbAttributes(), el.getBulbAttributes());
         assertEquals(firstBulb.getState(), el.getState());
         assertEquals(firstBulb.getPlatform(), el.getPlatform());
@@ -199,7 +195,7 @@ public class BulbBridgeRepositoryImplIT {
         bulbBridge.setBulbs(new HashSet<Bulb>(){{
             for (int i = 1; i < numBulbs+1; i++) {
                 add(new Bulb(
-                        new BulbId(bulbBridge.getBridgeId(), i), 
+                        new BulbId(bulbBridge.getId(), i),
                         BulbsPlatform.PHILIPS_HUE, 
                         "testBulb_"+i, 
                         bulbBridge, 

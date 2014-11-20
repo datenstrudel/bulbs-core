@@ -4,7 +4,9 @@ import net.datenstrudel.bulbs.core.application.facade.ModelFacadeOutPort;
 import net.datenstrudel.bulbs.core.domain.model.identity.*;
 import net.datenstrudel.bulbs.core.domain.model.identity.ValidatorBulbsContextUser.NotificationHandlerBulbsContextUser;
 import net.datenstrudel.bulbs.core.domain.model.messaging.IllegalArgumentExceptionNotRepeatable;
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -43,7 +45,7 @@ public class BulbsContextUserServiceImpl implements BulbsContextUserService{
     //~ Method(s) //////////////////////////////////////////////////////////////
     @Override
     public BulbsContextUser loadById(BulbsContextUserId userId){
-        BulbsContextUser res = userRepository.loadById(userId);
+        BulbsContextUser res = userRepository.findOne(userId);
         outPort.write(res);
         return res;
     }
@@ -62,7 +64,7 @@ public class BulbsContextUserServiceImpl implements BulbsContextUserService{
                 nickname,
                 userService.createNewApiKey());
         user.validateNew(notificationHandler, userRepository);
-        userRepository.store(user);
+        userRepository.save(user);
         log.info(" -- BulbsContextUser created: " + user);
         outPort.write(user);
         return user;
@@ -70,14 +72,14 @@ public class BulbsContextUserServiceImpl implements BulbsContextUserService{
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        BulbsContextUser user = userRepository.loadByEmail(username);
+        BulbsContextUser user = userRepository.findByEmail(username);
         if(user == null) throw new UsernameNotFoundException("User not found: " + username);
         return user;
     }
     @Override
     public UserDetails loadUserDetails(PreAuthenticatedAuthenticationToken token) throws UsernameNotFoundException {
         String apiKey = (String)token.getPrincipal();
-        BulbsContextUser user = userRepository.loadByApiKey(apiKey);
+        BulbsContextUser user = userRepository.findByApiKey(apiKey);
         if(user == null) throw new UsernameNotFoundException("User not found: " + apiKey);
         return user;
     }
@@ -89,7 +91,7 @@ public class BulbsContextUserServiceImpl implements BulbsContextUserService{
             ) {
         
         log.info("|-- Going to sign in BulbsContextUser with email['"+email+"']..");
-        BulbsContextUser user = userRepository.loadByEmail(email);
+        BulbsContextUser user = userRepository.findByEmail(email);
         if(user == null) throw new IllegalArgumentException("errors.email.notfound");
         
         Authentication authentication = new UsernamePasswordAuthenticationToken(
@@ -103,35 +105,35 @@ public class BulbsContextUserServiceImpl implements BulbsContextUserService{
     @Override
     public void modifyPassword(String apiKey, String newCredentials,
                                NotificationHandlerBulbsContextUser validationNotificationHandler) {
-        BulbsContextUser contextUser = this.userRepository.loadByApiKey(apiKey);
+        BulbsContextUser contextUser = this.userRepository.findByApiKey(apiKey);
 
         contextUser.modifyPassword(passwordEncoder.encode(newCredentials));
         contextUser.validateExisting(validationNotificationHandler, userRepository, null);
-        this.userRepository.store(contextUser);
+        this.userRepository.save(contextUser);
     }
 
     @Override
     public void addBulbsPrincipal(BulbsContextUserId userId, BulbsPrincipal newPrincipal) {
         log.info("|-- Going to assign new BulbsPrincipal["+newPrincipal+"] to BulbsContextUser["+userId+"]");
         assert(userId != null);
-        BulbsContextUser user = userRepository.loadById(userId);
+        BulbsContextUser user = userRepository.findOne(userId);
         if(user == null) throw new IllegalArgumentExceptionNotRepeatable("User["+userId+"] doesn't exist!");
         
         if( newPrincipal.getState() != BulbsPrincipalState.PENDING )
             throw new IllegalStateException("BulbsPrincipal for assignment has not state PENDING which indicates it is not suited to be assigned to a user yet.");
         user.addBulbsPrincipal(newPrincipal);
-        userRepository.store(user);
+        userRepository.save(user);
         log.info(" -- BulbsPrincipal["+newPrincipal+"] successfully assigned to BulbsContextUser["+userId+"].");
     }
     @Override
     public void removeBulbsPrincipal(BulbsContextUserId userId, BulbsPrincipal principal) {
         log.info("|-- Going to finally delete BulbsPrincipal["+principal+"] from BulbsContextUser["+userId+"]");
         assert(userId != null);
-        BulbsContextUser user = userRepository.loadById(userId);
+        BulbsContextUser user = userRepository.findOne(userId);
         if(user == null) throw new IllegalArgumentException("User["+userId+"] doesn't exist!");
         
         user.removeBulbsPrincipal(principal);
-        userRepository.store(user);
+        userRepository.save(user);
     }
 
     //~ Private Artifact(s) ////////////////////////////////////////////////////

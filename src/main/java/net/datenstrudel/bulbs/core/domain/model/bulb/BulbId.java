@@ -2,13 +2,14 @@ package net.datenstrudel.bulbs.core.domain.model.bulb;
 import net.datenstrudel.bulbs.shared.domain.model.ValueObject;
 
 import javax.validation.ValidationException;
+import java.io.Serializable;
 
 /**
  * @author Thomas Wendzinski
  * @version 1.0
  * @created 08-Jun-2013 22:51:42
  */
-public class BulbId implements ValueObject<BulbId> {
+public class BulbId implements ValueObject<BulbId>, Serializable{
 
 	private Integer localId;
     private BulbBridgeId bridgeId;

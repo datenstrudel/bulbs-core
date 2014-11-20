@@ -23,7 +23,7 @@ public class ConverterPreset implements DtoConverter<Preset, DtoPreset>{
     public DtoPreset convert(Preset src) {
         DtoPreset res = new DtoPreset();
         res.setPresetId((String) DtoConverterRegistry.instance()
-                .converterForDomain(PresetId.class).convert(src.getPresetId())
+                .converterForDomain(PresetId.class).convert(src.getId())
         );
         res.setName(src.getName());
         res.setStates(

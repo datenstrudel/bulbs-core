@@ -40,13 +40,13 @@ public class BulbBridgeDomainServiceImpl implements BulbBridgeDomainService{
     @Deprecated
     public AppLinkResult linkAppToCore(String userApiKey, AppId appId)
             throws IllegalArgumentException{
-        BulbsContextUser user = userRepository.loadByApiKey(userApiKey);
+        BulbsContextUser user = userRepository.findByApiKey(userApiKey);
         String apiKey;
         AppLinkResult res;
         if(user == null) throw new IllegalArgumentException("User with given apiKey["
                 + userApiKey + "] doesn't exist!");
 
-        Set<BulbBridge> bridges = bridgeRepository.loadByOwner(
+        Set<BulbBridge> bridges = bridgeRepository.findByOwner(
                 user.getBulbsContextUserlId());
         apiKey = user.getApiKey();
         res = new AppLinkResult(apiKey);
@@ -57,8 +57,8 @@ public class BulbBridgeDomainServiceImpl implements BulbBridgeDomainService{
         BulbsPrincipal tmpPrincipal;
         String uvBridgeId;
         for (BulbBridge el : bridges) {
-            uvBridgeId = el.getBridgeId().getUuId() + "-" + el.getName();
-            tmpPrincipal = user.principalFrom(el.getBridgeId());
+            uvBridgeId = el.getId().getUuId() + "-" + el.getName();
+            tmpPrincipal = user.principalFrom(el.getId());
             if(tmpPrincipal != null){
                 res.addLinkState(uvBridgeId, true);
                 continue;
@@ -101,18 +101,18 @@ public class BulbBridgeDomainServiceImpl implements BulbBridgeDomainService{
         freshBridge.syncToHardwareState(tmpPrincipal);
         log.info(" -- .. SUCCEEDED.");
         
-        BulbBridge existingBridge = bridgeRepository.loadById(freshBridge.getBridgeId());
+        BulbBridge existingBridge = bridgeRepository.findOne(freshBridge.getId());
         if(existingBridge != null) throw new IllegalArgumentException("Bridge with ID["
-                +freshBridge.getBridgeId()+"] already in use and cannot be assigned a second time!");
+                +freshBridge.getId()+"] already in use and cannot be assigned a second time!");
         
         finalPrincipal = new BulbsPrincipal(
                 tmpPrincipal.getUsername(), 
                 tmpPrincipal.getAppId(), 
-                freshBridge.getBridgeId().getUuId(), 
+                freshBridge.getId().getUuId(),
                 BulbsPrincipalState.PENDING);
         
-        log.info(" -- Try to persistently store new BulbBridge .. ");
-        bridgeRepository.store(freshBridge);
+        log.info(" -- Try to persistently save new BulbBridge .. ");
+        freshBridge = bridgeRepository.save(freshBridge);
         log.info(" -- SUCCEEDED (still before commit). ");
         
         DomainEventPublisher.instance().publish(
@@ -125,14 +125,14 @@ public class BulbBridgeDomainServiceImpl implements BulbBridgeDomainService{
     
     @Override
     public void removeBulbBridge(BulbBridgeId bridgeId, BulbsContextUser initiator) {
-        BulbBridge b2Del = bridgeRepository.loadById(bridgeId);
+        BulbBridge b2Del = bridgeRepository.findOne(bridgeId);
         if(b2Del == null) throw new IllegalArgumentException("Cannot delete Bridge["+bridgeId+"] due to doesn't exist.");
         if(!b2Del.getOwner().sameValueAs(initiator.getBulbsContextUserlId())){
             throw new IllegalArgumentException("Cannot delete Bridge["+bridgeId
                     +"] by user["+initiator.getBulbsContextUserlId()
                     +"] due to currently only the owner of a bridge is supported to trigger deletion.");
         }
-        bridgeRepository.remove(bridgeId);
+        bridgeRepository.delete(bridgeId);
         
         DomainEventPublisher.instance().publish( new BulbBridgeDeleted(
                 initiator.getBulbsContextUserlId(), 

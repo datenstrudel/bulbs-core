@@ -21,13 +21,7 @@ public class ConverterBulb implements DtoConverter<Bulb, DtoBulb>{
     public DtoBulb convert(Bulb src) {
         DtoBulb res = new DtoBulb();
         res.setName(src.getName());
-//        locTarget.setBulbId( "" + b.getBulbId().getLocalId());
-        
-        // TODO: Remove!
-//        res.setBulbId(
-//                DtoConverterRegistry.instance()
-//                .converterFor(DtoBulbId.class).convert(src.getBulbId()));
-        res.setBulbId(src.getBulbId().serialize());
+        res.setBulbId(src.getId().serialize());
         res.setOnline(src.getOnline());
         res.setState(src.getState());
         res.setBridge( 

@@ -13,8 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * @author Thomas Wendzinski
@@ -44,24 +45,27 @@ public class NotificationServiceRabbitMq implements NotificationService {
     @Override
     public void publishNotifications(){
         PublishedMessageTracker tracker = publishedMessageTracker();
-        List<Notification> notifications = listUnpublishedNotifications(
+        Stream<Notification> notifications = listUnpublishedNotifications(
                 tracker.getMostRecentPublishedStoredEventId());
-        if(notifications.isEmpty())return ;
-        
-        int i = 0;
-        for (Notification notification : notifications) {
+
+        Notification currentNf = null;
+        Notification previousNf = null;
+        Iterator<Notification> it = notifications.iterator();
+
+        while( it.hasNext() ){
+            currentNf = it.next();
             try {
-                if(log.isDebugEnabled()) log.debug("|-- [ -> ] Publishing " + notification);
-                publish(notification);
-                i++;
+                if(log.isDebugEnabled()) log.debug("|-- [ -> ] Publishing " + currentNf);
+                publish(currentNf);
+                previousNf = currentNf;
             } catch (IOException ex) {
-                log.error(" -- [ -> ] Unable to send "+notification+" on topic["+TOPIC+"]", ex);
-                trackMostRecentPublishedMessage(tracker, notifications.get(i));
+                log.error(" -- [ -> ] Unable to send " + currentNf + " on topic["+TOPIC+"]", ex);
+                if(previousNf != null) trackMostRecentPublishedMessage(tracker, previousNf);
                 throw new IllegalStateException(
                         "Unable to send notification for topic["+TOPIC+"]", ex);
             }
         }
-        trackMostRecentPublishedMessage(tracker, notifications.get(i-1));
+        if(currentNf != null) trackMostRecentPublishedMessage(tracker, currentNf);
 
     }
     
@@ -81,15 +85,10 @@ public class NotificationServiceRabbitMq implements NotificationService {
                 props, 
                 objectSerializer.toJson(notification).getBytes());
         channel.close();
-
     }
-    private List<Notification> listUnpublishedNotifications(Long mostRecentStoredEventId){
+    private Stream<Notification> listUnpublishedNotifications(Long mostRecentStoredEventId){
         List<StoredEvent> events = eventStore.loadAllStoredEventsSince(mostRecentStoredEventId);
-        List<Notification> res = new ArrayList<>(events.size());
-        for (StoredEvent el : events) {
-            res.add(notificationFrom(el));
-        }
-        return res;
+        return events.stream().map(this::notificationFrom);
     }
     private Notification notificationFrom(StoredEvent event){
         return new Notification(
@@ -102,10 +101,10 @@ public class NotificationServiceRabbitMq implements NotificationService {
     private void trackMostRecentPublishedMessage(
             PublishedMessageTracker tracker, Notification lastSuccessfulNotification){
         tracker.setMostRecentPublishedStoredEventId(lastSuccessfulNotification.getNotificationId());
-        messageTrackerStore.store(tracker);
+        messageTrackerStore.save(tracker);
     }
     private PublishedMessageTracker publishedMessageTracker(){
-        PublishedMessageTracker res = messageTrackerStore.loadByType(TOPIC);
+        PublishedMessageTracker res = messageTrackerStore.findByType(TOPIC);
         if(res == null) res = new PublishedMessageTracker(TOPIC);
         return res;
     }
