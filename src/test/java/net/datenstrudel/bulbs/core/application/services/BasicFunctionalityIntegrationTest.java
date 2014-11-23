@@ -12,7 +12,7 @@ import net.datenstrudel.bulbs.core.domain.model.identity.AppIdCore;
 import net.datenstrudel.bulbs.core.domain.model.identity.BulbsContextUser;
 import net.datenstrudel.bulbs.core.domain.model.identity.BulbsContextUserRepository;
 import net.datenstrudel.bulbs.core.domain.model.identity.ValidatorBulbsContextUser;
-import net.datenstrudel.bulbs.core.infrastructure.persistence.BulbBridgeRepositoryImpl;
+import net.datenstrudel.bulbs.core.infrastructure.persistence.repository.BulbBridgeRepositoryImpl;
 import net.datenstrudel.bulbs.core.security.config.SecurityConfig;
 import net.datenstrudel.bulbs.core.websocket.WebSocketConfig;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.*;
@@ -89,7 +89,7 @@ public class BasicFunctionalityIntegrationTest {
         }catch (InterruptedException iex){
         }
 
-        BulbsContextUser assertUser = userRepository.loadByEmail(user.getEmail());
+        BulbsContextUser assertUser = userRepository.findByEmail(user.getEmail());
         assertTrue(!assertUser.getBulbsPrincipals().isEmpty());
         
         BulbId bulbAddressed = bridge.getBulbs().iterator().next().getBulbId();

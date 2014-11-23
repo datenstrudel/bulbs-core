@@ -117,7 +117,7 @@ public class ScheduledActuationRepositoryImplTest {
 
     @Test
     public void testRemove() {
-        System.out.println("remove");
+        System.out.println("delete");
         BulbsContextUserId creator = new BulbsContextUserId("testLoadById__userId");
         ScheduledActuationId id = instance.nextIdentity(creator);
         ScheduledActuation expResult = newTestInstance(id, true, true);

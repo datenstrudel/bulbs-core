@@ -64,13 +64,13 @@ public class ActuatorDomainServiceImpl implements ActuatorDomainService{
         BulbsPrincipal principal = userService.loadPrincipalByUserApiKey(
                 bulbCommand.getUserApiKey(), bulbCommand.getAppId(), bridgeId);
         
-        BulbBridge bridge = bridgeRepository.loadById(bridgeId);
+        BulbBridge bridge = bridgeRepository.findOne(bridgeId);
         if(bridge == null){
             log.error("BulbBridge["+bridgeId+"] doesnt' exist! Command not executable.");
             throw new IllegalArgumentException("BulbBridge["+bridgeId+"] doesnt' exist! Command not executable.");
         }
         bridge.execBulbActuation(bulbCommand, principal);
-        bridgeRepository.store(bridge);
+        bridgeRepository.save(bridge);
     }
     @Override
     public void execute(GroupActuatorCommand groupCmd) throws BulbBridgeHwException{
@@ -125,7 +125,7 @@ public class ActuatorDomainServiceImpl implements ActuatorDomainService{
             BulbsPrincipal principal = userService.loadPrincipalByUserApiKey(
                     cancelCommand.getUserApiKey(), cancelCommand.getAppId(), bridgeId);
 
-            BulbBridge bridge = bridgeRepository.loadById(bridgeId);
+            BulbBridge bridge = bridgeRepository.findOne(bridgeId);
             if(bridge == null){
                 log.error("BulbBridge["+bridgeId+"] doesnt' exist! Command not executable.");
                 throw new IllegalArgumentException("BulbBridge["+bridgeId+"] doesnt' exist! Command not executable.");

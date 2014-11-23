@@ -15,9 +15,13 @@ import net.datenstrudel.bulbs.shared.domain.model.Entity;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbBridgeAddress;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbBridgeHwException;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbsPlatform;
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;import org.springframework.util.Assert;
+import org.slf4j.Logger; import org.slf4j.LoggerFactory;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
+import javax.persistence.PostLoad;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -31,11 +35,13 @@ import java.util.Set;
  * @version 1.0
  * @updated 08-Jun-2013 22:54:55
  */
+@javax.persistence.Entity
 public class BulbBridge extends Entity<BulbBridge, String> {
 
     //~ Member(s) //////////////////////////////////////////////////////////////
-    private static final Logger log = LoggerFactory.getLogger(BulbBridge.class);
-	private BulbBridgeId bridgeId;
+//    private static final Logger log = LoggerFactory.getLogger(BulbBridge.class);
+	@Id
+    private BulbBridgeId bridgeId;
     private BulbsPlatform platform;
 	private Map<String,Object> bridgeAttributes = new HashMap<>();
     private String macAddress;
@@ -89,7 +95,6 @@ public class BulbBridge extends Entity<BulbBridge, String> {
     public BulbBridgeId getBridgeId() {
         return bridgeId;
     }
-
     public String getMacAddress() {
         return macAddress;
     }
@@ -212,9 +217,9 @@ public class BulbBridge extends Entity<BulbBridge, String> {
      * @throws BulbBridgeHwException  
 	 */
 	public void syncToHardwareState(BulbsPrincipal principal) throws BulbBridgeHwException{
-        if(log.isDebugEnabled()){
-            log.debug(this.bridgeId + " - " + name +": " + "Synching to hardware state");
-        }
+//        if(log.isDebugEnabled()){
+//            log.debug(this.bridgeId + " - " + name +": " + "Synching to hardware state");
+//        }
         //~ Retrieve bridge parameter
         BulbBridge refBridge = hardwareService.bridgeFromHwInterface(
                 localAddress, this.bridgeId, principal, owner, platform);
@@ -312,11 +317,11 @@ public class BulbBridge extends Entity<BulbBridge, String> {
         
         if(cancelCommand.getEntityIds() == null) 
             throw new IllegalArgumentException("Entity IDs must not be null!");
-        log.info("Bridge["+this.name+"] cancel Actuation by Ids: " + cancelCommand.getEntityIds());
+//        log.info("Bridge["+this.name+"] cancel Actuation by Ids: " + cancelCommand.getEntityIds());
         cancelCommand.getEntityIds().stream().forEach( (BulbId bId) -> {
             Bulb b = bulbById(bId);
             if(b == null) {
-                log.error("Bulb["+bId+"] doesn't exist!");
+//                log.error("Bulb["+bId+"] doesn't exist!");
                 return ;
             }
             b.cancelActuation(cancelCommand);
@@ -464,6 +469,9 @@ public class BulbBridge extends Entity<BulbBridge, String> {
     private void setOwner(BulbsContextUserId owner) {
         this.owner = owner;
     }
-    
+
+    public void postLoad(){
+        this.bulbs.stream().forEach( b -> b.setBridge(this) );
+    }
 
 }

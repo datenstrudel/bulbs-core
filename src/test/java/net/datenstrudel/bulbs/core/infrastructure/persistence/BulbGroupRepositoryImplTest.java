@@ -93,7 +93,7 @@ public class BulbGroupRepositoryImplTest  {
 
     @Test
     public void testLoadByOwner() {
-        System.out.println("loadByOwner");
+        System.out.println("findByOwner");
         LinkedHashSet<BulbGroup> expResult = new LinkedHashSet<>();
         BulbGroup g_0 = newTestBulbGroup();
         BulbGroup g_1 = newTestBulbGroup();
@@ -115,7 +115,7 @@ public class BulbGroupRepositoryImplTest  {
 
     @Test
     public void testRemove() {
-        System.out.println("remove");
+        System.out.println("delete");
         BulbGroup group = newTestBulbGroup();
         BulbGroupId groupId = group.getGroupId();
         BulbGroup res;

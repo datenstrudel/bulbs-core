@@ -2,10 +2,7 @@ package net.datenstrudel.bulbs.core.infrastructure.persistence.repository;
 
 import net.datenstrudel.bulbs.core.IntegrationTest;
 import net.datenstrudel.bulbs.core.TestConfig;
-import net.datenstrudel.bulbs.core.domain.model.identity.BulbsContextUser;
-import net.datenstrudel.bulbs.core.domain.model.identity.BulbsContextUserId;
-import net.datenstrudel.bulbs.core.domain.model.identity.BulbsPrincipal;
-import net.datenstrudel.bulbs.core.domain.model.identity.BulbsPrincipalState;
+import net.datenstrudel.bulbs.core.domain.model.identity.*;
 import net.datenstrudel.bulbs.core.infrastructure.PersistenceConfig;
 import net.datenstrudel.bulbs.shared.domain.model.identity.AppId;
 import org.junit.Before;
@@ -31,7 +28,7 @@ import static org.junit.Assert.assertTrue;
         })
 @RunWith(SpringJUnit4ClassRunner.class)
 @Category(IntegrationTest.class)
-public class BulbsContextUserRepositoryTest {
+public class BulbsContextUserRepositoryIT {
 
     @Autowired
     BulbsContextUserRepository instance;
@@ -41,21 +38,20 @@ public class BulbsContextUserRepositoryTest {
 
     @Before
     public void setUp() {
-        if (BulbsContextUserRepositoryTest.initialized) return;
-        BulbsContextUserRepositoryTest.initialized = true;
+        if (BulbsContextUserRepositoryIT.initialized) return;
+        BulbsContextUserRepositoryIT.initialized = true;
         mongo.dropCollection(BulbsContextUser.class);
     }
 
     @Test
-    public void testNextIdentity() {
+    public void nextIdentity() {
         System.out.println("nextIdentity");
         BulbsContextUserId result = instance.nextIdentity();
         assertNotNull(result.getUuid());
         assertTrue(!result.getUuid().isEmpty());
     }
-
     @Test
-    public void testLoadByEmail() {
+    public void finddByEmail() {
         System.out.println("loadByEmail");
         BulbsContextUser testUser = newTestUser();
         String email = testUser.getEmail();
@@ -63,10 +59,18 @@ public class BulbsContextUserRepositoryTest {
         BulbsContextUser result = instance.findByEmail(email);
         assertEquals(testUser, result);
     }
-
     @Test
-    public void testStore() {
-        System.out.println("store");
+    public void findByApiKey() {
+        System.out.println("findByApiKey");
+        BulbsContextUser testUser = newTestUser();
+        String apiKey = testUser.getApiKey();
+        instance.save(testUser); // Store in order there is sth that can be found
+        BulbsContextUser result = instance.findByApiKey(apiKey);
+        assertEquals(testUser, result);
+    }
+    @Test
+    public void save() {
+        System.out.println("save");
         BulbsContextUser testUser = newTestUser();
         instance.save(testUser);
 
@@ -88,14 +92,6 @@ public class BulbsContextUserRepositoryTest {
         assertEquals(res.getBulbsPrincipals().size(), res2.getBulbsPrincipals().size());
         assertEquals(res.getBulbsPrincipals(), res2.getBulbsPrincipals());
 
-    }
-
-    public void testLoadById() {
-        // Tested in testStore()
-    }
-
-    public void testRemove() {
-        // Trivial
     }
 
     private BulbsContextUser newTestUser() {

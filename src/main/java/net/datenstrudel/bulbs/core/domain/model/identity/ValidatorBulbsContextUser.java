@@ -1,7 +1,6 @@
 package net.datenstrudel.bulbs.core.domain.model.identity;
 
 import net.datenstrudel.bulbs.core.domain.model.identity.ValidatorBulbsContextUser.NotificationHandlerBulbsContextUser;
-import net.datenstrudel.bulbs.shared.domain.validation.Validator.ValidationNotificationHandler;
 import net.datenstrudel.bulbs.shared.domain.validation.ValidationException;
 import net.datenstrudel.bulbs.shared.domain.validation.Validator;
 
@@ -32,7 +31,7 @@ public class ValidatorBulbsContextUser extends Validator<NotificationHandlerBulb
     @Override
     public void validateNew() throws ValidationException{
 
-        BulbsContextUser existingUsr = userRepository.loadByEmail(user2Val.getEmail());
+        BulbsContextUser existingUsr = userRepository.findByEmail(user2Val.getEmail());
         if(existingUsr != null){
             notificationHandler().handleDuplicateEmail(user2Val.getEmail());
             throw new ValidationException("User with given mail["+user2Val.getEmail()+"] already exists!");
@@ -45,7 +44,7 @@ public class ValidatorBulbsContextUser extends Validator<NotificationHandlerBulb
     @Override
     public void validateExisting() throws ValidationException{
         if(oldMail != null && !user2Val.getEmail().equals(this.oldMail)){
-            BulbsContextUser existingUsr = userRepository.loadByEmail(user2Val.getEmail());
+            BulbsContextUser existingUsr = userRepository.findByEmail(user2Val.getEmail());
             if(existingUsr != null){
                 notificationHandler().handleDuplicateEmail(user2Val.getEmail());
                 throw new ValidationException("User with given mail["+user2Val.getEmail()+"] already exists!");
@@ -58,7 +57,7 @@ public class ValidatorBulbsContextUser extends Validator<NotificationHandlerBulb
     }
 
     ////////////////////////////////////////////////////////////////////////////
-    public static interface NotificationHandlerBulbsContextUser extends ValidationNotificationHandler{
+    public static interface NotificationHandlerBulbsContextUser extends Validator.ValidationNotificationHandler{
         void handleDuplicateEmail(String mailAddressConcerned);
         void handleInvalidPassword();
     }

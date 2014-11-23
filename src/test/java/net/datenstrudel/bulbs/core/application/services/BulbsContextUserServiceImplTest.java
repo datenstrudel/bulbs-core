@@ -62,9 +62,9 @@ public class BulbsContextUserServiceImplTest {
         };
         expect(mk_userDomainService.createNewApiKey()).andReturn(UUID.randomUUID().toString().toUpperCase());
         expect(mk_userRepository.nextIdentity()).andReturn(new BulbsContextUserId("GEN_USER_ID"));
-        expect(mk_userRepository.loadByEmail(email)).andReturn(null);
+        expect(mk_userRepository.findByEmail(email)).andReturn(null);
         expect(mk_passwordEncoder.encode(credentials)).andReturn("encryptedCredentials");
-        mk_userRepository.store(isA(BulbsContextUser.class));
+        mk_userRepository.save(isA(BulbsContextUser.class));
         expectLastCall();
         replay(mk_userDomainService, mk_userRepository, mk_passwordEncoder);
         BulbsContextUser result = instance.signUp(email, credentials, nickname, notificationHandler);

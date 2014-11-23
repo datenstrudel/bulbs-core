@@ -15,8 +15,7 @@ public interface BulbsContextUserDomainService {
      * This method simplifies retrieval of a {@link BulbBridge}, {@link AppId} and
      * {@link BulbsContextUser} specific <code>BulbsPrincipal</code>. These principals
      * are stored for each user after successful initial linking process 
-     * (see {@link #linkAppToCore(java.lang.String, java.lang.String, net.datenstrudel.bulbs.shared.domain.model.identity.AppId) linkAppToCore(..)}).
-     * 
+     *
      * @param userApiKey {@link BulbsContextUser} specific api key
      * @param appId Identity of the application requesting a resource/interaction
      * @param bridgeId The identifier of the {@link BulbBridge} for whose interaction

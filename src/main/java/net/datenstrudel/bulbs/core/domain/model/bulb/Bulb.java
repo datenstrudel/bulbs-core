@@ -6,7 +6,11 @@ import net.datenstrudel.bulbs.shared.domain.model.Entity;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbBridgeHwException;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbState;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbsPlatform;
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;import org.springframework.util.Assert;
+import org.slf4j.Logger; import org.slf4j.LoggerFactory;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Reference;
+import org.springframework.data.annotation.Transient;
+import org.springframework.util.Assert;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -17,17 +21,18 @@ import java.util.Map;
  * framework.
  * @author derTom
  */
+//@JsonIde
 public class Bulb extends Entity<Bulb, String> implements Serializable{
 
     //~ Member(s) //////////////////////////////////////////////////////////////
     private static final Logger log = LoggerFactory.getLogger(Bulb.class);
-    
+    @Id
 	private BulbId bulbId;
     private BulbsPlatform platform;
     private String name;
 	private Map<String, Object> bulbAttributes = new HashMap<>();
 	private BulbState state;
-	private BulbBridge bridge;
+	@Transient private BulbBridge bridge;
     private Boolean online;
     
     private PriorityCoordinator priorityCoordinator = new PriorityCoordinator();

@@ -124,11 +124,11 @@ public class ActuatorDomainServiceImplTest {
         mk_br1 = createMock( BulbBridge.class); 
         mk_br2 = createMock( BulbBridge.class);
         
-        expect(mk_bridgeRepository.loadById(bridges[0])).andReturn(mk_br1).once();
+        expect(mk_bridgeRepository.findOne(bridges[0])).andReturn(mk_br1).once();
         mk_br1.cancelActuation(capture(captCmd), isA(BulbsPrincipal.class));
         expectLastCall().once();
         
-        expect(mk_bridgeRepository.loadById(bridges[1])).andReturn(mk_br2).once();
+        expect(mk_bridgeRepository.findOne(bridges[1])).andReturn(mk_br2).once();
         mk_br2.cancelActuation(capture(captCmd), isA(BulbsPrincipal.class));
         expectLastCall().once();
         

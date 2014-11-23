@@ -1,7 +1,6 @@
 package net.datenstrudel.bulbs.core.infrastructure;
 
 import com.mongodb.*;
-import net.datenstrudel.bulbs.core.infrastructure.persistence.MongoConverter;
 import net.datenstrudel.bulbs.core.infrastructure.persistence.converters.BulbsContextUserIdConverterRead;
 import net.datenstrudel.bulbs.core.infrastructure.persistence.converters.BulbsContextUserIdConverterWrite;
 import org.slf4j.Logger; import org.slf4j.LoggerFactory;import org.springframework.beans.factory.annotation.Autowired;
@@ -22,17 +21,19 @@ import java.util.List;
  * @author Thomas Wendzinski
  */
 @Configuration
-//@EnableSpringConfigured
-//@EnableLoadTimeWeaving
-//@EnableAspectJAutoProxy
-@Import({ 
+@Import({
     SerializerConfig.class
 })
 @PropertySource("classpath:/bulbs-core-config.properties")
 @ComponentScan(basePackages = {
         "net.datenstrudel.bulbs.core.infrastructure.persistence.repository"
 }, excludeFilters = @ComponentScan.Filter(Configuration.class))
-@EnableMongoRepositories("net.datenstrudel.bulbs.core.infrastructure.persistence.repository")
+@EnableMongoRepositories(
+        basePackages = {
+            "net.datenstrudel.bulbs.core.infrastructure.persistence.repository",
+            "net.datenstrudel.bulbs.core.domain.model"
+        }
+)
 public class PersistenceConfig extends AbstractMongoConfiguration{
 
     //~ Member(s) //////////////////////////////////////////////////////////////

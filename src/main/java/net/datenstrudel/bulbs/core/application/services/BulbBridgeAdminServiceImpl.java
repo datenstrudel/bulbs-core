@@ -50,7 +50,7 @@ public class BulbBridgeAdminServiceImpl
             BulbBridgeAddress localAddress, 
             String userApiKey)throws BulbBridgeHwException {
         
-        BulbsContextUser user = userRepository.loadByApiKey(userApiKey);
+        BulbsContextUser user = userRepository.findByApiKey(userApiKey);
         if(user == null) throw new IllegalArgumentException("No user for apiKey["+userApiKey+"]");
         BulbBridge res = bridgeDomainService.findAndCreateBulbBridge(
                 localAddress, platform, user);
@@ -61,9 +61,9 @@ public class BulbBridgeAdminServiceImpl
     @Override
     public void performBulbSearch(BulbBridgeId bridgeId, String userApiKey) 
             throws BulbBridgeHwException{
-        BulbsContextUser user = userRepository.loadByApiKey(userApiKey);
+        BulbsContextUser user = userRepository.findByApiKey(userApiKey);
         if(user == null) throw new AuthenticationException("No user for apiKey["+userApiKey+"]");
-        BulbBridge bridge = bridgeRepository.loadById(bridgeId);
+        BulbBridge bridge = bridgeRepository.findOne(bridgeId);
         if(!bridge.getOwner().sameValueAs(user.getBulbsContextUserlId()))
             throw new NotAuthorizedException("Permission denied for ApiKey["+userApiKey+"] to access bridge with "+bridgeId);
         bridge.performBulbSearch(user.principalFrom(bridgeId));
@@ -71,13 +71,13 @@ public class BulbBridgeAdminServiceImpl
 
     @Override
     public void syncAllBridges(String userApiKey) throws BulbBridgeHwException {
-        BulbsContextUser user = userRepository.loadByApiKey(userApiKey);
+        BulbsContextUser user = userRepository.findByApiKey(userApiKey);
         if(user == null) throw new AuthenticationException("No user for apiKey["+userApiKey+"]");
-        Set<BulbBridge> bridges = bridgeRepository.loadByOwner(user.getBulbsContextUserlId());
+        Set<BulbBridge> bridges = bridgeRepository.findByOwner(user.getBulbsContextUserlId());
         for (BulbBridge el : bridges) {
             try{
                 el.syncToHardwareState(user.principalFrom(el.getBridgeId()));
-                bridgeRepository.store(el);
+                bridgeRepository.save(el);
             }catch(BulbBridgeHwException bbhwex){
                 log.info("Couldn't sync due to: " + bbhwex.getMessage());
             }
@@ -87,9 +87,9 @@ public class BulbBridgeAdminServiceImpl
     
     @Override
     public Bulb loadBulb(BulbId bulbId, String userApiKey){
-        BulbsContextUser user = userRepository.loadByApiKey(userApiKey);
+        BulbsContextUser user = userRepository.findByApiKey(userApiKey);
         if(user == null) throw new AuthenticationException("No user for apiKey["+userApiKey+"]");
-        BulbBridge bridge = bridgeRepository.loadById(bulbId.getBridgeId());
+        BulbBridge bridge = bridgeRepository.findOne(bulbId.getBridgeId());
         if(!bridge.getOwner().sameValueAs(user.getBulbsContextUserlId()))
             throw new NotAuthorizedException("Permission denied for ApiKey["+userApiKey+"] to access bulb with " + bulbId);
         Bulb res = bridge.bulbById(bulbId);
@@ -99,9 +99,9 @@ public class BulbBridgeAdminServiceImpl
     }
     @Override
     public Set<Bulb> bulbsByContextUser(String userApiKey) {
-        BulbsContextUser user = userRepository.loadByApiKey(userApiKey);
+        BulbsContextUser user = userRepository.findByApiKey(userApiKey);
         if(user == null) throw new AuthenticationException("No user for apiKey["+userApiKey+"]");
-        Set<BulbBridge> bridges = bridgeRepository.loadByOwner(user.getBulbsContextUserlId());
+        Set<BulbBridge> bridges = bridgeRepository.findByOwner(user.getBulbsContextUserlId());
         Set<Bulb> bulbs = new HashSet<>();
         for (BulbBridge bulbBridge : bridges) {
             bulbs.addAll(bulbBridge.getBulbs());
@@ -113,9 +113,9 @@ public class BulbBridgeAdminServiceImpl
 
     @Override
     public BulbBridge loadBridge(BulbBridgeId bridgeId, String userApiKey) {
-        BulbsContextUser user = userRepository.loadByApiKey(userApiKey);
+        BulbsContextUser user = userRepository.findByApiKey(userApiKey);
         if(user == null) throw new AuthenticationException("No user for apiKey["+userApiKey+"]");
-        BulbBridge res = bridgeRepository.loadById(bridgeId);
+        BulbBridge res = bridgeRepository.findOne(bridgeId);
         if(!res.getOwner().sameValueAs(user.getBulbsContextUserlId()))
             throw new IllegalArgumentException("Permission denied for ApiKey["+userApiKey+"] to access bridge with "+bridgeId);
         modelPort.write( res);
@@ -123,17 +123,17 @@ public class BulbBridgeAdminServiceImpl
     }
     @Override
     public Set<BulbBridge> bridgesByContextUser(String userApiKey) {
-        BulbsContextUser user = userRepository.loadByApiKey(userApiKey);
+        BulbsContextUser user = userRepository.findByApiKey(userApiKey);
         if(user == null) throw new AuthenticationException("No user for apiKey["+userApiKey+"]");
-        Set<BulbBridge> res = bridgeRepository.loadByOwner(user.getBulbsContextUserlId());
+        Set<BulbBridge> res = bridgeRepository.findByOwner(user.getBulbsContextUserlId());
         modelPort.write( (Collection) res);
         return res;
     }
     @Override
     public String[] allBulbNames(String userApiKey) {
-        BulbsContextUser user = userRepository.loadByApiKey(userApiKey);
+        BulbsContextUser user = userRepository.findByApiKey(userApiKey);
         if(user == null) throw new AuthenticationException("No user for apiKey["+userApiKey+"]");
-        Set<BulbBridge> bridges = bridgeRepository.loadByOwner(user.getBulbsContextUserlId());
+        Set<BulbBridge> bridges = bridgeRepository.findByOwner(user.getBulbsContextUserlId());
         List<String> res = new ArrayList<>();
         for (BulbBridge el : bridges) {
             res.addAll(el.allBulbNames());
@@ -149,11 +149,11 @@ public class BulbBridgeAdminServiceImpl
         
         BulbsPrincipal principal = userService.loadPrincipalByUserApiKey(
                 userApiKey, AppIdCore.instance(), bridgeId);
-        BulbBridge b = bridgeRepository.loadById(bridgeId);
+        BulbBridge b = bridgeRepository.findOne(bridgeId);
         
         if(b == null) throw new IllegalArgumentException("Bridge["+bridgeId+"] doesn't exist.");
         b.modifyName(newName, principal);
-        bridgeRepository.store(b);
+        bridgeRepository.save(b);
     }
      
     @Override
@@ -164,11 +164,11 @@ public class BulbBridgeAdminServiceImpl
         BulbBridgeId bridgeId = bulbId.getBridgeId();
         BulbsPrincipal principal = userService.loadPrincipalByUserApiKey(
                 userApiKey, AppIdCore.instance(), bridgeId);
-        BulbBridge b = bridgeRepository.loadById(bridgeId);
+        BulbBridge b = bridgeRepository.findOne(bridgeId);
         
         if(b == null) throw new IllegalArgumentException("Bulb with ["+bulbId+"] doesn't exist.");
         b.mofiyBulbName(principal, bulbId, newName);
-        bridgeRepository.store(b);
+        bridgeRepository.save(b);
     }
     
     @Override
@@ -176,21 +176,21 @@ public class BulbBridgeAdminServiceImpl
             String userApiKey,
             BulbBridgeId bridgeId, 
             BulbBridgeAddress newAddress) throws BulbBridgeHwException{
-        BulbsContextUser user = userRepository.loadByApiKey(userApiKey);
+        BulbsContextUser user = userRepository.findByApiKey(userApiKey);
         if(user == null) throw new IllegalArgumentException("No user for apiKey["+userApiKey+"]");
-        BulbBridge b = bridgeRepository.loadById(bridgeId);
+        BulbBridge b = bridgeRepository.findOne(bridgeId);
         if(b == null) throw new IllegalArgumentException("Bridge["+bridgeId+"] doesn't exist.");
         BulbsPrincipal principal = userService.loadPrincipalByUserApiKey(
                 userApiKey, AppIdCore.instance(), bridgeId);
         b.modifyLocalAddress(newAddress, principal);
-        bridgeRepository.store(b);
+        bridgeRepository.save(b);
     }
 
     public void removeAllBulbsPrincipalsAfterBridgeDeletion(
             final BulbsContextUserId userId, final BulbBridgeId bridgeId, BulbBridgeAddress address, BulbsPlatform platform) {
 
         log.info("|-- Going to delete BulbsPrincipals from  hardware at address["+address+"]");
-        final BulbsContextUser user = userRepository.loadById(userId);
+        final BulbsContextUser user = userRepository.findOne(userId);
         BulbsPrincipal[] principals2Del = user.getBulbsPrincipals().stream()
                 .filter(bulbsPrincipal -> bulbsPrincipal.getBulbBridgeId().equals(bridgeId.getUuId()))
                 .toArray(value -> new BulbsPrincipal[value] );
@@ -213,18 +213,18 @@ public class BulbBridgeAdminServiceImpl
             BulbBridgeId bulbBridgeId, 
             BulbsPrincipal principal2Remove) throws BulbBridgeHwException {
         BulbsPrincipal principal = userService.loadPrincipalByUserApiKey(userApiKey, AppIdCore.instance(), bulbBridgeId);
-        BulbBridge b = bridgeRepository.loadById(bulbBridgeId);
+        BulbBridge b = bridgeRepository.findOne(bulbBridgeId);
         if(b == null) throw new IllegalArgumentException("Bridge["+bulbBridgeId+"] doesn't exist.");
-        BulbsContextUser user = userRepository.loadByApiKey(userApiKey);
+        BulbsContextUser user = userRepository.findByApiKey(userApiKey);
         b.removeBulbsPrincipal(principal, principal2Remove, user);
-        bridgeRepository.store(b);
+        bridgeRepository.save(b);
     }
     
     @Override
     public void removeBulbBridge(
             String userApiKey, 
             BulbBridgeId bridgeId ) {
-        BulbsContextUser user = userRepository.loadByApiKey(userApiKey);
+        BulbsContextUser user = userRepository.findByApiKey(userApiKey);
         if(user == null) throw new IllegalArgumentException("No user for apiKey["+userApiKey+"]");
         bridgeDomainService.removeBulbBridge(bridgeId, user);
     }
@@ -232,24 +232,24 @@ public class BulbBridgeAdminServiceImpl
     //~ By IBulbBridgeAdminServiceInternal /////////////////////////////////////
     @Override
     public void updateBulbStateInternal(BulbId bulbId, BulbState state) {
-        BulbBridge bridge = bridgeRepository.loadById(bulbId.getBridgeId());
+        BulbBridge bridge = bridgeRepository.findOne(bulbId.getBridgeId());
         if(bridge == null) throw new IllegalArgumentExceptionNotRepeatable(
                 "Bridge didn't exist anymore: " + bulbId.getBridgeId());
         Bulb bulb = bridge.bulbById(bulbId);
         if(bulb == null) throw new IllegalArgumentExceptionNotRepeatable(
                 "Bulb didn't exist anymore: " + bulbId );
         bulb.updateState(state);
-        bridgeRepository.store(bridge);
+        bridgeRepository.save(bridge);
     }
     @Override
     public void syncToHardwareStateInternal(BulbBridgeId bridgeId, BulbsPrincipal principal) {
         log.info("Going to sync hardware state for bridge " + bridgeId);
-        BulbBridge bridge = bridgeRepository.loadById(bridgeId);
+        BulbBridge bridge = bridgeRepository.findOne(bridgeId);
         if(bridge == null) throw new IllegalArgumentExceptionNotRepeatable(
                 "Bridge didn't exist anymore: " + bridgeId);
         try{
             bridge.syncToHardwareState(principal);
-            bridgeRepository.store(bridge);
+            bridgeRepository.save(bridge);
         }catch(BulbBridgeHwException bbhex){
             log.error(bbhex.getMessage(), bbhex);
         }

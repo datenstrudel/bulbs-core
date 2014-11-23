@@ -102,7 +102,7 @@ public class PresetRepositoryImplTest {
     }
     @Test
     public void testLoadByOwner() {
-        System.out.println("loadByOwner");
+        System.out.println("findByOwner");
         Preset xp1 = newTestPreset();
         Preset xp2 = newTestPreset();
         ReflectionTestUtils.setField(
@@ -123,7 +123,7 @@ public class PresetRepositoryImplTest {
     }
     @Test
     public void testRemove() {
-        System.out.println("remove");
+        System.out.println("delete");
         
         Preset o1 = newTestPreset();
         Preset o2 = newTestPreset();

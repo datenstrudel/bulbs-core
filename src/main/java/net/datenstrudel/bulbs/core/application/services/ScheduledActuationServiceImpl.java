@@ -154,7 +154,7 @@ public class ScheduledActuationServiceImpl implements ScheduledActuationService{
         if(schedAct == null)
             throw new IllegalArgumentExceptionNotRepeatable("error.scheduledActuation.notFound");
         
-        final String userApiKey = userRepository.loadById(userId).getApiKey();
+        final String userApiKey = userRepository.findOne(userId).getApiKey();
         final List<AbstractActuatorCmd> states = schedAct.getStates();
         for (AbstractActuatorCmd cmd : states) {
             cmd.setUserApiKey(userApiKey);
