@@ -19,11 +19,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 
 /**
@@ -84,8 +82,9 @@ public class BulbBridgeRepositoryImplIT {
         ReflectionTestUtils.setField(bulbBridge_0, "owner", userId);
         ReflectionTestUtils.setField(bulbBridge_1, "owner", userId);
 
-        instance.save(bulbBridge_0);
         instance.save(bulbBridge_1);
+        instance.save(bulbBridge_0);
+        assertThat(instance.findAll().containsAll(Arrays.asList(bulbBridge_0, bulbBridge_1)), is(Boolean.TRUE));
         Set expResult = new HashSet<BulbBridge>(){{
           add(bulbBridge_0);
           add(bulbBridge_1);
@@ -100,9 +99,9 @@ public class BulbBridgeRepositoryImplIT {
         final BulbBridge bulbBridge = aTestBridge(2);
         
         instance.save(bulbBridge);
-        instance.delete(bulbBridge.getBridgeId());
+        instance.delete(bulbBridge.getId());
         
-        BulbBridge res = instance.findOne(bulbBridge.getBridgeId());
+        BulbBridge res = instance.findOne(bulbBridge.getId());
         assertNull(res);
     }
     @Test
@@ -113,7 +112,7 @@ public class BulbBridgeRepositoryImplIT {
         
         instance.save(bulbBridge);
         
-        BulbBridge res = instance.findOne(bulbBridge.getBridgeId());
+        BulbBridge res = instance.findOne(bulbBridge.getId());
         assertBulbBridge(bulbBridge, res, firstBulb);
     }
     @Test
@@ -121,7 +120,7 @@ public class BulbBridgeRepositoryImplIT {
         System.out.println("save_many");
         int numBulbs = 100;
         final BulbBridge bulbBridge = aTestBridge(numBulbs);
-        final Bulb firstBulb = bulbBridge.bulbById(new BulbId(bulbBridge.getBridgeId(), 1));
+        final Bulb firstBulb = bulbBridge.bulbById(new BulbId(bulbBridge.getId(), 1));
         Long start;
         BulbBridge res;
         
@@ -131,7 +130,7 @@ public class BulbBridgeRepositoryImplIT {
             log.info("StoreTime of " + numBulbs + " bulbs (ms): " + (System.currentTimeMillis() - start) );
             
             start = System.currentTimeMillis();
-            res = instance.findOne(bulbBridge.getBridgeId());
+            res = instance.findOne(bulbBridge.getId());
             log.info("Restore time of " + numBulbs + " (ms): " + (System.currentTimeMillis() - start));
             
             assertBulbBridge(bulbBridge, res, firstBulb);
@@ -143,7 +142,7 @@ public class BulbBridgeRepositoryImplIT {
 //        System.out.println("testStoreDuplicate");
 //        final BulbBridge bulbBridge = aTestBridge(1);
 //        final BulbBridge bulbBridge_dup = aTestBridge(1);
-//        ReflectionTestUtils.setField(bulbBridge_dup.getBridgeId(), "macAddress", bulbBridge.getBridgeId().getMacAddress());
+//        ReflectionTestUtils.setField(bulbBridge_dup.getId(), "macAddress", bulbBridge.getId().getMacAddress());
 //        ReflectionTestUtils.setField(bulbBridge_dup, "name", "nameDup");
 //        
 //        
@@ -160,8 +159,8 @@ public class BulbBridgeRepositoryImplIT {
         
         assertEquals(expResult, result);
 
-        Bulb el = result.bulbById(new BulbId(result.getBridgeId(), 1));
-        assertEquals(firstBulb.getBulbId(), el.getBulbId());
+        Bulb el = result.bulbById(new BulbId(result.getId(), 1));
+        assertEquals(firstBulb.getId(), el.getId());
         assertEquals(firstBulb.getBulbAttributes(), el.getBulbAttributes());
         assertEquals(firstBulb.getState(), el.getState());
         assertEquals(firstBulb.getPlatform(), el.getPlatform());
@@ -196,7 +195,7 @@ public class BulbBridgeRepositoryImplIT {
         bulbBridge.setBulbs(new HashSet<Bulb>(){{
             for (int i = 1; i < numBulbs+1; i++) {
                 add(new Bulb(
-                        new BulbId(bulbBridge.getBridgeId(), i), 
+                        new BulbId(bulbBridge.getId(), i),
                         BulbsPlatform.PHILIPS_HUE, 
                         "testBulb_"+i, 
                         bulbBridge, 

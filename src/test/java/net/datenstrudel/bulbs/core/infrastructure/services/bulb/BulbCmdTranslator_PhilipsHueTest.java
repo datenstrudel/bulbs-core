@@ -69,7 +69,7 @@ public class BulbCmdTranslator_PhilipsHueTest {
         BulbsContextUserId contextUserId = new BulbsContextUserId("userUuid");
         BulbBridge result = instance.bridgeFromJson(json, bridgeId, T_BRIDGE_ADDRESS, contextUserId);
         
-        assertEquals(bridgeId, result.getBridgeId());
+        assertEquals(bridgeId, result.getId());
         assertEquals("00:17:88:00:00:00", result.getMacAddress());
         assertEquals("Smartbridge 1", result.getName());
         assertEquals(T_BRIDGE_ADDRESS, result.getLocalAddress());
@@ -130,7 +130,7 @@ public class BulbCmdTranslator_PhilipsHueTest {
                 BulbsPlatform.PHILIPS_HUE, T_BRIDGE_ADDRESS, 
                 null, null, null);
         Bulb expResult = new Bulb(
-                new BulbId(parentBridge.getBridgeId(), 1), 
+                new BulbId(parentBridge.getId(), 1),
                 BulbsPlatform.PHILIPS_HUE, "LC 1", parentBridge, 
                 new BulbState(new ColorHSB(1f, 1f, 0f), true),
                 true,
@@ -138,7 +138,7 @@ public class BulbCmdTranslator_PhilipsHueTest {
                     put("swversion", "1.0.3");
                     put("type", "Living Colors");
                 }});
-        Bulb result = instance.bulbFromJson(json, parentBridge, new BulbId(parentBridge.getBridgeId(), 1));
+        Bulb result = instance.bulbFromJson(json, parentBridge, new BulbId(parentBridge.getId(), 1));
         assertEquals(expResult, result);
         assertEquals(expResult.getName(), result.getName());
         

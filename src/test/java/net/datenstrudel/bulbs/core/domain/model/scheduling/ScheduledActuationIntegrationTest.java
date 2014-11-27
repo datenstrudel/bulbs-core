@@ -75,7 +75,7 @@ public class ScheduledActuationIntegrationTest {
 //        Date trigger = Date.from(trigger_.toInstant().atZone(ZoneId.of(instance.getTimezoneId())).toLocalDateTime().toInstant(ZoneOffset.UTC));
         System.out.println("Trigger: " + trigger_);
         instance.defineTrigger(trigger, jobCoordinator);
-        mk_actService.execute(instance.getScheduleId().getUserId(), instance.getScheduleId());
+        mk_actService.execute(instance.getId().getCreator(), instance.getId());
         expectLastCall().once();
         replay(mk_actService);
         instance.activate(jobCoordinator);

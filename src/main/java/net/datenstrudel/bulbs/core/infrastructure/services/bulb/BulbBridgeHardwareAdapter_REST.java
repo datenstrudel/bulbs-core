@@ -112,7 +112,7 @@ public class BulbBridgeHardwareAdapter_REST implements BulbBridgeHardwareAdapter
             BulbCmdTranslator cmdTranslator) throws BulbBridgeHwException {
         HttpCommand cmd = cmdTranslator.toToBulbsPrincipalsCmd(bridge, principal);
         ResponseEntity<String> resp = executeHttpCmd(cmd, cmdTranslator);
-        return cmdTranslator.bulbsPrincipalsFromJson(resp.getBody(), bridge.getBridgeId());
+        return cmdTranslator.bulbsPrincipalsFromJson(resp.getBody(), bridge.getId());
     }
     
     @Override
@@ -143,7 +143,7 @@ public class BulbBridgeHardwareAdapter_REST implements BulbBridgeHardwareAdapter
         HttpCommand cmd = cmdTranslator.toBulbsFromHwInterfaceCmd(
                 parentBridge.getLocalAddress(), principal);
         ResponseEntity<String> resp = executeHttpCmd(cmd, cmdTranslator);
-        BulbId[] bulbIds = cmdTranslator.bulbIdsFromJson(resp.getBody(), parentBridge.getBridgeId());
+        BulbId[] bulbIds = cmdTranslator.bulbIdsFromJson(resp.getBody(), parentBridge.getId());
         return bulbIds;
     }
     

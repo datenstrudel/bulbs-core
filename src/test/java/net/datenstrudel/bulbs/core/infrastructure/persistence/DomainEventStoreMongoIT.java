@@ -1,5 +1,6 @@
 package net.datenstrudel.bulbs.core.infrastructure.persistence;
 
+import jdk.nashorn.internal.ir.annotations.Ignore;
 import net.datenstrudel.bulbs.core.IntegrationTest;
 import net.datenstrudel.bulbs.core.TestConfig;
 import net.datenstrudel.bulbs.core.application.messaging.eventStore.DomainEventStore;
@@ -35,17 +36,17 @@ classes = {
         TestConfig.class
 })
 @RunWith(SpringJUnit4ClassRunner.class)
-@Category(IntegrationTest.class)
-public class DomainEventStoreMongoTest {
+@Ignore
+public class DomainEventStoreMongoIT {
     
-    private static final Logger log = LoggerFactory.getLogger(DomainEventStoreMongoTest.class);
+    private static final Logger log = LoggerFactory.getLogger(DomainEventStoreMongoIT.class);
     
     @Autowired
     DomainEventStore instance;
     @Autowired
     private MongoTemplate mongo;
     
-    public DomainEventStoreMongoTest() {
+    public DomainEventStoreMongoIT() {
     }
     
     @After
@@ -74,7 +75,7 @@ public class DomainEventStoreMongoTest {
     }
     @Test
     public void testStore() {
-        System.out.println("store");
+        System.out.println("save");
         DomainEvent event = new TestEvent(
                 new BulbState(new ColorRGB(1, 2, 3), true), 
                 "testDId", 
@@ -84,7 +85,6 @@ public class DomainEventStoreMongoTest {
         
         StoredEvent res = instance.loadById(storedEventId);
         assertEquals(event, instance.fromStoredEvent(res));
-        
     }
     @Test
     public void testLoadAllStoredEventsSince(){

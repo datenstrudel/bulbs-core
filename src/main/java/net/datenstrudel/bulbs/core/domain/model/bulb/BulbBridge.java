@@ -15,13 +15,10 @@ import net.datenstrudel.bulbs.shared.domain.model.Entity;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbBridgeAddress;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbBridgeHwException;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbsPlatform;
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
-import javax.persistence.PostLoad;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -35,13 +32,10 @@ import java.util.Set;
  * @version 1.0
  * @updated 08-Jun-2013 22:54:55
  */
-@javax.persistence.Entity
-public class BulbBridge extends Entity<BulbBridge, String> {
+public class BulbBridge extends Entity<BulbBridge, BulbBridgeId> {
 
     //~ Member(s) //////////////////////////////////////////////////////////////
 //    private static final Logger log = LoggerFactory.getLogger(BulbBridge.class);
-	@Id
-    private BulbBridgeId bridgeId;
     private BulbsPlatform platform;
 	private Map<String,Object> bridgeAttributes = new HashMap<>();
     private String macAddress;
@@ -57,6 +51,7 @@ public class BulbBridge extends Entity<BulbBridge, String> {
 	private Set<Bulb> bulbs = new HashSet<>();
 	
     //~ Service Stuff
+    @Transient
     private BulbsHwService hardwareService;
     
     //~ Construction ///////////////////////////////////////////////////////////
@@ -81,8 +76,9 @@ public class BulbBridge extends Entity<BulbBridge, String> {
             String name, 
             BulbsContextUserId owner,
             Map<String,Object> bridgeAttributes) {
-        this();
-        this.bridgeId = bridgeId;
+        super(bridgeId);
+        this.hardwareService = DomainServiceLocator.getBean(BulbsHwService.class);
+//        this.bridgeId = bridgeId;
         this.macAddress = macAddress;
         this.platform = platform;
         this.localAddress = localAddress;
@@ -92,9 +88,6 @@ public class BulbBridge extends Entity<BulbBridge, String> {
     }
     
     //~ Method(s) //////////////////////////////////////////////////////////////
-    public BulbBridgeId getBridgeId() {
-        return bridgeId;
-    }
     public String getMacAddress() {
         return macAddress;
     }
@@ -144,7 +137,7 @@ public class BulbBridge extends Entity<BulbBridge, String> {
 	 */
 	public void modifyLocalAddress(BulbBridgeAddress address, BulbsPrincipal principal) throws BulbBridgeHwException{
         BulbBridge testBridge = hardwareService.bridgeFromHwInterface(
-                address, this.bridgeId, principal, owner, platform);
+                address, super.getId(), principal, owner, platform);
         if(testBridge == null){
             throw new IllegalArgumentException("No Bridge found on new address["+address+"]");
         }
@@ -184,7 +177,7 @@ public class BulbBridge extends Entity<BulbBridge, String> {
         assert(!StringUtils.isEmpty(principal2Register.getUsername()));
         assert(!StringUtils.isEmpty(principal2Register.getBulbBridgeId()));
         assert( new BulbBridgeId(principal2Register.getBulbBridgeId())
-                .sameValueAs(this.bridgeId) );
+                .sameValueAs(super.getId()) );
         if(!this.owner.sameValueAs(user.getBulbsContextUserlId())){
             throw new IllegalArgumentException("Illegal access: User["+user.getBulbsContextUserlId()
                     + "] not owner of bridge that was attempted of beeing modified.");
@@ -222,11 +215,11 @@ public class BulbBridge extends Entity<BulbBridge, String> {
 //        }
         //~ Retrieve bridge parameter
         BulbBridge refBridge = hardwareService.bridgeFromHwInterface(
-                localAddress, this.bridgeId, principal, owner, platform);
+                localAddress, getId(), principal, owner, platform);
         if(!refBridge.getMacAddress().equals(this.macAddress)){
             throw new IllegalStateException(
-                    "Reference Hardware Bridge[" + refBridge.getBridgeId()
-                    + "] not equal to this[" + bridgeId + "], due to MAC addresses do not match!");
+                    "Reference Hardware Bridge[" + refBridge.getId()
+                    + "] not equal to this[" + getId() + "], due to MAC addresses do not match!");
         }
         setBridgeAttributes( refBridge.getBridgeAttributes() );
         setLocalAddress(refBridge.getLocalAddress());
@@ -239,8 +232,8 @@ public class BulbBridge extends Entity<BulbBridge, String> {
         BulbId[] bulbIdsRef = new BulbId[refBulbs.length];
         int i = 0;
         for (Bulb bulbRef : refBulbs) {
-            bulbIdsRef[i++] = bulbRef.getBulbId();
-            bulbOrig = bulbById(bulbRef.getBulbId());
+            bulbIdsRef[i++] = bulbRef.getId();
+            bulbOrig = bulbById(bulbRef.getId());
             if(bulbOrig != null){
                 // Update existing
                 bulbOrig.syncToHardwareState(bulbRef);
@@ -252,7 +245,7 @@ public class BulbBridge extends Entity<BulbBridge, String> {
         // Maintain online status of known bulbs
         this.updateBulbsOnlineState(bulbIdsRef);
         DomainEventPublisher.instance().publish(
-                new BulbBridgeSynced(this.bridgeId.getUuId(), principal));
+                new BulbBridgeSynced(getId().getUuId(), principal));
 	}
     
     //~ BULBS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -264,7 +257,7 @@ public class BulbBridge extends Entity<BulbBridge, String> {
         return Iterables.find(bulbs, new Predicate<Bulb>() {
             @Override
             public boolean apply(Bulb t) {
-                return t.getBulbId().sameValueAs(bulbId);
+                return t.getId().sameValueAs(bulbId);
             }
         }, null);
     }
@@ -292,7 +285,7 @@ public class BulbBridge extends Entity<BulbBridge, String> {
 	 */
 	public void performBulbSearch(BulbsPrincipal principal) throws BulbBridgeHwException{
 		this.hardwareService.discoverNewBulbs(
-                this.bridgeId, this.localAddress, principal, this.platform);
+                getId(), this.localAddress, principal, this.platform);
 	}
     /**
 	 * 
@@ -372,7 +365,7 @@ public class BulbBridge extends Entity<BulbBridge, String> {
             idsRef = new HashSet<>();
         else idsRef = Sets.newHashSet(idsFoundRecently);
         for (Bulb el : this.bulbs) {
-            if(idsRef.contains(el.getBulbId())){
+            if(idsRef.contains(el.getId())){
 //                el.changedOnlineState(true); // that the bridge returns the bulb doesn't mean it is actually reachable and online
             }else{
                 el.changedOnlineState(false);
@@ -399,12 +392,12 @@ public class BulbBridge extends Entity<BulbBridge, String> {
     @Override
     public boolean sameIdentityAs(BulbBridge other) {
         if(other == null)return false;
-        return this.bridgeId.sameValueAs(other.bridgeId);
+        return this.getId().sameValueAs(other.getId());
     }
     @Override
     public int hashCode() {
         int hash = 3;
-        hash = 37 * hash + (this.bridgeId != null ? this.bridgeId.hashCode() : 0);
+        hash = 37 * hash + (this.getId() != null ? this.getId().hashCode() : 0);
         return hash;
     }
     @Override
@@ -421,7 +414,7 @@ public class BulbBridge extends Entity<BulbBridge, String> {
     @Override
     public String toString() {
         return "BulbBridge{" 
-                + "bridgeId=" + bridgeId 
+                + "bridgeId=" + getId()
                 + ", platform=" + platform 
 //                + ", bridgeAttributes=" + bridgeAttributes 
                 + ", localAddress=" + localAddress 
@@ -448,9 +441,6 @@ public class BulbBridge extends Entity<BulbBridge, String> {
         this.online = online;
     }
     
-    private void setBridgeId(BulbBridgeId bridgeId) {
-        this.bridgeId = bridgeId;
-    }
     private void setPlatform(BulbsPlatform platform) {
         this.platform = platform;
     }

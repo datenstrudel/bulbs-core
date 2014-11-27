@@ -25,7 +25,7 @@ public class ConverterGroup implements DtoConverter<BulbGroup, DtoGroup>{
         res.setName(src.getName());
         res.setGroupId(
                 (String) DtoConverterRegistry.instance()
-                        .converterForDomain(BulbGroupId.class).convert(src.getGroupId())
+                        .converterForDomain(BulbGroupId.class).convert(src.getId())
         );
         res.setBulbIds( (Set) DtoConverterRegistry.instance()
                         .converterForDomain(BulbId.class).convertCollection(src.getBulbs()));

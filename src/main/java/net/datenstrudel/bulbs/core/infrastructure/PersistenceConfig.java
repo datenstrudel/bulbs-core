@@ -1,9 +1,10 @@
 package net.datenstrudel.bulbs.core.infrastructure;
 
 import com.mongodb.*;
-import net.datenstrudel.bulbs.core.infrastructure.persistence.converters.BulbsContextUserIdConverterRead;
-import net.datenstrudel.bulbs.core.infrastructure.persistence.converters.BulbsContextUserIdConverterWrite;
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;import org.springframework.beans.factory.annotation.Autowired;
+import net.datenstrudel.bulbs.core.infrastructure.persistence.MongoConverter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.*;
@@ -13,6 +14,7 @@ import org.springframework.data.mongodb.config.AbstractMongoConfiguration;
 import org.springframework.data.mongodb.core.convert.CustomConversions;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
+import javax.annotation.PreDestroy;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,7 +33,8 @@ import java.util.List;
 @EnableMongoRepositories(
         basePackages = {
             "net.datenstrudel.bulbs.core.infrastructure.persistence.repository",
-            "net.datenstrudel.bulbs.core.domain.model"
+            "net.datenstrudel.bulbs.core.domain.model",
+            "net.datenstrudel.bulbs.core.application.messaging"
         }
 )
 public class PersistenceConfig extends AbstractMongoConfiguration{
@@ -71,6 +74,7 @@ public class PersistenceConfig extends AbstractMongoConfiguration{
     Environment env;
     @Autowired
     ApplicationContext appCtx;
+    private Mongo mongo;
 
     @Override
     public Mongo mongo() throws Exception {env.getProperty("dbname");
@@ -85,8 +89,8 @@ public class PersistenceConfig extends AbstractMongoConfiguration{
                 .socketTimeout(socketTimeout)
 //                .writeConcern(WriteConcern.ACKNOWLEDGED).build();
                 .writeConcern(WriteConcern.UNACKNOWLEDGED).build();
-        MongoClient res = new MongoClient(new ServerAddress(host, port ), opts);
-        return res;
+        this.mongo = new MongoClient(new ServerAddress(host, port ), opts);
+        return this.mongo;
     }
     
     //~ Private Artifact(s) ////////////////////////////////////////////////////
@@ -97,13 +101,17 @@ public class PersistenceConfig extends AbstractMongoConfiguration{
     @Override
     public CustomConversions customConversions() {
         final List converters = new ArrayList<>();
-//        converters.addAll(appCtx.getBeansWithAnnotation(MongoConverter.class).values());
-        //TODO: Check: Doesn't seem to be necessary
-//        converters.add(new BulbsContextUserIdConverterRead());
-//        converters.add(new BulbsContextUserIdConverterWrite());
+        converters.addAll(appCtx.getBeansWithAnnotation(MongoConverter.class).values());
+
         final CustomConversions res = new CustomConversions(converters);
         log.info("Found and applied persistence converters: " + converters.size());
         return res;
+    }
+
+    @PreDestroy
+    public void shutdown(){
+        log.info("Going to close Mongo connection(s)..");
+        this.mongo.close();
     }
 
 

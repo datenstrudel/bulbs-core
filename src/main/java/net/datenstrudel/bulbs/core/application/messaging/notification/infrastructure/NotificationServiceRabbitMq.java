@@ -12,9 +12,7 @@ import org.slf4j.Logger; import org.slf4j.LoggerFactory;import org.springframewo
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
-import javax.annotation.PreDestroy;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
@@ -103,10 +101,10 @@ public class NotificationServiceRabbitMq implements NotificationService {
     private void trackMostRecentPublishedMessage(
             PublishedMessageTracker tracker, Notification lastSuccessfulNotification){
         tracker.setMostRecentPublishedStoredEventId(lastSuccessfulNotification.getNotificationId());
-        messageTrackerStore.store(tracker);
+        messageTrackerStore.save(tracker);
     }
     private PublishedMessageTracker publishedMessageTracker(){
-        PublishedMessageTracker res = messageTrackerStore.loadByType(TOPIC);
+        PublishedMessageTracker res = messageTrackerStore.findByType(TOPIC);
         if(res == null) res = new PublishedMessageTracker(TOPIC);
         return res;
     }

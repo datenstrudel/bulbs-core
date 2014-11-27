@@ -14,34 +14,34 @@ import java.util.Objects;
 public class BulbGroupId implements ValueObject<BulbGroupId>, Serializable{
 
     //~ Member(s) //////////////////////////////////////////////////////////////
-    private BulbsContextUserId userId;
+    private BulbsContextUserId creator;
     private String groupUuid;
 
     //~ Construction ///////////////////////////////////////////////////////////
     public BulbGroupId() {
     }
-    public BulbGroupId(BulbsContextUserId userId, String groupUuid) {
-        this.userId = userId;
+    public BulbGroupId(BulbsContextUserId creator, String groupUuid) {
+        this.creator = creator;
         this.groupUuid = groupUuid;
     }
     
     //~ Method(s) //////////////////////////////////////////////////////////////
-    public BulbsContextUserId getUserId() {
-        return userId;
+    public BulbsContextUserId getCreator() {
+        return creator;
     }
     public String getGroupUuid() {
         return groupUuid;
     }
 
-    public void setUserId(BulbsContextUserId userId) {
-        this.userId = userId;
+    public void setCreator(BulbsContextUserId creator) {
+        this.creator = creator;
     }
     public void setGroupUuid(String groupUuid) {
         this.groupUuid = groupUuid;
     }
 
     public String serialize(){
-        return groupUuid + userId.getUuid();
+        return groupUuid + creator.getUuid();
     }
     public static BulbGroupId fromSerialized(String in){
         if(in.length() < 37)throw new ValidationException("Id was too short");
@@ -53,14 +53,14 @@ public class BulbGroupId implements ValueObject<BulbGroupId>, Serializable{
     @Override
     public boolean sameValueAs(BulbGroupId other) {
         if(other == null) return false;
-        if(!this.userId.sameValueAs(other.userId))return false;
+        if(!this.creator.sameValueAs(other.creator))return false;
         if(!this.groupUuid.equals(other.groupUuid))return false;
         return true;
     }
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 17 * hash + Objects.hashCode(this.userId);
+        hash = 17 * hash + Objects.hashCode(this.creator);
         hash = 17 * hash + Objects.hashCode(this.groupUuid);
         return hash;
     }

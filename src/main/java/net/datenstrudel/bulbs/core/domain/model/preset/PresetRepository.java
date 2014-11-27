@@ -1,6 +1,7 @@
 package net.datenstrudel.bulbs.core.domain.model.preset;
 
 import net.datenstrudel.bulbs.core.domain.model.identity.BulbsContextUserId;
+import net.datenstrudel.bulbs.core.domain.model.infrastructure.BCoreBaseRepository;
 
 import java.util.Set;
 
@@ -9,13 +10,9 @@ import java.util.Set;
  * @version 1.0
  * @created 08-Jun-2013 22:51:42
  */
-public interface PresetRepository {
+public interface PresetRepository extends BCoreBaseRepository<Preset, PresetId>, PresetRepositoryExt{
 
-    public PresetId nextIdentity(BulbsContextUserId userId);
-    public Preset loadById(PresetId presetId);
-    public Preset loadByName(BulbsContextUserId userId, String presetName);
-    public Set<Preset> loadByOwner(BulbsContextUserId userId);
+    public Preset findByNameAndId_Creator(String name, BulbsContextUserId creator);
+    public Set<Preset> findById_Creator(BulbsContextUserId userId);
     
-    public void store(Preset group);
-    public void remove(PresetId presetId);
 }

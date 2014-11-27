@@ -1,27 +1,23 @@
 package net.datenstrudel.bulbs.core.application.services;
 
-import net.datenstrudel.bulbs.core.IntegrationTest;
 import net.datenstrudel.bulbs.core.TestConfig;
 import net.datenstrudel.bulbs.core.application.ApplicationLayerConfig;
 import net.datenstrudel.bulbs.core.config.BulbsCoreConfig;
-import net.datenstrudel.bulbs.core.domain.model.bulb.Bulb;
-import net.datenstrudel.bulbs.core.domain.model.bulb.BulbActuatorCommand;
-import net.datenstrudel.bulbs.core.domain.model.bulb.BulbBridge;
-import net.datenstrudel.bulbs.core.domain.model.bulb.BulbId;
+import net.datenstrudel.bulbs.core.domain.model.bulb.*;
 import net.datenstrudel.bulbs.core.domain.model.identity.AppIdCore;
 import net.datenstrudel.bulbs.core.domain.model.identity.BulbsContextUser;
 import net.datenstrudel.bulbs.core.domain.model.identity.BulbsContextUserRepository;
 import net.datenstrudel.bulbs.core.domain.model.identity.ValidatorBulbsContextUser;
-import net.datenstrudel.bulbs.core.infrastructure.persistence.repository.BulbBridgeRepositoryImpl;
 import net.datenstrudel.bulbs.core.security.config.SecurityConfig;
 import net.datenstrudel.bulbs.core.websocket.WebSocketConfig;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.*;
 import net.datenstrudel.bulbs.shared.domain.model.color.ColorRGB;
+import org.junit.Before;
 import org.slf4j.Logger; import org.slf4j.LoggerFactory;import org.junit.Test;
-import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.LinkedList;
@@ -42,11 +38,10 @@ import static org.junit.Assert.*;
         TestConfig.class
 })
 @RunWith(SpringJUnit4ClassRunner.class)
-@Category(value = IntegrationTest.class)
-public class BasicFunctionalityIntegrationTest {
+public class BasicFunctionalityIntegrationIT {
     
     //~ Member(s) //////////////////////////////////////////////////////////////
-    private static final Logger log = LoggerFactory.getLogger(BasicFunctionalityIntegrationTest.class);
+    private static final Logger log = LoggerFactory.getLogger(BasicFunctionalityIntegrationIT.class);
     @Autowired
     BulbsContextUserService userService;
     @Autowired
@@ -56,10 +51,18 @@ public class BasicFunctionalityIntegrationTest {
     @Autowired
     ActuatorService actuatorService;
     @Autowired
-    BulbBridgeRepositoryImpl bridgeRepository;
+    BulbBridgeRepository bridgeRepository;
+    @Autowired
+    private MongoTemplate mongo;
     
     //~ Construction ///////////////////////////////////////////////////////////
     //~ Method(s) //////////////////////////////////////////////////////////////
+    @Before
+    public void setUp() {
+        mongo.dropCollection(BulbBridge.class);
+        mongo.dropCollection(BulbsContextUser.class);
+    }
+
     @Test
     public void testSignup_BridgeCreation_CommandExec() throws BulbBridgeHwException{
         BulbsContextUser user = userService.signUp("integrationTest_"+System.currentTimeMillis(), 
@@ -74,7 +77,6 @@ public class BasicFunctionalityIntegrationTest {
                         log.error("Invalid Password");
                     }
                 }
-
         );
 
         assertNotNull(user);
@@ -86,13 +88,12 @@ public class BasicFunctionalityIntegrationTest {
         log.info("Bridge created: " + bridge);
         try{
             Thread.sleep(1000);
-        }catch (InterruptedException iex){
-        }
+        }catch (InterruptedException iex){}
 
         BulbsContextUser assertUser = userRepository.findByEmail(user.getEmail());
         assertTrue(!assertUser.getBulbsPrincipals().isEmpty());
         
-        BulbId bulbAddressed = bridge.getBulbs().iterator().next().getBulbId();
+        BulbId bulbAddressed = bridge.getBulbs().iterator().next().getId();
         final BulbState state2Apply = new BulbState(new ColorRGB(255, 255, 255), true);
         actuatorService.execute(
                 new BulbActuatorCommand(

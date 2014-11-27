@@ -3,6 +3,7 @@ package net.datenstrudel.bulbs.core.domain.model.scheduling;
 import net.datenstrudel.bulbs.core.domain.model.bulb.AbstractActuatorCmd;
 import net.datenstrudel.bulbs.shared.domain.model.Entity;
 import net.datenstrudel.bulbs.shared.domain.model.scheduling.Trigger;
+import org.springframework.data.annotation.Id;
 
 import java.util.*;
 
@@ -10,10 +11,9 @@ import java.util.*;
  *
  * @author Thomas Wendzinski
  */
-public class ScheduledActuation extends Entity<ScheduledActuation, String>{
+public class ScheduledActuation extends Entity<ScheduledActuation, ScheduledActuationId>{
 
     //~ Member(s) //////////////////////////////////////////////////////////////
-    private ScheduledActuationId scheduleId;
     private String name;
     private List<AbstractActuatorCmd> states = new ArrayList<>(10);
     private Date created = new Date();
@@ -25,20 +25,20 @@ public class ScheduledActuation extends Entity<ScheduledActuation, String>{
         
     }
     public ScheduledActuation(
-            ScheduledActuationId scheduleId, 
+            ScheduledActuationId id,
             String name, 
             Trigger trigger,
             boolean deleteAfterExecution) {
-        this.scheduleId = scheduleId;
+        this.id = id;
         this.name = name;
         this.trigger = trigger;
         this.deleteAfterExecution = deleteAfterExecution;
     }
     public ScheduledActuation(
-            ScheduledActuationId scheduleId, 
+            ScheduledActuationId id,
             String name, 
             boolean deleteAfterExecution) {
-        this.scheduleId = scheduleId;
+        this.id = id;
         this.name = name;
         this.deleteAfterExecution = deleteAfterExecution;
     }
@@ -53,20 +53,19 @@ public class ScheduledActuation extends Entity<ScheduledActuation, String>{
         if( trigger == null ) throw new IllegalStateException("error.noTrigger");
         if( states == null || states.isEmpty() ) throw new IllegalStateException("error.noStates");
         if(this.isActive(coordinator)){
-            coordinator.unSchedule(this.scheduleId.getUuid());
+            coordinator.unSchedule(this.id.getUuid());
         }
-        coordinator.schedule(this.scheduleId.getUuid(), trigger.toCronExpression(), 
-                new ScheduledActuationExecutor(scheduleId, scheduleId.getUserId(), name));
+        coordinator.schedule(this.id.getUuid(), trigger.toCronExpression(),
+                new ScheduledActuationExecutor(id, id.getCreator(), name));
         //TODO: Fire SchedulerStatusChangedEvent!
     }
     public void deActivate(JobCoordinator coordinator){
-        coordinator.unSchedule(this.scheduleId.getUuid());
+        coordinator.unSchedule(this.id.getUuid());
     }
     public boolean isActive(JobCoordinator coordinator) {
-        return coordinator.isScheduled(this.scheduleId.getUuid());
+        return coordinator.isScheduled(this.id.getUuid());
     }
     /**
-     * 
      * @return whether <code>this</code> won't trigger anymore in the future
      * @throws IllegalStateException in case no trigger has been set so far
      */
@@ -102,9 +101,6 @@ public class ScheduledActuation extends Entity<ScheduledActuation, String>{
     }
 
     //~ ////////////////////////////////////////////////////////////////////////
-    public ScheduledActuationId getScheduleId() {
-        return scheduleId;
-    }
     public String getName() {
         return name;
     }
@@ -125,7 +121,7 @@ public class ScheduledActuation extends Entity<ScheduledActuation, String>{
     @Override
     public int hashCode() {
         int hash = 5;
-        hash = 79 * hash + Objects.hashCode(this.scheduleId);
+        hash = 79 * hash + Objects.hashCode(this.id);
         return hash;
     }
     @Override
@@ -138,20 +134,17 @@ public class ScheduledActuation extends Entity<ScheduledActuation, String>{
             return false;
         }
         final ScheduledActuation other = (ScheduledActuation) obj;
-        if (!Objects.equals(this.scheduleId, other.scheduleId)) {
+        if (!Objects.equals(this.id, other.id)) {
             return false;
         }
         return true;
     }
     @Override
     public String toString() {
-        return "ScheduledActuation{" + "scheduleId=" + scheduleId + ", name=" + name + ", trigger=" + trigger + '}';
+        return "ScheduledActuation{" + "id=" + id + ", name=" + name + ", trigger=" + trigger + '}';
     }
     
     //~ Private Artifact(s) ////////////////////////////////////////////////////
-    private void setScheduleId(ScheduledActuationId scheduleId) {
-        this.scheduleId = scheduleId;
-    }
     private void setName(String name) {
         this.name = name;
     }

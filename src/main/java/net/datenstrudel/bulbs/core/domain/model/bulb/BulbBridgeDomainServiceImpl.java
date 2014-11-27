@@ -57,8 +57,8 @@ public class BulbBridgeDomainServiceImpl implements BulbBridgeDomainService{
         BulbsPrincipal tmpPrincipal;
         String uvBridgeId;
         for (BulbBridge el : bridges) {
-            uvBridgeId = el.getBridgeId().getUuId() + "-" + el.getName();
-            tmpPrincipal = user.principalFrom(el.getBridgeId());
+            uvBridgeId = el.getId().getUuId() + "-" + el.getName();
+            tmpPrincipal = user.principalFrom(el.getId());
             if(tmpPrincipal != null){
                 res.addLinkState(uvBridgeId, true);
                 continue;
@@ -101,18 +101,18 @@ public class BulbBridgeDomainServiceImpl implements BulbBridgeDomainService{
         freshBridge.syncToHardwareState(tmpPrincipal);
         log.info(" -- .. SUCCEEDED.");
         
-        BulbBridge existingBridge = bridgeRepository.findOne(freshBridge.getBridgeId());
+        BulbBridge existingBridge = bridgeRepository.findOne(freshBridge.getId());
         if(existingBridge != null) throw new IllegalArgumentException("Bridge with ID["
-                +freshBridge.getBridgeId()+"] already in use and cannot be assigned a second time!");
+                +freshBridge.getId()+"] already in use and cannot be assigned a second time!");
         
         finalPrincipal = new BulbsPrincipal(
                 tmpPrincipal.getUsername(), 
                 tmpPrincipal.getAppId(), 
-                freshBridge.getBridgeId().getUuId(), 
+                freshBridge.getId().getUuId(),
                 BulbsPrincipalState.PENDING);
         
-        log.info(" -- Try to persistently store new BulbBridge .. ");
-        bridgeRepository.save(freshBridge);
+        log.info(" -- Try to persistently save new BulbBridge .. ");
+        freshBridge = bridgeRepository.save(freshBridge);
         log.info(" -- SUCCEEDED (still before commit). ");
         
         DomainEventPublisher.instance().publish(

@@ -37,11 +37,7 @@ public class BulbBridgeRepositoryImpl implements BulbBridgeRepositoryExt {
     public void init(){
         IndexOperations iOps = mongo.indexOps(BulbBridge.class);
         iOps.ensureIndex(new Index()
-                .on("bulbBridgeId", Sort.Direction.ASC)
-                .unique(Index.Duplicates.DROP));
-        iOps.ensureIndex(new Index()
                 .on("owner", Sort.Direction.ASC));
-        
     }
     
     //~ Method(s) //////////////////////////////////////////////////////////////

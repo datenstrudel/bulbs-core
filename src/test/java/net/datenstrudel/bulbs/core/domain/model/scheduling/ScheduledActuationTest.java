@@ -54,9 +54,9 @@ public class ScheduledActuationTest {
         
         resetToNice(mk_jobCoordinator);
         // Am I already activated?
-        expect(mk_jobCoordinator.isScheduled(instance.getScheduleId().getUuid()))
+        expect(mk_jobCoordinator.isScheduled(instance.getId().getUuid()))
                 .andReturn(Boolean.TRUE);
-        mk_jobCoordinator.unSchedule(instance.getScheduleId().getUuid());
+        mk_jobCoordinator.unSchedule(instance.getId().getUuid());
         expectLastCall().once();
         
         mk_jobCoordinator.schedule(
@@ -64,7 +64,7 @@ public class ScheduledActuationTest {
         expectLastCall().andStubDelegateTo(new JobCoordinator() {
             @Override
             public void schedule(String jobId, CronExpression cronTrigger, ScheduledJobExecutor jobExec) {
-                assertEquals(instance.getScheduleId().getUuid(), jobId);
+                assertEquals(instance.getId().getUuid(), jobId);
                 assertEquals(instance.getTrigger().toCronExpression().getCronExpression(), cronTrigger.getCronExpression());
             }
             @Override
@@ -97,7 +97,7 @@ public class ScheduledActuationTest {
         instance.setNewStates(states, mk_jobCoordinator);
         reset(mk_jobCoordinator);
 
-        mk_jobCoordinator.unSchedule(instance.getScheduleId().getUuid());
+        mk_jobCoordinator.unSchedule(instance.getId().getUuid());
         expectLastCall().once();
         replay(mk_jobCoordinator);
 

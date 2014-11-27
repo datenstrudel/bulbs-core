@@ -19,7 +19,7 @@ public class ConverterBridge implements DtoConverter<BulbBridge, DtoBulbBridge>{
     @Override
     public DtoBulbBridge convert(BulbBridge src) {
         DtoBulbBridge res = new DtoBulbBridge();
-        res.setBridgeId(src.getBridgeId().getUuId());
+        res.setBridgeId(src.getId().getUuId());
         res.setName(src.getName());
         res.setLocalAddress(src.getLocalAddress());
         res.setMacAddress(src.getMacAddress());

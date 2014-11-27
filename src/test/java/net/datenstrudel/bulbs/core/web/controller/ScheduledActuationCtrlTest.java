@@ -63,13 +63,13 @@ public class ScheduledActuationCtrlTest {
 
 //    @Test
     public void testLoadById() {
-        System.out.println("loadById");
+        System.out.println("findOne");
         String scheduledActuationUuid = "";
         Authentication authentication = null;
         
         
         DtoPreset expResult = null;
-//        DtoPreset result = instance.loadById(scheduledActuationUuid, authentication);
+//        DtoPreset result = instance.findOne(scheduledActuationUuid, authentication);
 //        assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");

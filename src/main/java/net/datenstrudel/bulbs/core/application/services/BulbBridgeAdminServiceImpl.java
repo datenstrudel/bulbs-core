@@ -76,7 +76,7 @@ public class BulbBridgeAdminServiceImpl
         Set<BulbBridge> bridges = bridgeRepository.findByOwner(user.getBulbsContextUserlId());
         for (BulbBridge el : bridges) {
             try{
-                el.syncToHardwareState(user.principalFrom(el.getBridgeId()));
+                el.syncToHardwareState(user.principalFrom(el.getId()));
                 bridgeRepository.save(el);
             }catch(BulbBridgeHwException bbhwex){
                 log.info("Couldn't sync due to: " + bbhwex.getMessage());

@@ -6,42 +6,45 @@ package net.datenstrudel.bulbs.core.application.services;
 
 import net.datenstrudel.bulbs.core.application.facade.ModelFacadeOutPort;
 import net.datenstrudel.bulbs.core.domain.model.identity.*;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.slf4j.Logger; import org.slf4j.LoggerFactory;import org.junit.Before;
 import org.junit.Test;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.UUID;
 
-import static org.easymock.EasyMock.*;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.isA;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  *
  * @author Thomas Wendzinski
  */
+@RunWith(MockitoJUnitRunner.class)
 public class BulbsContextUserServiceImplTest {
     
     private static final Logger log = LoggerFactory.getLogger(BulbsContextUserServiceImplTest.class);
-    
-    BulbsContextUserServiceImpl instance = new BulbsContextUserServiceImpl();
+    @InjectMocks
+    BulbsContextUserServiceImpl instance;// = new BulbsContextUserServiceImpl();
+    @Mock
     BulbsContextUserRepository mk_userRepository;
+    @Mock
     BulbsContextUserDomainService mk_userDomainService;
+    @Mock
     ModelFacadeOutPort mk_modelFacadeOutport;
+    @Mock
     PasswordEncoder mk_passwordEncoder;
     public BulbsContextUserServiceImplTest() {
     }
     
     @Before
     public void setUp() {
-        mk_userRepository = createMock(BulbsContextUserRepository.class);
-        ReflectionTestUtils.setField(instance, "userRepository", mk_userRepository);
-        mk_userDomainService = createMock(BulbsContextUserDomainService.class);
-        ReflectionTestUtils.setField(instance, "userService", mk_userDomainService);
-        mk_modelFacadeOutport = new ModelFacadeOutPort();
-        ReflectionTestUtils.setField(instance, "outPort", mk_modelFacadeOutport);
-        mk_passwordEncoder = createMock(PasswordEncoder.class);
-        ReflectionTestUtils.setField(instance, "passwordEncoder", mk_passwordEncoder);
     }
 
     @Test
@@ -60,21 +63,17 @@ public class BulbsContextUserServiceImplTest {
                 log.error("Invalid PW");
             }
         };
-        expect(mk_userDomainService.createNewApiKey()).andReturn(UUID.randomUUID().toString().toUpperCase());
-        expect(mk_userRepository.nextIdentity()).andReturn(new BulbsContextUserId("GEN_USER_ID"));
-        expect(mk_userRepository.findByEmail(email)).andReturn(null);
-        expect(mk_passwordEncoder.encode(credentials)).andReturn("encryptedCredentials");
-        mk_userRepository.save(isA(BulbsContextUser.class));
-        expectLastCall();
-        replay(mk_userDomainService, mk_userRepository, mk_passwordEncoder);
+        when(mk_userDomainService.createNewApiKey()).thenReturn(UUID.randomUUID().toString().toUpperCase());
+        when(mk_userRepository.nextIdentity()).thenReturn(new BulbsContextUserId("GEN_USER_ID"));
+        when(mk_userRepository.findByEmail(email)).thenReturn(null);
+        when(mk_passwordEncoder.encode(credentials)).thenReturn("encryptedCredentials");
         BulbsContextUser result = instance.signUp(email, credentials, nickname, notificationHandler);
         log.info("Created TestUser: " + result);
-        verify(mk_userRepository);
+        verify(mk_userRepository, atLeastOnce()).save(isA(BulbsContextUser.class));
         
         assertEquals(new BulbsContextUserId("GEN_USER_ID"), result.getBulbsContextUserlId());
         assertEquals(email, result.getEmail());
         assertEquals("encryptedCredentials", result.getCredentials());
         assertEquals(nickname, result.getNickname());
-        
     }
 }

@@ -39,29 +39,29 @@ public class PresetServiceImpl implements PresetService {
     //~ Method(s) //////////////////////////////////////////////////////////////
     @Override
     public Preset loadById(BulbsContextUserId userId, PresetId presetId) {
-        Preset res = presetRepository.loadById(presetId);
+        Preset res = presetRepository.findOne(presetId);
         outPort.write(res);
         return res;
     }
     @Override
     public void remove(BulbsContextUserId userId, PresetId presetId) {
-        Preset res = presetRepository.loadById(presetId);
+        Preset res = presetRepository.findOne(presetId);
         if(res == null)throw new IllegalArgumentExceptionNotRepeatable("Preset["
                 +presetId+"] for deletion doesn't exist!");
         log.info("Deleting preset by ID: " + presetId);
-        presetRepository.remove(presetId);
+        presetRepository.delete(presetId);
 //        DomainEventPublisher.instance().publish(new PresetDeleted(presetId));
     }
     @Override
     public Set<Preset> loadAllByUser(BulbsContextUserId userId) {
-        Set<Preset> res = presetRepository.loadByOwner(userId);
+        Set<Preset> res = presetRepository.findById_Creator(userId);
         outPort.write(res);
         return res;
     }
     @Override
     public Preset loadByName(BulbsContextUserId userId, String presetName) {
-        Preset res = presetRepository.loadByName(userId, presetName);
-        if(!res.getPresetId().getUserId().sameValueAs(userId)){
+        Preset res = presetRepository.findByNameAndId_Creator(presetName, userId);
+        if(!res.getId().getCreator().sameValueAs(userId)){
             throw new NotAuthorizedException("Illegal access to not posessing preset!");
         }
         outPort.write(res);
@@ -76,9 +76,9 @@ public class PresetServiceImpl implements PresetService {
         log.info("Creating empty new Preset '"+uniquePresetName+"' by user " + creatorId);
         Preset res = new Preset(presetRepository.nextIdentity(creatorId), uniquePresetName);
         res.validateNew(validationNotifier, presetRepository);
-        presetRepository.store(res);
+        presetRepository.save(res);
         outPort.write(res);
-//        DomainEventPublisher.instance().publish(new PresetCreated(res.getPresetId()));
+//        DomainEventPublisher.instance().publish(new PresetCreated(res.getId()));
         return res;
     }
     @Override
@@ -91,9 +91,9 @@ public class PresetServiceImpl implements PresetService {
         Preset res = new Preset(presetRepository.nextIdentity(creatorId), uniquePresetName);
         res.validateNew(validationNotifier, presetRepository);
         res.addStates(states);
-        presetRepository.store(res);
+        presetRepository.save(res);
         outPort.write(res);
-//        DomainEventPublisher.instance().publish(new PresetCreated(res.getPresetId()));
+//        DomainEventPublisher.instance().publish(new PresetCreated(res.getId()));
         return res;
     }
     @Override
@@ -103,12 +103,12 @@ public class PresetServiceImpl implements PresetService {
             String newUniquePresetName, 
             ValidatorPreset.NotificationHandlerPreset validationNotifier) {
         
-        Preset preset = presetRepository.loadById(presetId);
-        if(!preset.getPresetId().getUserId().sameValueAs(userId)){
+        Preset preset = presetRepository.findOne(presetId);
+        if(!preset.getId().getCreator().sameValueAs(userId)){
             throw new NotAuthorizedException("Illegal attempt to modify preset's name!");
         }
         preset.modifyName(newUniquePresetName, validationNotifier, presetRepository);
-        presetRepository.store(preset);
+        presetRepository.save(preset);
         outPort.write(preset);
         return preset;
     }
@@ -117,13 +117,13 @@ public class PresetServiceImpl implements PresetService {
             BulbsContextUserId userId, 
             PresetId presetId, 
             Collection<AbstractActuatorCmd> newStates) {
-        Preset preset = presetRepository.loadById(presetId);
-        if(!preset.getPresetId().getUserId().sameValueAs(userId)){
+        Preset preset = presetRepository.findOne(presetId);
+        if(!preset.getId().getCreator().sameValueAs(userId)){
             throw new NotAuthorizedException("Illegal attempt to modify preset!");
         }
         log.info("Replacing states of Preset[" + presetId + "]: " + newStates);
         preset.replaceStates(newStates);
-        presetRepository.store(preset);
+        presetRepository.save(preset);
         outPort.write(preset);
         return preset;
     }

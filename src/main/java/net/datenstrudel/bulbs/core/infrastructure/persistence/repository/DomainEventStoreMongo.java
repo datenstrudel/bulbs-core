@@ -1,4 +1,4 @@
-package net.datenstrudel.bulbs.core.infrastructure.persistence;
+package net.datenstrudel.bulbs.core.infrastructure.persistence.repository;
 
 import com.google.gson.Gson;
 import com.mongodb.BasicDBObject;
@@ -10,6 +10,7 @@ import net.datenstrudel.bulbs.core.application.messaging.eventStore.StoredEvent;
 import net.datenstrudel.bulbs.core.domain.model.messaging.DomainEvent;
 import org.slf4j.Logger; import org.slf4j.LoggerFactory;import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.CollectionOptions;
 import org.springframework.data.mongodb.core.IndexOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -55,7 +56,7 @@ public class DomainEventStoreMongo implements DomainEventStore{
             COLL_NAME = mongo.getCollectionName(StoredEvent.class);
         }
         iOps.ensureIndex(new Index()
-                .on("_id", Order.ASCENDING));
+                .on("_id", Sort.Direction.ASC));
         DBCollection coll_Counters = mongo.getDb().getCollection("counters");
         DBObject eventCollCounter = coll_Counters.findOne(new BasicDBObject("_id", COLL_NAME));
         if(eventCollCounter == null){ 

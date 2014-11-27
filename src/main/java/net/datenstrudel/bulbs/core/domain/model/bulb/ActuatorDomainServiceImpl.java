@@ -74,7 +74,7 @@ public class ActuatorDomainServiceImpl implements ActuatorDomainService{
     }
     @Override
     public void execute(GroupActuatorCommand groupCmd) throws BulbBridgeHwException{
-        BulbGroup group = groupRepository.loadById(groupCmd.getGroupId());
+        BulbGroup group = groupRepository.findOne(groupCmd.getGroupId());
         if(group == null){
             throw new IllegalArgumentException("Group["+groupCmd.getGroupId()+"] addressed doesn't exist!");
         }
@@ -94,7 +94,7 @@ public class ActuatorDomainServiceImpl implements ActuatorDomainService{
     }
     @Override
     public void execute(PresetActuatorCommand presetCommand)throws BulbBridgeHwException{
-        Preset preset = presetRepository.loadById(presetCommand.getPresetId());
+        Preset preset = presetRepository.findOne(presetCommand.getPresetId());
         if(preset == null){
             throw new IllegalArgumentException("Preset["+presetCommand.getPresetId()+"] addressed doesn't exist!");
         }
@@ -112,7 +112,7 @@ public class ActuatorDomainServiceImpl implements ActuatorDomainService{
         // AspectJ doesn't compile  :/
 //        Map<BulbBridgeId, List<BulbId>> groupedMap = 
 //                cancelCommand.getEntityIds().stream().collect(
-//                    Collectors.groupingBy( (BulbId t) -> { return t.getBridgeId(); } )
+//                    Collectors.groupingBy( (BulbId t) -> { return t.getId(); } )
 //        );
         Map<BulbBridgeId, Set<BulbId>> groupedMap = new HashMap<>();
         cancelCommand.getEntityIds().forEach( (BulbId bId) -> {
