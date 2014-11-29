@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>1.1.4.RELEASE</version>
+        <version>1.1.9.RELEASE</version>
     </parent>
 
     <groupId>net.datenstrudel.bulbs</groupId>
@@ -22,7 +22,7 @@
         <aspectj.version>1.8.0.RELEASE</aspectj.version>
         <slf4j.version>1.6.4</slf4j.version>
         <spring.version-stable>4.0.3.RELEASE</spring.version-stable>
-        <spring.version>4.0.3.RELEASE</spring.version>
+        <spring.version>4.1.0.RELEASE</spring.version>
         <org.springframework.security-version>3.2.0.RELEASE</org.springframework.security-version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <tomcat.version>8.0.8</tomcat.version>

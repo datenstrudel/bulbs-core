@@ -43,12 +43,13 @@ public class DtoConverterRegistry {
         converters = Maps.newHashMapWithExpectedSize(c.size());
         convertersByDomain = Maps.newHashMapWithExpectedSize(c.size());
         for (DtoConverter el : c.values()) {
-            log.info("Register DtoConverter for Dto Type '"
-                    +el.supportedDtoClass()+"' and Domin Type '"
-                    +el.supportedDomainClass()+"': " + el.getClass().getName());
+            log.debug("Register DtoConverter for Dto Type '"
+                    + el.supportedDtoClass()+"' and Domin Type '"
+                    + el.supportedDomainClass()+"': " + el.getClass().getName());
             converters.put(el.supportedDtoClass(), el);
             convertersByDomain.put(el.supportedDomainClass(), el);
         }
+        log.info("Count DtoConverters registered: {}", c.size());
     }
     
     //~ Method(s) //////////////////////////////////////////////////////////////

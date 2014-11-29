@@ -554,7 +554,7 @@ angular.module('entityServices', ['ngResource', 'identityAuthServices'])
 				var promiseChangedPreset = $q.defer();
 				PresetResourceService.modifyName(
 						{presetId : preset.presetId},
-						{name : preset.name},
+						{value : preset.name},
 						function(resp){
 							presets.remove(preset);
 							presets.push(resp);

@@ -26,8 +26,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     
 	@Override
 	public void registerStompEndpoints(StompEndpointRegistry registry) {
-//        SockJsServiceRegistration registration = 
-                registry.addEndpoint("/core/websockets").withSockJS();
+        registry.addEndpoint("/core/websockets").withSockJS();
 	}
 	@Override
 	public void configureMessageBroker(MessageBrokerRegistry configurer) {
@@ -61,23 +60,11 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         return new DefaultHandshakeHandler(
                 requestUpgradeStrategy);
     }
-//    @Bean
-//    public ServletServerContainerFactoryBean createWebSocketContainer() {
-//        ServletServerContainerFactoryBean container = new ServletServerContainerFactoryBean();
-//        container.setMaxTextMessageBufferSize(8192);
-//        container.setMaxBinaryMessageBufferSize(8192);
-//        return container;
-//    }
-
-
 
     @Override
     public boolean configureMessageConverters(List<MessageConverter> messageConverters) {
         messageConverters.add(new DtoWsMessageJsonAdapter());
         return false;
     }
-    
-    
-    
-    
+
 }

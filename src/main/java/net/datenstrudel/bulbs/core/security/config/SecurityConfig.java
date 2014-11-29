@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -68,6 +69,7 @@ public class SecurityConfig {
                     .antMatchers("/assets/**").permitAll()
                     .antMatchers("/core/identity/signIn/**").permitAll()
                     .antMatchers("/core/identity/signUp/**").permitAll()
+                    .antMatchers("/core/websockets/info/**").permitAll()
                     .antMatchers("/core/websockets/**").authenticated()
                     .antMatchers("/core/bridges/**").authenticated()
                     .antMatchers("/core/bulbs/**").authenticated()
@@ -122,10 +124,15 @@ public class SecurityConfig {
             usernameDetailAuthProvider.setUserDetailsService(userService);
             usernameDetailAuthProvider.setPasswordEncoder(passwordEncoder);
 
-            // Actually used to authenticate requests by http header attribute ApiKey
+            // Actually used to authenticate requests by http header attribute 'Auth'
             auth.authenticationProvider(preAuthProvider)
                 .authenticationProvider(usernameDetailAuthProvider);
 
+        }
+
+        @Bean
+        public AuthenticationManager coreAuthenticationManager() throws Exception {
+            return authenticationManagerBean();
         }
     }
         
@@ -158,6 +165,7 @@ public class SecurityConfig {
                     .antMatchers("/core/identity/signIn/**").permitAll()
                     .antMatchers("/core/identity/signUp/**").permitAll()
                     .antMatchers("/core/websockets/**").authenticated()
+                    .antMatchers("/core/websockets/info/**").permitAll()
                     .antMatchers("/core/bridges/**").authenticated()
                     .antMatchers("/core/bulbs/**").authenticated()
                     .antMatchers("/core/groups/**").authenticated()
@@ -218,6 +226,11 @@ public class SecurityConfig {
             auth.authenticationProvider(preAuthProvider)
                 .authenticationProvider(usernameDetailAuthProvider);
             
+        }
+
+        @Bean
+        public AuthenticationManager coreAuthenticationManager() throws Exception {
+            return authenticationManagerBean();
         }
     }
     //~ Private Artifact(s) ////////////////////////////////////////////////////
