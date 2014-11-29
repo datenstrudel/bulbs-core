@@ -244,14 +244,14 @@
           <version>4.3</version>
         </dependency>
         <dependency>
+          <groupId>org.apache.commons</groupId>
+          <artifactId>commons-lang3</artifactId>
+          <version>3.1</version>
+        </dependency>
+        <dependency>
           <groupId>com.google.code.gson</groupId>
           <artifactId>gson</artifactId>
           <version>2.2.4</version>
-        </dependency>
-        <dependency>
-          <groupId>org.mongodb</groupId>
-          <artifactId>mongo-java-driver</artifactId>
-          <version>2.11.1</version>
         </dependency>
 
         <dependency>
@@ -277,6 +277,12 @@
           <groupId>commons-io</groupId>
           <type>jar</type>
           <version>1.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mongeez</groupId>
+            <artifactId>mongeez</artifactId>
+            <version>0.9.3</version>
         </dependency>
 
         <!-- SCOPE TEST ////////////////////////////////////////////-->

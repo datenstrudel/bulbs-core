@@ -110,9 +110,4 @@ public class BulbGroupServiceImpl implements BulbGroupService{
         outPort.write(group);
         return group;
     }
-
-
-    //~ Actuation ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
-    //~ Private Artifact(s) ////////////////////////////////////////////////////
 }

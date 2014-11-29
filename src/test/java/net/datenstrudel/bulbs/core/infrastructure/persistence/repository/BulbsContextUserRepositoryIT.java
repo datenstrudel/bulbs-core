@@ -93,6 +93,15 @@ public class BulbsContextUserRepositoryIT {
         assertEquals(res.getBulbsPrincipals(), res2.getBulbsPrincipals());
 
     }
+    @Test
+    public void findOne() {
+        System.out.println("findOne");
+        BulbsContextUser testUser = newTestUser();
+        BulbsContextUserId id = testUser.getId();
+        instance.save(testUser); // Store in order there is sth that can be found
+        BulbsContextUser result = instance.findOne(id);
+        assertEquals(testUser, result);
+    }
 
     private BulbsContextUser newTestUser() {
         BulbsContextUser testUser = new BulbsContextUser(

@@ -2,6 +2,7 @@ package net.datenstrudel.bulbs.core.infrastructure;
 
 import com.mongodb.*;
 import net.datenstrudel.bulbs.core.infrastructure.persistence.MongoConverter;
+import org.mongeez.Mongeez;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,10 +11,12 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.Environment;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.mongodb.config.AbstractMongoConfiguration;
 import org.springframework.data.mongodb.core.convert.CustomConversions;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.util.ArrayList;
 import java.util.List;
@@ -76,6 +79,17 @@ public class PersistenceConfig extends AbstractMongoConfiguration{
     ApplicationContext appCtx;
     private Mongo mongo;
 
+    @PostConstruct
+    private void init() throws Exception {
+        //~ Execute database changeset(s)
+        log.info("Attempt to execute mongodb changesets..");
+        Mongeez mongeez = new Mongeez();
+        mongeez.setFile(new ClassPathResource("/mongodb-changesets/mongeez.xml"));
+        mongeez.setMongo(mongo());
+        mongeez.setDbName(this.dbName);
+        mongeez.process();
+    }
+
     @Override
     public Mongo mongo() throws Exception {env.getProperty("dbname");
         if(connectionsPerHost == null) return null;
@@ -93,7 +107,6 @@ public class PersistenceConfig extends AbstractMongoConfiguration{
         return this.mongo;
     }
     
-    //~ Private Artifact(s) ////////////////////////////////////////////////////
     @Bean
     public static PropertySourcesPlaceholderConfigurer propertyPlaceholderConfigurer() {
         return new PropertySourcesPlaceholderConfigurer();

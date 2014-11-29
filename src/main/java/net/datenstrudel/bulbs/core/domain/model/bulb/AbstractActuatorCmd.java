@@ -29,7 +29,6 @@ public abstract class AbstractActuatorCmd<T extends AbstractActuatorCmd>
 	 */
     @NotEmpty
     protected List<BulbState> states;
-    protected Date created = new Date();
     private boolean loop = false;
     
     //~ Construction ///////////////////////////////////////////////////////////
@@ -111,9 +110,6 @@ public abstract class AbstractActuatorCmd<T extends AbstractActuatorCmd>
     public List<BulbState> getStates() {
         return states;
     }
-    public Date getCreated() {
-        return created;
-    }
     public boolean isLoop() {
         return loop;
     }
@@ -125,8 +121,7 @@ public abstract class AbstractActuatorCmd<T extends AbstractActuatorCmd>
         if(!userApiKey.equals(other.userApiKey))return false;
         if(!priority.equals(other.priority))return false;
         if(!states.equals(other.states))return false;
-        if(!created.equals(other.created))return false;
-        
+
         return true;
     }
     @Override
@@ -136,7 +131,6 @@ public abstract class AbstractActuatorCmd<T extends AbstractActuatorCmd>
         hash = 97 * hash + (this.userApiKey != null ? this.userApiKey.hashCode() : 0);
         hash = 97 * hash + (this.priority != null ? this.priority.hashCode() : 0);
         hash = 97 * hash + (this.states != null ? this.states.hashCode() : 0);
-        hash = 97 * hash + (this.created != null ? this.created.hashCode() : 0);
         return hash;
     }
     @Override
@@ -163,9 +157,6 @@ public abstract class AbstractActuatorCmd<T extends AbstractActuatorCmd>
     }
     protected void setStates(List<BulbState> states) {
         this.states = states;
-    }
-    protected void setCreated(Date created) {
-        this.created = created;
     }
     protected void setLoop(boolean loop) {
         this.loop = loop;

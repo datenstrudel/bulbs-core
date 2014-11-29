@@ -117,7 +117,7 @@ public class BulbsContextUser extends Entity<BulbsContextUser, BulbsContextUserI
     @Override
     public boolean sameIdentityAs(BulbsContextUser other) {
         if(other == null)return false;
-        if(!this.id.sameValueAs(id))return false;
+        if(!this.id.sameValueAs(other.getId()))return false;
         return true;
     }
     @Override

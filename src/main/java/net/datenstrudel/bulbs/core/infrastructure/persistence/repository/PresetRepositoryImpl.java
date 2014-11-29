@@ -41,6 +41,7 @@ public class PresetRepositoryImpl implements PresetRepositoryExt{
         
         iOps.ensureIndex(new Index()
                 .on("_id.presetUuid", Sort.Direction.ASC)
+                .on("_id.creator", Sort.Direction.ASC)
                 .unique(Index.Duplicates.DROP)
         );
         iOps.ensureIndex(new Index()

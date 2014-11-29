@@ -1,4 +1,4 @@
-![Build Status](https://api.travis-ci.org/datenstrudel/bulbs-core.svg?branch=master)
+![Build Status](https://api.travis-ci.org/datenstrudel/bulbs-core.svg?branch=refactoring/integrateSpringData)
 
 # Bulbs-Core
 

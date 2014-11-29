@@ -15,6 +15,7 @@ import net.datenstrudel.bulbs.core.infrastructure.PersistenceConfig;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbState;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.CommandPriority;
 import net.datenstrudel.bulbs.shared.domain.model.color.ColorRGB;
+import org.hamcrest.Matchers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.junit.Before;
@@ -31,6 +32,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -93,7 +95,7 @@ public class PresetRepositoryImplIT {
         Preset unExpResult = newTestPreset();
         BulbsContextUserId userId = expResult.getId().getCreator();
         String presetName = expResult.getName();
-
+        assertThat(instance.findAll().size(), Matchers.greaterThan(1));
         instance.save(expResult);
         instance.save(unExpResult);
         Preset result = instance.findByNameAndId_Creator(presetName, userId);

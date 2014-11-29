@@ -56,6 +56,7 @@ public class ModelFacadeOutPort{
     
     //~ Method(s) //////////////////////////////////////////////////////////////
     public void write(Object domainObject){
+        if(domainObject == null)return;
         if (CONVERTING.get()){
             return ;
         }
@@ -64,9 +65,7 @@ public class ModelFacadeOutPort{
             Set<DtoConverter> converters = (Set<DtoConverter>) CONVERTERS.get();
             converters.stream()
                     .filter( (el) ->  el.supportedDomainClass().isAssignableFrom(domainObject.getClass())  )
-                    .forEach( (el) -> {
-                        RESULTS.get().put( el.supportedDtoClass(), el.convert(domainObject) );
-                    }
+                    .forEach( (el) -> RESULTS.get().put( el.supportedDtoClass(), el.convert(domainObject) )
             );
         }finally{
             CONVERTING.set(Boolean.FALSE);
