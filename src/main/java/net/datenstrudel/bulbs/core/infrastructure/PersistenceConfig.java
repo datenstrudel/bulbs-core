@@ -42,7 +42,6 @@ import java.util.List;
 )
 public class PersistenceConfig extends AbstractMongoConfiguration{
 
-    //~ Member(s) //////////////////////////////////////////////////////////////
     private static final Logger log = LoggerFactory.getLogger(PersistenceConfig.class);
     
     @Value("${mongo.dbname}")
@@ -64,20 +63,17 @@ public class PersistenceConfig extends AbstractMongoConfiguration{
     private Boolean autoConnectRetry;
     @Value("${mongo.socket-timeout}")
     private Integer socketTimeout;
-    
-    //~ Converters ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    //~ Construction ///////////////////////////////////////////////////////////
-    //~ Method(s) //////////////////////////////////////////////////////////////
-    @Override
-    protected String getDatabaseName() {
-        return dbName;
-    }
-    
+
     @Autowired
     Environment env;
     @Autowired
     ApplicationContext appCtx;
     private Mongo mongo;
+
+    @Override
+    protected String getDatabaseName() {
+        return dbName;
+    }
 
     @PostConstruct
     private void init() throws Exception {
@@ -126,6 +122,5 @@ public class PersistenceConfig extends AbstractMongoConfiguration{
         log.info("Going to close Mongo connection(s)..");
         this.mongo.close();
     }
-
 
 }

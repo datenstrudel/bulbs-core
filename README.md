@@ -73,7 +73,7 @@ a brief API description will be given here..
 
 ## Development
 ### Build and start the application
-
+ * Checkout with submodules by `git clone --recursive git://github.com/datenstrudel/bulbs-core.git`
  * In order to build and start this project run `vagrant up`. ([Vagrant](https://www.vagrantup.com) required!)
         This will start a virtual machine, hosting required infrastructure modules, such as running instances of MongoDB and RabbitMq.
  * Run `mvn clean install`
@@ -89,7 +89,7 @@ Working with spring-loaded allows you to make changes to the code at runtime, re
 
  `mvn spring-boot:run -Pdebug`
  
- the application starts in debug mode, waiting for a debugger connection on port 5005.
+ the application starts in debug mode, waiting for a debugger connection at port 5005.
  Within your IDE you might find the spring-boot plugin somewhere along the build plugins and just start it from there (The mvn profile 'debug' must be active!).
  Now, within your IDE you can connect a debugger (e.g. remote runner in IntelliJ f.ex.) against that port 5005. When connected the application fully starts.
  Now breakpoints and immediate code changes should work in your debug session.

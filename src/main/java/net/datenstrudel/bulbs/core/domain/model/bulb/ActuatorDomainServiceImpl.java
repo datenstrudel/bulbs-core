@@ -10,6 +10,7 @@ import net.datenstrudel.bulbs.core.domain.model.preset.PresetActuatorCommand;
 import net.datenstrudel.bulbs.core.domain.model.preset.PresetRepository;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbBridgeHwException;
 import org.slf4j.Logger; import org.slf4j.LoggerFactory;import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.metrics.CounterService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -34,6 +35,9 @@ public class ActuatorDomainServiceImpl implements ActuatorDomainService{
     private BulbGroupRepository groupRepository;
     @Autowired
     private PresetRepository presetRepository;
+
+    @Autowired
+    private CounterService counterService;
     
     private static final Map<Integer, AbstractActuatorCmd> deferredCommands 
             = new ConcurrentHashMap<>();
@@ -44,6 +48,7 @@ public class ActuatorDomainServiceImpl implements ActuatorDomainService{
     public void executeDeferred(AbstractActuatorCmd command) {
         Assert.notNull(command.getUserApiKey());
         deferredCommands.put(command.deferredExecutionHash(), command);
+        counterService.decrement("ws.inbound.receivedButNotProcessed");
     }
     @Override
     public void execute(AbstractActuatorCmd command) throws BulbBridgeHwException{

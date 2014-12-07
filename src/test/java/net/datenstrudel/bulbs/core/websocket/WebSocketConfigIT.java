@@ -1,6 +1,5 @@
 package net.datenstrudel.bulbs.core.websocket;
 
-import com.google.common.collect.ImmutableMap;
 import net.datenstrudel.bulbs.core.main.Main;
 import net.datenstrudel.bulbs.core.util.IdentityUtil;
 import net.datenstrudel.bulbs.core.TestConfig;
@@ -30,7 +29,6 @@ import java.util.List;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.fail;
-
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration()

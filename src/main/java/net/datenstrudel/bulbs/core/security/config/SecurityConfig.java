@@ -3,9 +3,11 @@ package net.datenstrudel.bulbs.core.security.config;
 import net.datenstrudel.bulbs.core.application.services.BulbsContextUserService;
 import net.datenstrudel.bulbs.core.web.filter.PreAuthenticationProcessingFilter;
 import org.slf4j.Logger; import org.slf4j.LoggerFactory;import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.autoconfigure.ManagementServerProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -44,6 +46,7 @@ public class SecurityConfig {
     @Configuration
     @Profile(value = "development")
     @EnableWebSecurity
+    @Order(ManagementServerProperties.ACCESS_OVERRIDE_ORDER)
     public static class WebSecurityConfigDevel extends WebSecurityConfigurerAdapter {
         //~ Member(s) //////////////////////////////////////////////////////////////
         @Autowired
@@ -76,6 +79,7 @@ public class SecurityConfig {
                     .antMatchers("/core/groups/**").authenticated()
                     .antMatchers("/core/presets/**").authenticated()
                     .antMatchers("/core/schedules/**").authenticated()
+                    .antMatchers("/manage/**").authenticated()
                     .antMatchers("/**").permitAll()
                     .anyRequest().authenticated()
                     .and()
@@ -139,6 +143,7 @@ public class SecurityConfig {
     @Configuration
     @Profile(value = "production")
     @EnableWebSecurity
+    @Order(ManagementServerProperties.ACCESS_OVERRIDE_ORDER)
     public static class WebSecurityConfigProduction extends WebSecurityConfigurerAdapter {
         //~ Member(s) //////////////////////////////////////////////////////////////
         @Autowired
@@ -171,6 +176,7 @@ public class SecurityConfig {
                     .antMatchers("/core/groups/**").authenticated()
                     .antMatchers("/core/presets/**").authenticated()
                     .antMatchers("/core/schedules/**").authenticated()
+                    .antMatchers("/manage/**").authenticated()
                     .antMatchers("/**").permitAll()
                     .anyRequest().authenticated()
                     .and()

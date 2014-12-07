@@ -2,6 +2,7 @@ package net.datenstrudel.bulbs.core.config;
 
 import net.datenstrudel.bulbs.core.infrastructure.PersistenceConfig;
 import net.datenstrudel.bulbs.core.infrastructure.SerializerConfig;
+import net.datenstrudel.bulbs.core.infrastructure.monitoring.MonitoringConfig;
 import net.datenstrudel.bulbs.core.infrastructure.services.InfrastructureServicesConfig;
 import org.slf4j.Logger; import org.slf4j.LoggerFactory;import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,7 +24,8 @@ import javax.annotation.PostConstruct;
 @Import({ 
     PersistenceConfig.class,
     SerializerConfig.class,
-    InfrastructureServicesConfig.class
+    InfrastructureServicesConfig.class,
+    MonitoringConfig.class,
 })
 @ComponentScan(basePackages = {
         "net.datenstrudel.bulbs.core.domain"
@@ -35,6 +37,15 @@ public class BulbsCoreConfig {
 
     @Autowired
     private Environment env;
+
+    @Value("${info.build.artifact:[unknown]}")
+    String artifact;
+    @Value("${info.build.name:[unknown]}")
+    String artifactName;
+    @Value("${info.build.version:[unknown]}")
+    String version;
+
+
     //~ Construction ///////////////////////////////////////////////////////////
     @PostConstruct
     public void init(){
@@ -43,6 +54,10 @@ public class BulbsCoreConfig {
             msg += " [" + el + "]";
         }
         log.info(msg);
+        log.info("+++ Artifact: " + artifact);
+        log.info("+++ Name:     " + artifactName);
+        log.info("+++ Version:  " + version);
+
     }
     //~ Method(s) //////////////////////////////////////////////////////////////
     @Bean
@@ -57,6 +72,7 @@ public class BulbsCoreConfig {
         res.setMaxPoolSize(maxPoolsize);
         res.setQueueCapacity(queueCapacity);
         res.setKeepAliveSeconds(keepAliveSeconds);
+        res.setThreadNamePrefix("exec-bulbs-core-");
         return res;
     }
 
