@@ -47,15 +47,14 @@ public class Main extends SpringBootServletInitializer {
     public static void main(String[] args) {
         ApplicationContext ctx = new SpringApplicationBuilder()
                 .sources(
-                        BulbsCoreConfig.class)
-                .child(
+                        BulbsCoreConfig.class,
                         ApplicationLayerConfig.class,
                         SecurityConfig.class,
                         WebConfig.class,
                         WebSocketConfig.class,
                         SwaggerConfig.class,
-                        Main.class)
-//                .parent()
+                        Main.class
+                )
                 .web(true)
                 .run(args);
 

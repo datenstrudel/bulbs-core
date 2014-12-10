@@ -703,12 +703,10 @@ angular.module('webSocketServices', ['ngResource', 'identityAuthServices'])
             var res = new function(){
                 console.log("Creating new Core WebSocketService..");
                 var self = this;
-                self.socket = new SockJS('/core/websockets');
                 self.stompClient = null;
                 self.connected = false;
                 self.queueSuffix;
                 self.subscriptions = {};
-                self.reconnectIncrement = 5;
                 self.reconnectAttempt = 1;
                 self.reconnTimer = null;
                 self.subObjs = [];
@@ -735,17 +733,18 @@ angular.module('webSocketServices', ['ngResource', 'identityAuthServices'])
                             $rootScope.reconnectCounter = 1 ;
                         }
                     }
-                    self.reconnTimer = $timeout($rootScope.onReconnectTimerTrigger,1000);
+                    self.reconnTimer = $timeout($rootScope.onReconnectTimerTrigger, 1000);
                 };
                 self.connect = function(){
                     console.log("Connecting Websocket..");
                     var error_callback = function(error) {
                         // Trigger reconnect timer
+                        console.log("Error on connect: ", error);
                         self.reconnTimer = $timeout($rootScope.onReconnectTimerTrigger, 1000);
                     };
                     self.socket = new SockJS('/core/websockets');
                     self.stompClient = Stomp.over(self.socket);
-                    self.stompClient.connect('', '', function(frame) {
+                    self.stompClient.connect( '', '', function(frame) {
                         //~ On Connection Success
                         if(self.reconnTimer != null ) $timeout.cancel(self.reconnTimer);
                         self.reconnectAttempt = 1;
@@ -753,10 +752,10 @@ angular.module('webSocketServices', ['ngResource', 'identityAuthServices'])
                         self.connected = true;
                         $rootScope.reconnectMessage = '';
                         console.log('WebSocket frame connected: ' + frame);
-                        var username = frame.headers['user-name'];
-                        console.log('WebSocket username: ' + username);
-                        self.queueSuffix = frame.headers['queue-suffix'];
-                        console.log('Queue Suffix: ' + self.queueSuffix);
+                        //var username = frame.headers['user-name'];
+                        //console.log('WebSocket username: ' + username);
+                        //self.queueSuffix = frame.headers['queue-suffix'];
+                        //console.log('Queue Suffix: ' + self.queueSuffix);
                         $rootScope.$broadcast('Evt_StompClientConnected', true);
                         console.log("Authenticated: " + IdentityService.authenticated());
                         for (var i in self.subObjs){
@@ -799,9 +798,9 @@ angular.module('webSocketServices', ['ngResource', 'identityAuthServices'])
                     return subscr;
                 }
             };
+            $rootScope._StompClientHolder = res;
             res.connect();
         }
-        $rootScope._StompClientHolder = res;
         return $rootScope._StompClientHolder;
     });
 ;
