@@ -39,7 +39,7 @@ public class PublishedMessageTrackerStoreIT {
     public void setUp() {
         if(PublishedMessageTrackerStoreIT.initialized) return ;
         PublishedMessageTrackerStoreIT.initialized = true;
-        mongo.dropCollection(Preset.class);
+        mongo.dropCollection(PublishedMessageTracker.class);
     }
 
     @Test

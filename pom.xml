@@ -391,7 +391,7 @@
                     </webResources>
                 </configuration>
             </plugin>
-            <!-- // UNIT TESTS ///////////////////////////////////////////////////// -->
+            <!-- //TESTS ///////////////////////////////////////////////////// -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -400,58 +400,45 @@
                     <dependency>
                         <groupId>org.apache.maven.surefire</groupId>
                         <artifactId>common-junit48</artifactId>
-                        <!--<artifactId>surefire-junit47</artifactId>-->
                         <version>2.17</version>
                     </dependency>
                 </dependencies>
                 <configuration>
-
+                    <skip>true</skip>
                     <argLine>
                         -Duser.timezone=UTC
                     </argLine>
-                    <includes>
-                        <include>**/*.class</include>
-                    </includes>
-                    <useSystemClassLoader>false</useSystemClassLoader>
-                    <threadCount>10</threadCount>
-                    <parallel>classes</parallel>
-                    <forkCount>4</forkCount>
-                    <reuseForks>true</reuseForks>
-                    <excludedGroups>net.datenstrudel.bulbs.core.IntegrationTest</excludedGroups>
-                    <excludes>
-                        <exclude>**/*IT.java</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-            <!-- // INTEGRATION TESTS ////////////////////////////////////////////// -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <version>2.11</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.apache.maven.surefire</groupId>
-                        <artifactId>surefire-junit47</artifactId>
-                        <version>2.12</version>
-                    </dependency>
-                </dependencies>
-                <configuration>
-                    <argLine>
-                        -Duser.timezone=UTC
-                    </argLine>
-                    <groups>net.datenstrudel.bulbs.core.IntegrationTest</groups>
-                    <skipTests>${skipIT}</skipTests>
                 </configuration>
                 <executions>
                     <execution>
-                        <goals>
-                            <goal>integration-test</goal>
-                        </goals>
+                        <id>unit-tests</id>
+                        <phase>test</phase>
+                        <goals><goal>test</goal></goals>
                         <configuration>
+                            <skip>false</skip>
                             <includes>
                                 <include>**/*.class</include>
                             </includes>
-                            <encoding>${project.build.sourceEncoding}</encoding>
+                            <excludes>
+                                <exclude>**/*IT.class</exclude>
+                            </excludes>
+                            <excludedGroups>net.datenstrudel.bulbs.core.IntegrationTest</excludedGroups>
+                            <useSystemClassLoader>false</useSystemClassLoader>
+                            <threadCount>10</threadCount>
+                            <parallel>classes</parallel>
+                            <forkCount>4</forkCount>
+                            <reuseForks>true</reuseForks>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>integration-tests</id>
+                        <phase>integration-test</phase>
+                        <goals><goal>test</goal></goals>
+                        <configuration>
+                            <skip>${skipIT}</skip>
+                            <includes>
+                                <include>**/*IT.class</include>
+                            </includes>
                         </configuration>
                     </execution>
                 </executions>

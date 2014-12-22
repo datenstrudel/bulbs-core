@@ -1,7 +1,9 @@
 package net.datenstrudel.bulbs.core;
 
 import net.datenstrudel.bulbs.core.domain.model.bulb.BulbsHwService;
+import org.mockito.Mockito;
 import org.slf4j.Logger; import org.slf4j.LoggerFactory;import org.easymock.EasyMock;
+import org.springframework.boot.actuate.metrics.CounterService;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -31,6 +33,11 @@ public class TestConfig
     @Bean(name = "bulbsHwService")
     public BulbsHwService bulbsHwService_mk(){
         BulbsHwService res = EasyMock.createStrictMock(BulbsHwService.class);
+        return res;
+    }
+    @Bean
+    public CounterService counterService_mk() {
+        CounterService res = Mockito.mock(CounterService.class);
         return res;
     }
 

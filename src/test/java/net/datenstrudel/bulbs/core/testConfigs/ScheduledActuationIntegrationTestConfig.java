@@ -24,7 +24,7 @@ public class ScheduledActuationIntegrationTestConfig {
 
     @Bean
     public DomainServiceLocator domainServiceLocator_Mk() {
-        return EasyMock.createMock(DomainServiceLocator.class);
+        return EasyMock.createNiceMock(DomainServiceLocator.class);
     }
 
     @Bean

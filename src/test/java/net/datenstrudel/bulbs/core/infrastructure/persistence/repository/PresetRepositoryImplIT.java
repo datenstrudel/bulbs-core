@@ -91,13 +91,14 @@ public class PresetRepositoryImplIT {
     @Test
     public void findByNameAndPresetId_Creator() {
         System.out.println("findByName");
+        instance.deleteAll();
         Preset expResult = newTestPreset();
         Preset unExpResult = newTestPreset();
         BulbsContextUserId userId = expResult.getId().getCreator();
         String presetName = expResult.getName();
-        assertThat(instance.findAll().size(), Matchers.greaterThan(1));
         instance.save(expResult);
         instance.save(unExpResult);
+        assertThat(instance.findAll().size(), Matchers.greaterThan(1));
         Preset result = instance.findByNameAndId_Creator(presetName, userId);
         
         assertEquals(expResult, result);
