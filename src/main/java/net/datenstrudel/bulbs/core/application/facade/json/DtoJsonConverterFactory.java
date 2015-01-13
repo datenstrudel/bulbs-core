@@ -23,7 +23,6 @@ import java.util.Map;
 public class DtoJsonConverterFactory {
 
     //~ Member(s) //////////////////////////////////////////////////////////////
-    private static final Logger log = LoggerFactory.getLogger(DtoJsonConverterFactory.class);
     private static final Gson DTO_JSON_CONVERTER = new GsonBuilder()
             .registerTypeAdapter(Color.class, new TypeHierarchyAdapterColor())
             .registerTypeAdapter(Date.class, new TypeConverterDate())

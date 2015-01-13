@@ -44,7 +44,7 @@ public class DtoConverterRegistry {
         convertersByDomain = Maps.newHashMapWithExpectedSize(c.size());
         for (DtoConverter el : c.values()) {
             log.debug("Register DtoConverter for Dto Type '"
-                    + el.supportedDtoClass()+"' and Domin Type '"
+                    + el.supportedDtoClass()+"' and Domain Type '"
                     + el.supportedDomainClass()+"': " + el.getClass().getName());
             converters.put(el.supportedDtoClass(), el);
             convertersByDomain.put(el.supportedDomainClass(), el);

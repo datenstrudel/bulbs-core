@@ -25,7 +25,7 @@ import java.util.*;
  * 
  * @author Thomas Wendzinski
  */
-public class BulbCmdTranslator_PhilipsHue implements BulbCmdTranslator {
+public class BulbCmdTranslator_PhilipsHue implements BulbCmdTranslator_HTTP {
 
     //~ Member(s) //////////////////////////////////////////////////////////////
     private final Gson gson = new Gson();

@@ -11,71 +11,68 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * This interface separates the translation of <b>hardware vendor specific commands<(b> and
- * <b>command responses</b> from technical implementation of communication mechanisms.
- * 
- * @author Thomas Wendzinski
+ *
+ * In/Out types produced to be uniformly processed by a corresponding
+ * {@link net.datenstrudel.bulbs.core.infrastructure.services.bulb.BulbBridgeHardwareAdapter BulbBridgeHardwareAdapter}
+ * @param I Input type, e.g. payload from hardware
+ * @param O Output type, payload sent to hardware
  */
-public interface BulbCmdTranslator {
+public interface BulbCmdTranslator<I,O> {
 
-    //~ Member(s) //////////////////////////////////////////////////////////////
-    //~ Method(s) //////////////////////////////////////////////////////////////
-    public BulbBridge bridgeFromJson(String json, BulbBridgeId bridgeId, BulbBridgeAddress localAddress,
-            BulbsContextUserId contextUserId);
-    public BulbId[] bulbIdsFromJson(String json, BulbBridgeId bridgeId);
-    public Bulb bulbFromJson(String json, BulbBridge parentBridge, BulbId bulbId);
-    public BulbState stateFromJson(String json);
-    public Set<BulbsPrincipal> bulbsPrincipalsFromJson(String json, BulbBridgeId bridgeId);
-    public HwResponse responseFromJson(String json, HttpStatus httpStatuscode);
-    public InvocationResponse responseFromHardwareInvocation(String json);
+    public BulbBridge bridgeFromJson(I payload, BulbBridgeId bridgeId, BulbBridgeAddress localAddress,
+                                     BulbsContextUserId contextUserId);
+    public BulbId[] bulbIdsFromJson(I payload, BulbBridgeId bridgeId);
+    public Bulb bulbFromJson(I payload, BulbBridge parentBridge, BulbId bulbId);
+    public BulbState stateFromJson(I payload);
+    public Set<BulbsPrincipal> bulbsPrincipalsFromJson(I payload, BulbBridgeId bridgeId);
+    public HwResponse responseFromJson(I payload, HttpStatus httpStatuscode);
+    public InvocationResponse responseFromHardwareInvocation(I payload);
     /**
-     * Check the given response as <code>json</code> whether it represents an error and return
+     * Check the given response as <code>payload</code> whether it represents an error and return
      * it as <code>InvocationResponse</code>. Return <code>null</code> if there was no error.
-     * 
-     * @param json
+     *
+     * @param payload
      * @return Error response or <code>null</code> if there was no error.
      */
-    public InvocationResponse checkResponseForError(String json);
-    
+    public InvocationResponse checkResponseForError(I payload);
+
     ////////////////////////////////////////////////////////////////////////////
-    public HttpCommand toBridgeFromHwInterfaceCmd(
+    public O toBridgeFromHwInterfaceCmd(
             BulbBridgeAddress address,
             BulbsPrincipal principal );
-    public HttpCommand toToBulbsPrincipalsCmd(
+    public O toToBulbsPrincipalsCmd(
             BulbBridge bridge,
             BulbsPrincipal principal );
-    public HttpCommand toCreateBulbsPrincipalCmd(
+    public O toCreateBulbsPrincipalCmd(
             BulbBridgeAddress address,
             BulbsPrincipal principal );
-    public HttpCommand toRemoveBulbsPrincipalCmd(
+    public O toRemoveBulbsPrincipalCmd(
             BulbBridgeAddress address,
             BulbsPrincipal principal,
             BulbsPrincipal principal2Remove );
-    public HttpCommand toDiscoverNewBulbsCmd(
-            BulbBridgeAddress address, 
+    public O toDiscoverNewBulbsCmd(
+            BulbBridgeAddress address,
             BulbsPrincipal principal);
-    public HttpCommand toModifyBridgeAttributesCmd(
-            BulbBridgeAddress address, 
+    public O toModifyBridgeAttributesCmd(
+            BulbBridgeAddress address,
             BulbsPrincipal principal,
             Map<String, Object> attributes);
-    public HttpCommand toBulbsFromHwInterfaceCmd(
-            BulbBridgeAddress address, 
+    public O toBulbsFromHwInterfaceCmd(
+            BulbBridgeAddress address,
             BulbsPrincipal principal);
-    public HttpCommand toBulbFromHwInterfaceCmd(
+    public O toBulbFromHwInterfaceCmd(
             BulbId bulbId,
-            BulbBridgeAddress address, 
+            BulbBridgeAddress address,
             BulbsPrincipal principal);
-    
-    public HttpCommand toModifyBulbAttributesCmd(
+
+    public O toModifyBulbAttributesCmd(
             BulbId bulbId,
-            BulbBridgeAddress address, 
+            BulbBridgeAddress address,
             BulbsPrincipal principal,
             Map<String, Object> attributes);
-    public HttpCommand toApplyBulbStateCmd(
-            BulbId bulbId, 
-            BulbBridgeAddress address, 
+    public O toApplyBulbStateCmd(
+            BulbId bulbId,
+            BulbBridgeAddress address,
             BulbsPrincipal principal,
             BulbState state);
-    //~ Private Artifact(s) ////////////////////////////////////////////////////
-
 }

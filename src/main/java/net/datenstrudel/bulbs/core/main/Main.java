@@ -73,7 +73,6 @@ public class Main extends SpringBootServletInitializer {
         return super.configure(application);
     }
 
-
     @Override
     public void onStartup(ServletContext servletContext) throws ServletException {
         super.onStartup(servletContext);
@@ -108,7 +107,6 @@ public class Main extends SpringBootServletInitializer {
         Connector connector = new Connector("org.apache.coyote.http11.Http11NioProtocol");
         Http11NioProtocol protocol = (Http11NioProtocol) connector.getProtocolHandler();
         try {
-
             File keystore = new DefaultResourceLoader().getResource(this.pathToKeystore).getFile(); //new ClassPathResource(pathToKeystore).getFile();
             File truststore = new DefaultResourceLoader().getResource(pathToKeystore).getFile();
             connector.setScheme("https");

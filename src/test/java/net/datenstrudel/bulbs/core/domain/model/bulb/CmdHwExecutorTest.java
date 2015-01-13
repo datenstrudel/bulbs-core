@@ -14,7 +14,7 @@ import net.datenstrudel.bulbs.core.domain.model.infrastructure.DomainServiceLoca
 import net.datenstrudel.bulbs.core.domain.model.messaging.DomainEvent;
 import net.datenstrudel.bulbs.core.domain.model.messaging.DomainEventPublisherDeferrer;
 import net.datenstrudel.bulbs.core.infrastructure.services.bulb.BulbBridgeHardwareAdapter;
-import net.datenstrudel.bulbs.core.infrastructure.services.bulb.BulbCmdTranslator;
+import net.datenstrudel.bulbs.core.infrastructure.services.bulb.BulbCmdTranslator_HTTP;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbBridgeAddress;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbState;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.CommandPriority;
@@ -40,7 +40,7 @@ public class CmdHwExecutorTest {
     BulbBridgeHardwareAdapter mk_hwAdapter;
     DomainEventStore mk_eventStore;
     BulbBridgeAddress T_BRIDGE_ADDRESS = new BulbBridgeAddress("localhost", 0);
-    BulbCmdTranslator mk_cmdTranslator;
+    BulbCmdTranslator_HTTP mk_cmdTranslator;
     DomainServiceLocator mk_domainServiceLocator;
     DomainServiceLocator serviceLocator;
     
@@ -53,7 +53,7 @@ public class CmdHwExecutorTest {
         mk_eventStore = createMock(DomainEventStore.class);
         ReflectionTestUtils.setField(new BulbsCoreEventProcessor(), "eventStore", 
                 mk_eventStore);
-        mk_cmdTranslator = createMock(BulbCmdTranslator.class);
+        mk_cmdTranslator = createMock(BulbCmdTranslator_HTTP.class);
         mk_domainServiceLocator = createMock(DomainServiceLocator.class);
 
         serviceLocator = new DomainServiceLocator();
@@ -115,7 +115,7 @@ public class CmdHwExecutorTest {
                 isA(BulbId.class), eq(T_BRIDGE_ADDRESS), 
                 eq(principal),
                 isA(BulbState.class),
-                isA(BulbCmdTranslator.class))).andReturn(
+                isA(BulbCmdTranslator_HTTP.class))).andReturn(
                     new InvocationResponse("OK", false))
                 .times(COUNT_STATES);
         replay(mk_hwAdapter, mk_eventStore, mk_cmdTranslator, mk_domainServiceLocator);

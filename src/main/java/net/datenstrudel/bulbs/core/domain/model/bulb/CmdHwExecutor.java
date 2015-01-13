@@ -6,6 +6,7 @@ import net.datenstrudel.bulbs.core.domain.model.messaging.DomainEventPublisher;
 import net.datenstrudel.bulbs.core.infrastructure.Runnable_EventPublishingAware;
 import net.datenstrudel.bulbs.core.infrastructure.services.bulb.BulbBridgeHardwareAdapter;
 import net.datenstrudel.bulbs.core.infrastructure.services.bulb.BulbCmdTranslator;
+import net.datenstrudel.bulbs.core.infrastructure.services.bulb.BulbCmdTranslator_HTTP;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbBridgeAddress;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbBridgeHwException;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbState;

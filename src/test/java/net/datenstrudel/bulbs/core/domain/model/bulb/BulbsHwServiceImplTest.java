@@ -9,7 +9,7 @@ import net.datenstrudel.bulbs.core.domain.model.infrastructure.DomainServiceLoca
 import net.datenstrudel.bulbs.core.domain.model.messaging.DomainEvent;
 import net.datenstrudel.bulbs.core.domain.model.messaging.DomainEventPublisherDeferrer;
 import net.datenstrudel.bulbs.core.infrastructure.services.bulb.BulbBridgeHardwareAdapter;
-import net.datenstrudel.bulbs.core.infrastructure.services.bulb.BulbCmdTranslator;
+import net.datenstrudel.bulbs.core.infrastructure.services.bulb.BulbCmdTranslator_HTTP;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.*;
 import net.datenstrudel.bulbs.shared.domain.model.color.ColorRGB;
 import net.datenstrudel.bulbs.shared.domain.model.identity.AppId;
@@ -222,7 +222,7 @@ public class BulbsHwServiceImplTest {
                 isA(BulbId.class), eq(T_BRIDGE_ADDRESS),
                 eq(principal),
                 isA(BulbState.class),
-                isA(BulbCmdTranslator.class))).andReturn(
+                isA(BulbCmdTranslator_HTTP.class))).andReturn(
                     new InvocationResponse("OK", false))
                 .times(1, COUNT_STATES);
         replay(mk_hwAdapter, mk_eventStore, mk_domainServiceLocator);
@@ -266,7 +266,7 @@ public class BulbsHwServiceImplTest {
                 isA(BulbId.class), eq(T_BRIDGE_ADDRESS), 
                 eq(principal),
                 isA(BulbState.class),
-                isA(BulbCmdTranslator.class))).andReturn(
+                isA(BulbCmdTranslator_HTTP.class))).andReturn(
                     new InvocationResponse("OK", false))
                 .times(1, COUNT_STATES);
         expect(mk_eventStore.store(isA(DomainEvent.class))).andReturn(1l).anyTimes();

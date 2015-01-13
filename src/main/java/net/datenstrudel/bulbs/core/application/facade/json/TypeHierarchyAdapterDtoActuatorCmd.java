@@ -28,7 +28,6 @@ public class TypeHierarchyAdapterDtoActuatorCmd
     @Override
     public JsonElement serialize(
             DtoAbstractActuatorCmd src, Type typeOfSrc, JsonSerializationContext context) {
-        
         return context.serialize(src);
     }
 
