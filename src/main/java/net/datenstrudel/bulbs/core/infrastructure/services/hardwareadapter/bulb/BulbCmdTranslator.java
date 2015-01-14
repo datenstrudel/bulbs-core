@@ -1,4 +1,4 @@
-package net.datenstrudel.bulbs.core.infrastructure.services.bulb;
+package net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb;
 
 import net.datenstrudel.bulbs.core.domain.model.bulb.*;
 import net.datenstrudel.bulbs.core.domain.model.identity.BulbsContextUserId;
@@ -13,7 +13,7 @@ import java.util.Set;
 /**
  *
  * In/Out types produced to be uniformly processed by a corresponding
- * {@link net.datenstrudel.bulbs.core.infrastructure.services.bulb.BulbBridgeHardwareAdapter BulbBridgeHardwareAdapter}
+ * {@link net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.BulbBridgeHardwareAdapter BulbBridgeHardwareAdapter}
  * @param I Input type, e.g. payload from hardware
  * @param O Output type, payload sent to hardware
  */

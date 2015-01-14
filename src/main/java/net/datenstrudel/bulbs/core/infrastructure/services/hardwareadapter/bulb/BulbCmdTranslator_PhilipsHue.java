@@ -1,4 +1,4 @@
-package net.datenstrudel.bulbs.core.infrastructure.services.bulb;
+package net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;

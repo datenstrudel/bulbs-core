@@ -1,4 +1,4 @@
-package net.datenstrudel.bulbs.core.infrastructure.services.bulb;
+package net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb;
 
 import net.datenstrudel.bulbs.core.domain.model.bulb.*;
 import net.datenstrudel.bulbs.core.domain.model.identity.BulbsContextUserId;

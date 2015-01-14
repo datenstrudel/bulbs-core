@@ -1,4 +1,4 @@
-package net.datenstrudel.bulbs.core.infrastructure.services.bulb;
+package net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb;
 
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;

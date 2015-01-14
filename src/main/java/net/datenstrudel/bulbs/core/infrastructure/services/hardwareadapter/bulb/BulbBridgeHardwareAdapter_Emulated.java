@@ -1,4 +1,4 @@
-package net.datenstrudel.bulbs.core.infrastructure.services.bulb;
+package net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;

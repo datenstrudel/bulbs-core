@@ -1,8 +1,9 @@
-package net.datenstrudel.bulbs.core.infrastructure.services.bulb;
+package net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.lifx;
 
 import net.datenstrudel.bulbs.core.domain.model.bulb.*;
 import net.datenstrudel.bulbs.core.domain.model.identity.BulbsContextUserId;
 import net.datenstrudel.bulbs.core.domain.model.identity.BulbsPrincipal;
+import net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.BulbBridgeHardwareAdapter;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbBridgeAddress;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbBridgeHwException;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbState;

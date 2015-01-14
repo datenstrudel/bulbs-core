@@ -5,9 +5,9 @@ import net.datenstrudel.bulbs.core.domain.model.identity.BulbsContextUserId;
 import net.datenstrudel.bulbs.core.domain.model.identity.BulbsPrincipal;
 import net.datenstrudel.bulbs.core.domain.model.messaging.DomainEventPublisher;
 import net.datenstrudel.bulbs.core.infrastructure.Runnable_EventPublishingAware;
-import net.datenstrudel.bulbs.core.infrastructure.services.bulb.BulbBridgeHardwareAdapter;
-import net.datenstrudel.bulbs.core.infrastructure.services.bulb.BulbCmdTranslator;
-import net.datenstrudel.bulbs.core.infrastructure.services.bulb.BulbCmdTranslator_PhilipsHue;
+import net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.BulbBridgeHardwareAdapter;
+import net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.BulbCmdTranslator;
+import net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.BulbCmdTranslator_PhilipsHue;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbBridgeAddress;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbBridgeHwException;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbsPlatform;
@@ -183,9 +183,8 @@ public class BulbsHwServiceImpl implements BulbsHwService{
     public void clearFinishedFromIndex(){
         if( runningExecutions.isEmpty() )return ;
         runningExecutions.entrySet().removeIf(
-                (Entry<Object, CmdHwExecutor> t) -> {
-            return t.getValue().isExecutionFinished();
-        });
+                (Entry<Object, CmdHwExecutor> t) -> t.getValue().isExecutionFinished()
+        );
     }
     //~ Private Artifact(s) ////////////////////////////////////////////////////
     private BulbBridgeHardwareAdapter hwAdapterForPlatform(BulbsPlatform platform){
