@@ -17,6 +17,7 @@ import net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.
 import net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.BulbCmdTranslator_HTTP;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbBridgeAddress;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbState;
+import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbsPlatform;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.CommandPriority;
 import net.datenstrudel.bulbs.shared.domain.model.color.ColorRGB;
 import net.datenstrudel.bulbs.shared.domain.model.identity.AppId;
@@ -40,7 +41,7 @@ public class CmdHwExecutorTest {
     BulbBridgeHardwareAdapter mk_hwAdapter;
     DomainEventStore mk_eventStore;
     BulbBridgeAddress T_BRIDGE_ADDRESS = new BulbBridgeAddress("localhost", 0);
-    BulbCmdTranslator_HTTP mk_cmdTranslator;
+    BulbsPlatform mk_BulbsPlatform = BulbsPlatform._EMULATED;
     DomainServiceLocator mk_domainServiceLocator;
     DomainServiceLocator serviceLocator;
     
@@ -53,7 +54,6 @@ public class CmdHwExecutorTest {
         mk_eventStore = createMock(DomainEventStore.class);
         ReflectionTestUtils.setField(new BulbsCoreEventProcessor(), "eventStore", 
                 mk_eventStore);
-        mk_cmdTranslator = createMock(BulbCmdTranslator_HTTP.class);
         mk_domainServiceLocator = createMock(DomainServiceLocator.class);
 
         serviceLocator = new DomainServiceLocator();
@@ -106,19 +106,19 @@ public class CmdHwExecutorTest {
                 "testPrincipalUsernam", new AppId("testCore"), "brId", 
                 BulbsPrincipalState.REGISTERED);
 
-        instance = new CmdHwExecutor(T_BRIDGE_ADDRESS, principal, command, mk_hwAdapter, mk_cmdTranslator);
+        instance = new CmdHwExecutor(T_BRIDGE_ADDRESS, principal, command, mk_hwAdapter, mk_BulbsPlatform);
 
         expect(mk_domainServiceLocator.getBeanInternal(DomainEventStore.class)).andReturn(mk_eventStore).anyTimes();
         expect(mk_domainServiceLocator.getBeanInternal(DomainEventPublisherDeferrer.class)).andReturn(null).anyTimes();
         expect(mk_eventStore.store(isA(DomainEvent.class))).andReturn(-1l).anyTimes();
         expect(mk_hwAdapter.applyBulbState(
-                isA(BulbId.class), eq(T_BRIDGE_ADDRESS), 
+                isA(BulbId.class), eq(T_BRIDGE_ADDRESS),
                 eq(principal),
                 isA(BulbState.class),
-                isA(BulbCmdTranslator_HTTP.class))).andReturn(
-                    new InvocationResponse("OK", false))
+                isA(BulbsPlatform.class))).andReturn(
+                new InvocationResponse("OK", false))
                 .times(COUNT_STATES);
-        replay(mk_hwAdapter, mk_eventStore, mk_cmdTranslator, mk_domainServiceLocator);
+        replay(mk_hwAdapter, mk_eventStore, mk_domainServiceLocator);
         
         instance.run();
         verify(mk_hwAdapter);

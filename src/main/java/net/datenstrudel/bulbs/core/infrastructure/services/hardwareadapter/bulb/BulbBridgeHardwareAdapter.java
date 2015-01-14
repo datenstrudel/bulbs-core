@@ -6,6 +6,7 @@ import net.datenstrudel.bulbs.core.domain.model.identity.BulbsPrincipal;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbBridgeAddress;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbBridgeHwException;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbState;
+import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbsPlatform;
 
 import java.util.Map;
 import java.util.Set;
@@ -17,67 +18,67 @@ import java.util.Set;
  * @version 1.0
  * @updated 08-Jun-2013 22:54:56
  */
-public interface BulbBridgeHardwareAdapter<T extends BulbCmdTranslator> {
+public interface BulbBridgeHardwareAdapter {
 
     //~ BRIDGE ///////////////////////////////////////////////////////////////////
     public BulbBridge toBridge(
-            BulbBridgeAddress address, 
+            BulbBridgeAddress address,
             BulbBridgeId bridgeId,
             BulbsPrincipal principal,
             BulbsContextUserId contextUserId,
-            T cmdTranslator)throws BulbBridgeHwException;
+            BulbsPlatform platform)throws BulbBridgeHwException;
             
     public InvocationResponse discoverNewBulbs(
             BulbBridgeAddress address,
             BulbsPrincipal principal,
-            T cmdTranslator) throws BulbBridgeHwException;
+            BulbsPlatform platform) throws BulbBridgeHwException;
     
     public HwResponse modifyBridgeAttributes(
-            BulbBridgeAddress address, 
-            BulbsPrincipal principal, 
-            Map<String, Object> attributes, 
-            T cmdTranslator) throws BulbBridgeHwException;
+            BulbBridgeAddress address,
+            BulbsPrincipal principal,
+            Map<String, Object> attributes,
+            BulbsPlatform platform) throws BulbBridgeHwException;
     
     public Set<BulbsPrincipal> toBulbsPrincipals(
-            BulbBridge bridge, 
-            BulbsPrincipal principal, 
-            T cmdTranslator) throws BulbBridgeHwException;
+            BulbBridge bridge,
+            BulbsPrincipal principal,
+            BulbsPlatform platform) throws BulbBridgeHwException;
     public InvocationResponse createBulbsPrincipal(
             BulbBridgeAddress address,
             BulbsPrincipal principal,
-            T cmdTranslator) throws BulbBridgeHwException;
+            BulbsPlatform platform) throws BulbBridgeHwException;
     public HwResponse removeBulbsPrincipal(
-            BulbBridgeAddress address, 
-            BulbsPrincipal principal, 
-            BulbsPrincipal principal2Remove, 
-            T cmdTranslator) throws BulbBridgeHwException;
+            BulbBridgeAddress address,
+            BulbsPrincipal principal,
+            BulbsPrincipal principal2Remove,
+            BulbsPlatform platform) throws BulbBridgeHwException;
     
     //~ BULB /////////////////////////////////////////////////////////////////////
     public BulbId[] toBulbIds(
-            BulbBridge parentBridge, 
-            BulbsPrincipal principal, 
-            T cmdTranslator) throws BulbBridgeHwException;
+            BulbBridge parentBridge,
+            BulbsPrincipal principal,
+            BulbsPlatform platform) throws BulbBridgeHwException;
     public Bulb[] toBulbs(
-            BulbBridge parentBridge, 
-            BulbsPrincipal principal, 
-            T cmdTranslator)throws BulbBridgeHwException;
+            BulbBridge parentBridge,
+            BulbsPrincipal principal,
+            BulbsPlatform platform)throws BulbBridgeHwException;
     public Bulb toBulb(
             BulbId bulbId,
-            BulbBridge parentBridge, 
-            BulbsPrincipal principal, 
-            T cmdTranslator)throws BulbBridgeHwException;
+            BulbBridge parentBridge,
+            BulbsPrincipal principal,
+            BulbsPlatform platform)throws BulbBridgeHwException;
     
     public InvocationResponse modifyBulbAttributes(
             BulbId bulbId,
-            BulbBridgeAddress address, 
+            BulbBridgeAddress address,
             BulbsPrincipal principal,
             Map<String, Object> attributes,
-            T cmdTranslator) throws BulbBridgeHwException;
+            BulbsPlatform platform) throws BulbBridgeHwException;
     
     public InvocationResponse applyBulbState(
-            BulbId bulbId, 
-            BulbBridgeAddress address, 
-            BulbsPrincipal principal, 
-            BulbState state, 
-            T cmdTranslator) throws BulbBridgeHwException;
+            BulbId bulbId,
+            BulbBridgeAddress address,
+            BulbsPrincipal principal,
+            BulbState state,
+            BulbsPlatform platform) throws BulbBridgeHwException;
 }

@@ -7,6 +7,7 @@ import net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbBridgeAddress;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbBridgeHwException;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbState;
+import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbsPlatform;
 
 import java.util.Map;
 import java.util.Set;
@@ -14,7 +15,9 @@ import java.util.Set;
 /**
  * Created by Thomas Wendzinski.
  */
-public class BulbBridgeHardwareAdapter_LIFX implements BulbBridgeHardwareAdapter<BulbCmdTranslator_LIFX> {
+public class BulbBridgeHardwareAdapter_LIFX implements BulbBridgeHardwareAdapter {
+
+    private final BulbCmdTranslator_LIFX cmdTranslator = new BulbCmdTranslator_LIFX();
 
     @Override
     public BulbBridge toBridge(
@@ -22,14 +25,14 @@ public class BulbBridgeHardwareAdapter_LIFX implements BulbBridgeHardwareAdapter
             BulbBridgeId bridgeId,
             BulbsPrincipal principal,
             BulbsContextUserId contextUserId,
-            BulbCmdTranslator_LIFX cmdTranslator) throws BulbBridgeHwException {
+            BulbsPlatform platform) throws BulbBridgeHwException {
         return null;
     }
     @Override
     public InvocationResponse discoverNewBulbs(
             BulbBridgeAddress address,
             BulbsPrincipal principal,
-            BulbCmdTranslator_LIFX cmdTranslator) throws BulbBridgeHwException {
+            BulbsPlatform platform) throws BulbBridgeHwException {
         return null;
     }
     @Override
@@ -37,14 +40,14 @@ public class BulbBridgeHardwareAdapter_LIFX implements BulbBridgeHardwareAdapter
             BulbBridgeAddress address,
             BulbsPrincipal principal,
             Map<String, Object> attributes,
-            BulbCmdTranslator_LIFX cmdTranslator) throws BulbBridgeHwException {
+            BulbsPlatform platform) throws BulbBridgeHwException {
         return null;
     }
     @Override
     public Set<BulbsPrincipal> toBulbsPrincipals(
             BulbBridge bridge,
             BulbsPrincipal principal,
-            BulbCmdTranslator_LIFX cmdTranslator) throws BulbBridgeHwException {
+            BulbsPlatform platform) throws BulbBridgeHwException {
         return null;
     }
 
@@ -52,7 +55,7 @@ public class BulbBridgeHardwareAdapter_LIFX implements BulbBridgeHardwareAdapter
     public InvocationResponse createBulbsPrincipal(
             BulbBridgeAddress address,
             BulbsPrincipal principal,
-            BulbCmdTranslator_LIFX cmdTranslator) throws BulbBridgeHwException {
+            BulbsPlatform platform) throws BulbBridgeHwException {
         return null;
     }
 
@@ -61,7 +64,7 @@ public class BulbBridgeHardwareAdapter_LIFX implements BulbBridgeHardwareAdapter
             BulbBridgeAddress address,
             BulbsPrincipal principal,
             BulbsPrincipal principal2Remove,
-            BulbCmdTranslator_LIFX cmdTranslator) throws BulbBridgeHwException {
+            BulbsPlatform platform) throws BulbBridgeHwException {
         return null;
     }
 
@@ -69,7 +72,7 @@ public class BulbBridgeHardwareAdapter_LIFX implements BulbBridgeHardwareAdapter
     public BulbId[] toBulbIds(
             BulbBridge parentBridge,
             BulbsPrincipal principal,
-            BulbCmdTranslator_LIFX cmdTranslator) throws BulbBridgeHwException {
+            BulbsPlatform platform) throws BulbBridgeHwException {
         return new BulbId[0];
     }
 
@@ -77,7 +80,7 @@ public class BulbBridgeHardwareAdapter_LIFX implements BulbBridgeHardwareAdapter
     public Bulb[] toBulbs(
             BulbBridge parentBridge,
             BulbsPrincipal principal,
-            BulbCmdTranslator_LIFX cmdTranslator) throws BulbBridgeHwException {
+            BulbsPlatform platform) throws BulbBridgeHwException {
         return new Bulb[0];
     }
 
@@ -86,7 +89,7 @@ public class BulbBridgeHardwareAdapter_LIFX implements BulbBridgeHardwareAdapter
             BulbId bulbId,
             BulbBridge parentBridge,
             BulbsPrincipal principal,
-            BulbCmdTranslator_LIFX cmdTranslator) throws BulbBridgeHwException {
+            BulbsPlatform platform) throws BulbBridgeHwException {
         return null;
     }
 
@@ -96,7 +99,7 @@ public class BulbBridgeHardwareAdapter_LIFX implements BulbBridgeHardwareAdapter
             BulbBridgeAddress address,
             BulbsPrincipal principal,
             Map<String, Object> attributes,
-            BulbCmdTranslator_LIFX cmdTranslator) throws BulbBridgeHwException {
+            BulbsPlatform platform) throws BulbBridgeHwException {
         return null;
     }
 
@@ -106,7 +109,7 @@ public class BulbBridgeHardwareAdapter_LIFX implements BulbBridgeHardwareAdapter
             BulbBridgeAddress address,
             BulbsPrincipal principal,
             BulbState state,
-            BulbCmdTranslator_LIFX cmdTranslator) throws BulbBridgeHwException {
+            BulbsPlatform platform) throws BulbBridgeHwException {
         return null;
     }
 }

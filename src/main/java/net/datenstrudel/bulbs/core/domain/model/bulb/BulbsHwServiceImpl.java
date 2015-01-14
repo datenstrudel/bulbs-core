@@ -6,13 +6,9 @@ import net.datenstrudel.bulbs.core.domain.model.identity.BulbsPrincipal;
 import net.datenstrudel.bulbs.core.domain.model.messaging.DomainEventPublisher;
 import net.datenstrudel.bulbs.core.infrastructure.Runnable_EventPublishingAware;
 import net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.BulbBridgeHardwareAdapter;
-import net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.BulbCmdTranslator;
-import net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.BulbCmdTranslator_PhilipsHue;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbBridgeAddress;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbBridgeHwException;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbsPlatform;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.task.AsyncTaskExecutor;
@@ -32,7 +28,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class BulbsHwServiceImpl implements BulbsHwService{
     
     //~ Member(s) //////////////////////////////////////////////////////////////
-    private static final Logger log = LoggerFactory.getLogger(BulbsHwServiceImpl.class);
     @Autowired
     @Qualifier(value = "bulbBridgeHardwareAdapter_REST")
     private BulbBridgeHardwareAdapter hwAdapter_Rest;
@@ -59,7 +54,7 @@ public class BulbsHwServiceImpl implements BulbsHwService{
             BulbsContextUserId contextUserId,
             BulbsPlatform platform) throws BulbBridgeHwException {
         return hwAdapterForPlatform(platform).toBridge(address, bridgeId, principal, contextUserId, 
-                translatorForPlatform(platform) );
+                platform );
     }
     @Override 
     public void discoverNewBulbs(
@@ -68,7 +63,7 @@ public class BulbsHwServiceImpl implements BulbsHwService{
             final BulbsPrincipal principal, 
             final BulbsPlatform platform) throws BulbBridgeHwException {
         hwAdapterForPlatform(platform).discoverNewBulbs(
-                address, principal, translatorForPlatform(platform));
+                address, principal, platform);
         asyncExecutor.execute(new Runnable_EventPublishingAware() {
             @Override
             public void execute() {
@@ -87,7 +82,7 @@ public class BulbsHwServiceImpl implements BulbsHwService{
             BulbsPrincipal principal, 
             Map<String, Object> attributes, 
             BulbsPlatform platform) throws BulbBridgeHwException {
-        return hwAdapterForPlatform(platform).modifyBridgeAttributes(address, principal, attributes, translatorForPlatform(platform));
+        return hwAdapterForPlatform(platform).modifyBridgeAttributes(address, principal, attributes, platform);
     }
 
     @Override
@@ -95,14 +90,14 @@ public class BulbsHwServiceImpl implements BulbsHwService{
             BulbBridge bridge, 
             BulbsPrincipal principal, 
             BulbsPlatform platform) throws BulbBridgeHwException {
-        return hwAdapterForPlatform(platform).toBulbsPrincipals(bridge, principal, translatorForPlatform(platform));
+        return hwAdapterForPlatform(platform).toBulbsPrincipals(bridge, principal, platform);
     }
     @Override
     public InvocationResponse createBulbsPrincipal(
             BulbBridgeAddress address, 
             BulbsPrincipal principal, 
             BulbsPlatform platform) throws BulbBridgeHwException {
-        return hwAdapterForPlatform(platform).createBulbsPrincipal(address, principal, translatorForPlatform(platform));
+        return hwAdapterForPlatform(platform).createBulbsPrincipal(address, principal, platform);
     }
     @Override
     public HwResponse removeBulbsPrincipal(
@@ -110,7 +105,7 @@ public class BulbsHwServiceImpl implements BulbsHwService{
             BulbsPrincipal principal, 
             BulbsPrincipal principal2Remove, 
             BulbsPlatform platform) throws BulbBridgeHwException {
-        return hwAdapterForPlatform(platform).removeBulbsPrincipal(address, principal, principal2Remove, translatorForPlatform(platform));
+        return hwAdapterForPlatform(platform).removeBulbsPrincipal(address, principal, principal2Remove, platform);
     }
 
     //~ BULBs ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -119,7 +114,7 @@ public class BulbsHwServiceImpl implements BulbsHwService{
             BulbBridge parentBridge, 
             BulbsPrincipal principal, 
             BulbsPlatform platform) throws BulbBridgeHwException {
-        return hwAdapterForPlatform(platform).toBulbIds(parentBridge, principal, translatorForPlatform(platform));
+        return hwAdapterForPlatform(platform).toBulbIds(parentBridge, principal, platform);
     }
     
     @Override
@@ -127,7 +122,7 @@ public class BulbsHwServiceImpl implements BulbsHwService{
             BulbBridge parentBridge, 
             BulbsPrincipal principal, 
             BulbsPlatform platform) throws BulbBridgeHwException {
-        return hwAdapterForPlatform(platform).toBulbs(parentBridge, principal, translatorForPlatform(platform));
+        return hwAdapterForPlatform(platform).toBulbs(parentBridge, principal, platform);
     }
 
     @Override
@@ -136,7 +131,7 @@ public class BulbsHwServiceImpl implements BulbsHwService{
             BulbBridge parentBridge, 
             BulbsPrincipal principal, 
             BulbsPlatform platform) throws BulbBridgeHwException {
-        return hwAdapterForPlatform(platform).toBulb(bulbId, parentBridge, principal, translatorForPlatform(platform));
+        return hwAdapterForPlatform(platform).toBulb(bulbId, parentBridge, principal, platform);
     }
     
     @Override
@@ -147,7 +142,7 @@ public class BulbsHwServiceImpl implements BulbsHwService{
             Map<String, Object> attributes, 
             BulbsPlatform platform) throws BulbBridgeHwException {
         return hwAdapterForPlatform(platform).modifyBulbAttributes(
-                bulbId, address, principal, attributes, translatorForPlatform(platform));
+                bulbId, address, principal, attributes, platform);
     }
     
     @Override
@@ -168,7 +163,7 @@ public class BulbsHwServiceImpl implements BulbsHwService{
         CmdHwExecutor exec = new CmdHwExecutor(
                 address, principal, command, 
                 hwAdapterForPlatform(platform), 
-                translatorForPlatform(platform));
+                platform);
         CmdHwExecutor runningExec;
         if( ( runningExec = this.runningExecutions.get( command.getBulbId()) ) != null ){
             runningExec.cancelExecution();
@@ -196,20 +191,6 @@ public class BulbsHwServiceImpl implements BulbsHwService{
             default:
                 throw new UnsupportedOperationException("Platform not supported: " + platform);
         }
-        
     }
-    private BulbCmdTranslator translatorForPlatform(BulbsPlatform platform){
-        switch(platform){
-            case _EMULATED:
-                return null; // No translator necessary
-            case PHILIPS_HUE:
-                return new BulbCmdTranslator_PhilipsHue();
-            default:
-                throw new UnsupportedOperationException("Platform not supported: " + platform);
-        }
-    }
-    
 
-
-    
 }

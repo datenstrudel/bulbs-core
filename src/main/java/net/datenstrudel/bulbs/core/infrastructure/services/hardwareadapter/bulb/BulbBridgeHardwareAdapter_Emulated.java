@@ -21,7 +21,7 @@ import java.util.*;
  * @author Thomas Wendzinski
  */
 @Component(value = "bulbBridgeHardwareAdapter_Emulated")
-public class BulbBridgeHardwareAdapter_Emulated implements BulbBridgeHardwareAdapter<BulbCmdTranslator_HTTP>{
+public class BulbBridgeHardwareAdapter_Emulated implements BulbBridgeHardwareAdapter{
 
     //~ Member(s) //////////////////////////////////////////////////////////////
     private static final Logger log = LoggerFactory.getLogger(BulbBridgeHardwareAdapter_Emulated.class);
@@ -35,11 +35,11 @@ public class BulbBridgeHardwareAdapter_Emulated implements BulbBridgeHardwareAda
     //~ Method(s) //////////////////////////////////////////////////////////////
     @Override
     public BulbBridge toBridge(
-            final BulbBridgeAddress address, 
+            final BulbBridgeAddress address,
             BulbBridgeId bridgeId,
-            BulbsPrincipal principal, 
-            BulbsContextUserId contextUserId, 
-            BulbCmdTranslator_HTTP cmdTranslator) throws BulbBridgeHwException {
+            BulbsPrincipal principal,
+            BulbsContextUserId contextUserId,
+            BulbsPlatform platform) throws BulbBridgeHwException {
         if(!knownBridges.containsKey(address)){
             log.info("|-- Creating new emulated bridge.");
             createEmulatedBridge(address, contextUserId);
@@ -50,9 +50,9 @@ public class BulbBridgeHardwareAdapter_Emulated implements BulbBridgeHardwareAda
 
     @Override
     public InvocationResponse discoverNewBulbs(
-            BulbBridgeAddress address, 
-            BulbsPrincipal principal, 
-            BulbCmdTranslator_HTTP cmdTranslator) throws BulbBridgeHwException {
+            BulbBridgeAddress address,
+            BulbsPrincipal principal,
+            BulbsPlatform platform) throws BulbBridgeHwException {
         log.info("|-- NoOp.");
         BulbBridge bridge = this.knownBridges.get(address);
         Bulb newBulb = new Bulb(
@@ -62,7 +62,7 @@ public class BulbBridgeHardwareAdapter_Emulated implements BulbBridgeHardwareAda
                 bridge, 
                 new BulbState(new ColorRGB(0, 0, 0), true), 
                 true, 
-                new HashMap<String, Object>());
+                new HashMap<>());
         bridge.getBulbs().add(newBulb);
         knownBulbs.get(address).add(newBulb);
         return new InvocationResponse("Emulated Search Started.", false);
@@ -70,10 +70,10 @@ public class BulbBridgeHardwareAdapter_Emulated implements BulbBridgeHardwareAda
 
     @Override
     public HwResponse modifyBridgeAttributes(
-            BulbBridgeAddress address, 
-            BulbsPrincipal principal, 
-            Map<String, Object> attributes, 
-            BulbCmdTranslator_HTTP cmdTranslator) throws BulbBridgeHwException {
+            BulbBridgeAddress address,
+            BulbsPrincipal principal,
+            Map<String, Object> attributes,
+            BulbsPlatform platform) throws BulbBridgeHwException {
         if(!knownBridges.containsKey(address)){
             log.warn("Creating bridge without consistent contextUserId. Application failures might occur.");
             createEmulatedBridge(address, null);
@@ -85,19 +85,19 @@ public class BulbBridgeHardwareAdapter_Emulated implements BulbBridgeHardwareAda
 
     @Override
     public Set<BulbsPrincipal> toBulbsPrincipals(
-            BulbBridge bridge, 
+            BulbBridge bridge,
             BulbsPrincipal principal,
-            BulbCmdTranslator_HTTP cmdTranslator) throws BulbBridgeHwException {
+            BulbsPlatform platform) throws BulbBridgeHwException {
         log.info("|-- Returning principals directly created so far.");
         return knownBridgesPrincipals.get(bridge.getLocalAddress());
     }
 
     @Override
     public InvocationResponse createBulbsPrincipal(
-            BulbBridgeAddress address, BulbsPrincipal principal, BulbCmdTranslator_HTTP cmdTranslator) throws BulbBridgeHwException {
+            BulbBridgeAddress address, BulbsPrincipal principal, BulbsPlatform platform) throws BulbBridgeHwException {
         log.info("Creating "+principal+" for emulated bridge["+address+"]");
         if(!this.knownBridgesPrincipals.containsKey(address)){
-            knownBridgesPrincipals.put(address, new HashSet<BulbsPrincipal>());
+            knownBridgesPrincipals.put(address, new HashSet<>());
         }
         this.knownBridgesPrincipals.get(address).add(principal);
         return new InvocationResponse("Successfully created principal on emulated bridge.", false);
@@ -105,10 +105,10 @@ public class BulbBridgeHardwareAdapter_Emulated implements BulbBridgeHardwareAda
 
     @Override
     public HwResponse removeBulbsPrincipal(
-            BulbBridgeAddress address, 
-            BulbsPrincipal principal, 
-            BulbsPrincipal principal2Remove, 
-            BulbCmdTranslator_HTTP cmdTranslator) throws BulbBridgeHwException {
+            BulbBridgeAddress address,
+            BulbsPrincipal principal,
+            BulbsPrincipal principal2Remove,
+            BulbsPlatform platform) throws BulbBridgeHwException {
         log.info("Retrieving emulated principal" + principal2Remove);
         if(this.knownBridgesPrincipals.containsKey(address)){
             knownBridgesPrincipals.get(address).remove(principal2Remove);
@@ -118,9 +118,9 @@ public class BulbBridgeHardwareAdapter_Emulated implements BulbBridgeHardwareAda
 
     @Override
     public BulbId[] toBulbIds(
-            BulbBridge parentBridge, 
-            BulbsPrincipal principal, 
-            BulbCmdTranslator_HTTP cmdTranslator) throws BulbBridgeHwException {
+            BulbBridge parentBridge,
+            BulbsPrincipal principal,
+            BulbsPlatform platform) throws BulbBridgeHwException {
         log.info("Retrieving emulated bulbs' IDs for bridge["+parentBridge+"]");
         if(!this.knownBulbs.containsKey(parentBridge.getLocalAddress())){
             createEmulatedBulbs(parentBridge);
@@ -136,8 +136,8 @@ public class BulbBridgeHardwareAdapter_Emulated implements BulbBridgeHardwareAda
     @Override
     public Bulb[] toBulbs(
             BulbBridge parentBridge,
-            BulbsPrincipal principal, 
-            BulbCmdTranslator_HTTP cmdTranslator) throws BulbBridgeHwException {
+            BulbsPrincipal principal,
+            BulbsPlatform platform) throws BulbBridgeHwException {
         
         log.info("Retrieving emulated bulbs for bridge["+parentBridge+"]");
         if(!this.knownBulbs.containsKey(parentBridge.getLocalAddress())){
@@ -154,10 +154,10 @@ public class BulbBridgeHardwareAdapter_Emulated implements BulbBridgeHardwareAda
 
     @Override
     public Bulb toBulb(
-            final BulbId bulbId, 
-            BulbBridge parentBridge, 
-            BulbsPrincipal principal, 
-            BulbCmdTranslator_HTTP cmdTranslator) throws BulbBridgeHwException {
+            final BulbId bulbId,
+            BulbBridge parentBridge,
+            BulbsPrincipal principal,
+            BulbsPlatform platform) throws BulbBridgeHwException {
         
         log.info("Retrieving emulated bulb["+bulbId+"]");
         if(!this.knownBulbs.containsKey(parentBridge.getLocalAddress())){
@@ -178,22 +178,22 @@ public class BulbBridgeHardwareAdapter_Emulated implements BulbBridgeHardwareAda
 
     @Override
     public InvocationResponse modifyBulbAttributes(
-            BulbId bulbId, 
-            BulbBridgeAddress address, 
-            BulbsPrincipal principal, 
-            Map<String, Object> attributes, 
-            BulbCmdTranslator_HTTP cmdTranslator) throws BulbBridgeHwException {
+            BulbId bulbId,
+            BulbBridgeAddress address,
+            BulbsPrincipal principal,
+            Map<String, Object> attributes,
+            BulbsPlatform platform) throws BulbBridgeHwException {
         log.info("Modifying bulb["+bulbId+"] attributes - noOp" );
         return new InvocationResponse("OK", false);
     }
 
     @Override
     public InvocationResponse applyBulbState(
-            final BulbId bulbId, 
-            BulbBridgeAddress address, 
-            BulbsPrincipal principal, 
-            BulbState state, 
-            BulbCmdTranslator_HTTP cmdTranslator) throws BulbBridgeHwException {
+            final BulbId bulbId,
+            BulbBridgeAddress address,
+            BulbsPrincipal principal,
+            BulbState state,
+            BulbsPlatform platform) throws BulbBridgeHwException {
         log.info("Applying state["+state+"] emulated - noOp");
         
         Bulb bulb = Iterables.find(this.knownBulbs.get(address), new Predicate<Bulb>() {
@@ -219,7 +219,7 @@ public class BulbBridgeHardwareAdapter_Emulated implements BulbBridgeHardwareAda
                 address, 
                 "EmulatedBridgeName__" + address.toHttpAddress(), 
                 contextUserId, 
-                new HashMap<String, Object>());
+                new HashMap<>());
         res.getBridgeAttributes().put("name", "EmulatedBridgeName__" + address.toHttpAddress());
         res.setOnline(true);
         knownBridges.put(address, res);
@@ -238,7 +238,7 @@ public class BulbBridgeHardwareAdapter_Emulated implements BulbBridgeHardwareAda
                 parentBridge, 
                 new BulbState(new ColorRGB(0, 0, 0), true), 
                 true, 
-                new HashMap<String, Object>()));
+                new HashMap<>()));
         bulbs.add(new Bulb(
                 new BulbId(parentBridge.getId(), 2),
                 BulbsPlatform._EMULATED, 
@@ -246,10 +246,10 @@ public class BulbBridgeHardwareAdapter_Emulated implements BulbBridgeHardwareAda
                 parentBridge, 
                 new BulbState(new ColorRGB(0, 0, 0), true), 
                 true, 
-                new HashMap<String, Object>()));
+                new HashMap<>()));
         
         if(!knownBulbs.containsKey(parentBridge.getLocalAddress())){
-            this.knownBulbs.put(parentBridge.getLocalAddress(), new HashSet<Bulb>());
+            this.knownBulbs.put(parentBridge.getLocalAddress(), new HashSet<>());
         }
         this.knownBulbs.get(parentBridge.getLocalAddress()).addAll(bulbs);
     }
