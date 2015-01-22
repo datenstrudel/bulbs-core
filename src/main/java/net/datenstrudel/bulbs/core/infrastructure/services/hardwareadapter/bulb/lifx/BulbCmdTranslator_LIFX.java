@@ -18,15 +18,24 @@ import java.util.Set;
 public class BulbCmdTranslator_LIFX implements BulbCmdTranslator<DatagramPacket, DatagramPacket> {
 
     @Override
-    public BulbBridge bridgeFromJson(DatagramPacket payload, BulbBridgeId bridgeId, BulbBridgeAddress localAddress, BulbsContextUserId contextUserId) {
+    public BulbBridge bridgeFromJson(
+            DatagramPacket payload,
+            BulbBridgeId bridgeId,
+            BulbBridgeAddress localAddress,
+            BulbsContextUserId contextUserId) {
         return null;
     }
     @Override
-    public BulbId[] bulbIdsFromJson(DatagramPacket payload, BulbBridgeId bridgeId) {
+    public BulbId[] bulbIdsFromJson(
+            DatagramPacket payload,
+            BulbBridgeId bridgeId) {
         return new BulbId[0];
     }
     @Override
-    public Bulb bulbFromJson(DatagramPacket payload, BulbBridge parentBridge, BulbId bulbId) {
+    public Bulb bulbFromJson(
+            DatagramPacket payload,
+            BulbBridge parentBridge,
+            BulbId bulbId) {
         return null;
     }
     @Override
@@ -34,7 +43,7 @@ public class BulbCmdTranslator_LIFX implements BulbCmdTranslator<DatagramPacket,
         return null;
     }
     @Override
-    public Set<BulbsPrincipal> bulbsPrincipalsFromJson(DatagramPacket payload, BulbBridgeId bridgeId) {
+    public Set<BulbsPrincipal> bulbsPrincipalsFromJson(DatagramPacket payload,BulbBridgeId bridgeId) {
         return null;
     }
 

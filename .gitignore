@@ -6,3 +6,4 @@ BulbsShared/target/**
 src/main/resources/META-INF/tomcat-bulbs.keystore
 target
 .vagrant
+doc/wiki

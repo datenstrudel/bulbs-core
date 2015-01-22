@@ -1,4 +1,4 @@
-package net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb;
+package net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.philipshue;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
@@ -7,6 +7,8 @@ import net.datenstrudel.bulbs.core.domain.model.bulb.*;
 import net.datenstrudel.bulbs.core.domain.model.identity.BulbsContextUserId;
 import net.datenstrudel.bulbs.core.domain.model.identity.BulbsPrincipal;
 import net.datenstrudel.bulbs.core.domain.model.identity.BulbsPrincipalState;
+import net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.BulbCmdTranslator_HTTP;
+import net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.HttpCommand;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbBridgeAddress;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbState;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbsPlatform;

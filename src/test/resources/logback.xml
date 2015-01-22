@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%date{MM-dd HH:mm:ss} %-5level [%thread] %-40logger{15} %msg%n</pattern>
+            <!--<pattern>%d{HH:mm:ss} [%8.40t] %-5p %35.35c.%10.10M() - %m%n</pattern>-->
+        </encoder>
+    </appender>
     <!--
 
     This file is the default logback configuration for Spring Boot. To use the same
@@ -11,9 +17,11 @@
     ...
 
     -->
-    <root level="INFO"></root>
+    <!--<root level="info">-->
+        <!--<appender-ref ref="STDOUT" />-->
+    <!--</root>-->
     <logger name="org.springframework" level="INFO"/>
-
+    <logger name="net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.lifx" level="DEBUG" />
     <include resource="org/springframework/boot/logging/logback/base.xml"/>
 
 </configuration>
