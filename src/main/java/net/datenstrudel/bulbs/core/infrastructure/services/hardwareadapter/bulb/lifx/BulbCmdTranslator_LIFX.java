@@ -15,11 +15,11 @@ import java.util.Set;
 /**
  * Created by Thomas Wendzinski.
  */
-public class BulbCmdTranslator_LIFX implements BulbCmdTranslator<DatagramPacket, DatagramPacket> {
+public class BulbCmdTranslator_LIFX implements BulbCmdTranslator<LifxMessage, LifxMessage> {
 
     @Override
     public BulbBridge bridgeFromJson(
-            DatagramPacket payload,
+            LifxMessage payload,
             BulbBridgeId bridgeId,
             BulbBridgeAddress localAddress,
             BulbsContextUserId contextUserId) {
@@ -27,76 +27,76 @@ public class BulbCmdTranslator_LIFX implements BulbCmdTranslator<DatagramPacket,
     }
     @Override
     public BulbId[] bulbIdsFromJson(
-            DatagramPacket payload,
+            LifxMessage payload,
             BulbBridgeId bridgeId) {
         return new BulbId[0];
     }
     @Override
     public Bulb bulbFromJson(
-            DatagramPacket payload,
+            LifxMessage payload,
             BulbBridge parentBridge,
             BulbId bulbId) {
         return null;
     }
     @Override
-    public BulbState stateFromJson(DatagramPacket payload) {
+    public BulbState stateFromJson(LifxMessage payload) {
         return null;
     }
     @Override
-    public Set<BulbsPrincipal> bulbsPrincipalsFromJson(DatagramPacket payload,BulbBridgeId bridgeId) {
+    public Set<BulbsPrincipal> bulbsPrincipalsFromJson(LifxMessage payload, BulbBridgeId bridgeId) {
         return null;
     }
 
     @Override
-    public HwResponse responseFromJson(DatagramPacket payload, HttpStatus httpStatuscode) {
+    public HwResponse responseFromJson(LifxMessage payload, HttpStatus httpStatuscode) {
         return null;
     }
     @Override
-    public InvocationResponse responseFromHardwareInvocation(DatagramPacket payload) {
+    public InvocationResponse responseFromHardwareInvocation(LifxMessage payload) {
         return null;
     }
     @Override
-    public InvocationResponse checkResponseForError(DatagramPacket payload) {
+    public InvocationResponse checkResponseForError(LifxMessage payload) {
         return null;
     }
     @Override
-    public DatagramPacket toBridgeFromHwInterfaceCmd(BulbBridgeAddress address, BulbsPrincipal principal) {
+    public LifxMessage toBridgeFromHwInterfaceCmd(BulbBridgeAddress address, BulbsPrincipal principal) {
         return null;
     }
     @Override
-    public DatagramPacket toToBulbsPrincipalsCmd(BulbBridge bridge, BulbsPrincipal principal) {
+    public LifxMessage toToBulbsPrincipalsCmd(BulbBridge bridge, BulbsPrincipal principal) {
         return null;
     }
     @Override
-    public DatagramPacket toCreateBulbsPrincipalCmd(BulbBridgeAddress address, BulbsPrincipal principal) {
+    public LifxMessage toCreateBulbsPrincipalCmd(BulbBridgeAddress address, BulbsPrincipal principal) {
         return null;
     }
     @Override
-    public DatagramPacket toRemoveBulbsPrincipalCmd(BulbBridgeAddress address, BulbsPrincipal principal, BulbsPrincipal principal2Remove) {
+    public LifxMessage toRemoveBulbsPrincipalCmd(BulbBridgeAddress address, BulbsPrincipal principal, BulbsPrincipal principal2Remove) {
         return null;
     }
     @Override
-    public DatagramPacket toDiscoverNewBulbsCmd(BulbBridgeAddress address, BulbsPrincipal principal) {
+    public LifxMessage toDiscoverNewBulbsCmd(BulbBridgeAddress address, BulbsPrincipal principal) {
         return null;
     }
     @Override
-    public DatagramPacket toModifyBridgeAttributesCmd(BulbBridgeAddress address, BulbsPrincipal principal, Map<String, Object> attributes) {
+    public LifxMessage toModifyBridgeAttributesCmd(BulbBridgeAddress address, BulbsPrincipal principal, Map<String, Object> attributes) {
         return null;
     }
     @Override
-    public DatagramPacket toBulbsFromHwInterfaceCmd(BulbBridgeAddress address, BulbsPrincipal principal) {
+    public LifxMessage toBulbsFromHwInterfaceCmd(BulbBridgeAddress address, BulbsPrincipal principal) {
         return null;
     }
     @Override
-    public DatagramPacket toBulbFromHwInterfaceCmd(BulbId bulbId, BulbBridgeAddress address, BulbsPrincipal principal) {
+    public LifxMessage toBulbFromHwInterfaceCmd(BulbId bulbId, BulbBridgeAddress address, BulbsPrincipal principal) {
         return null;
     }
     @Override
-    public DatagramPacket toModifyBulbAttributesCmd(BulbId bulbId, BulbBridgeAddress address, BulbsPrincipal principal, Map<String, Object> attributes) {
+    public LifxMessage toModifyBulbAttributesCmd(BulbId bulbId, BulbBridgeAddress address, BulbsPrincipal principal, Map<String, Object> attributes) {
         return null;
     }
     @Override
-    public DatagramPacket toApplyBulbStateCmd(BulbId bulbId, BulbBridgeAddress address, BulbsPrincipal principal, BulbState state) {
+    public LifxMessage toApplyBulbStateCmd(BulbId bulbId, BulbBridgeAddress address, BulbsPrincipal principal, BulbState state) {
         return null;
     }
 }

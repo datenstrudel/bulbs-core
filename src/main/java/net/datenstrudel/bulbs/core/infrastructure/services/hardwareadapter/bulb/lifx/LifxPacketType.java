@@ -7,6 +7,9 @@ public enum LifxPacketType {
 
     REQ_PAN_GATEWAY     (0x02, false),
     RESP_PAN_GATEWAY    (0x03, true),
+    REQ_POWER_STATE     (0x14, false),
+    REQ_SET_POWER_STATE (0x15, false),
+    RESP_POWER_STATE    (0x16, true),
     ;
 
     private BT.Uint16 protocolValue;

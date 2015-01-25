@@ -12,9 +12,11 @@ import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbsPlatform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
+import javax.net.SocketFactory;
+import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Created by Thomas Wendzinski.
@@ -22,115 +24,79 @@ import java.util.*;
 public class BulbBridgeHardwareAdapter_LIFX implements BulbBridgeHardwareAdapter {
 
     public static final Logger log = LoggerFactory.getLogger(BulbBridgeHardwareAdapter_LIFX.class);
-    public static final int LIFX_STD_PORT = 56700;
+
     private final BulbCmdTranslator_LIFX cmdTranslator = new BulbCmdTranslator_LIFX();
-    private final List<InetAddress> LOCAL_ADDRESSES;
+    private final UdpLifxMessageTransportManager transportManager;
 
+    private DatagramSocket udpSocket;
+    private Socket tcpSocket;
+
+    //~ ///////////////////////////////////////////////////////////////////////
     public BulbBridgeHardwareAdapter_LIFX() {
-        try{
-            this.LOCAL_ADDRESSES = allLocalAddresses();
-            StringJoiner joiner = new StringJoiner(" ; ");
-
-            this.LOCAL_ADDRESSES.stream().forEach( a -> joiner.add(a.getHostAddress()));
-            log.info("Local adresses found: {}", joiner.toString());
-        }catch (SocketException e) {
-            throw new IllegalStateException("Cannot construct due to local addresses not resolvable", e);
-        }
-
+        this.transportManager = new UdpLifxMessageTransportManager();
     }
 
-    private DatagramSocket socket;
+    //~ ///////////////////////////////////////////////////////////////////////
 
-    private DatagramSocket provideNewSocket() throws BulbBridgeHwException {
+    private Socket provideNewTcpSocket(InetAddress addr, int port) throws BulbBridgeHwException {
         try {
-            this.socket = new DatagramSocket(LIFX_STD_PORT);
-            this.socket.setSoTimeout(3000);
-            return socket;
-        } catch (SocketException e) {
-            throw new BulbBridgeHwException(e.getMessage(), e);
-        }
-    }
-    private InetAddress lanMulticastAddress() throws BulbBridgeHwException {
-        try {
-            return InetAddress.getByName("192.168.1.255");
-        } catch (UnknownHostException e) {
-            throw new BulbBridgeHwException(e.getMessage(), e);
-        }
-    }
-    private InetAddress localhostAddress() throws BulbBridgeHwException {
-        try {
-            InetAddress localHost = InetAddress.getLocalHost();
-            log.debug("Defined localhost as: {}", localHost.getHostAddress() );
-            return localHost;
-        } catch (UnknownHostException e) {
-            throw new BulbBridgeHwException(e.getMessage(), e);
-        }
-    }
-
-    //FIXME make private!
-    public void sendDatagramMessage(LifxMessage message, InetAddress target, int port ) throws BulbBridgeHwException {
-//        this.socket = provideNewSocket();
-        log.debug("|-- Going to send data on socket address [{}} and port [{}]..", target, port);
-        log.debug(" -- " + message.toBytes());
-        DatagramPacket packet = new DatagramPacket(
-                message.toBytes(), message.toBytes().length, target, port
-        );
-        try {
-            socket.send(packet);
+            this.tcpSocket = SocketFactory.getDefault().createSocket(addr, port);
+            this.tcpSocket.setSoTimeout(3000);
+            return this.tcpSocket;
         } catch (IOException e) {
             throw new BulbBridgeHwException(e.getMessage(), e);
         }
     }
 
-    /**
-     * Retrieve a UDP message and discard messages from known unlikely senders
-     * @return
-     * @throws BulbBridgeHwException
-     */
-    //FIXME make private!
-    public DatagramPacket retrieveDatagramMessage() throws BulbBridgeHwException {
-        byte[] respPayload = new byte[64];
-        DatagramPacket destPacket = new DatagramPacket(respPayload, respPayload.length);
-        try {
-            this.socket.receive(destPacket);
-            // TODO: Discard from unlikely sender(s)
-            if( ignorePacket(destPacket) ){
-                // FIXME Prevent potential endless recursion!!
-                log.debug("Message has been discarded from address: {}", destPacket.getAddress());
-                return retrieveDatagramMessage();
-            }
 
-            log.debug(":) -- Retrieved packet from address [{}]", destPacket.getAddress());
-            return destPacket;
-
-        }catch(SocketTimeoutException e){
-            log.info(":( .. receive timeout..");
-            return null;
+//    //FIXME make private!
+//    public void sendDatagramMessage(LifxMessage message ) throws BulbBridgeHwException {
+////        this.udpSocket = provideNewUdpSocket(LIFX_STD_PORT);
+//        log.debug("|-- Going to send data on udpSocket address [{}} and port [{}]..", message.getAddress(), message.getPort());
+//        log.debug(" -- " + message.toBytes());
+//        DatagramPacket packet = new DatagramPacket(
+//                message.toBytes(), message.toBytes().length, message.getAddress(), message.getPort()
+//        );
+//        try {
+//            udpSocket.send(packet);
+//        } catch (IOException e) {
 //            throw new BulbBridgeHwException(e.getMessage(), e);
+//        }
+//    }
+    //FIXME make private!
+    public byte[] sendAndReceiveTcpMessage(LifxMessage message) throws BulbBridgeHwException {
+        this.tcpSocket = provideNewTcpSocket(message.getAddress(), message.getPort());
+        log.debug("|-- Going to send data on tcpSocket at address [{}} and port [{}]..", message.getAddress(), message.getPort());
+        log.debug(" -- " + message);
+
+        OutputStream outputStream = null;
+        BufferedInputStream inFromServer = null;
+        byte[] in = new byte[84]; // 32 + 52
+        try {
+            outputStream = tcpSocket.getOutputStream();
         } catch (IOException e) {
-            throw new BulbBridgeHwException(e.getMessage(), e);
+            log.error("Error opening output stream on tcp socket", e);
         }
-
-    }
-
-    private boolean ignorePacket(DatagramPacket packet){
-        return LOCAL_ADDRESSES.contains( packet.getAddress() );
-    }
-
-    private List<InetAddress> allLocalAddresses() throws SocketException {
-        List<InetAddress> addrList = new LinkedList<>();
-        Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();;
-        NetworkInterface netIe;
-        while(networkInterfaces.hasMoreElements()) {
-            netIe = networkInterfaces.nextElement();
-            if (netIe.isUp()) {
-                Enumeration<InetAddress> addresses = netIe.getInetAddresses();
-                while (addresses.hasMoreElements()) {
-                    addrList.add(addresses.nextElement());
-                }
-            }
+        try {
+            inFromServer = new BufferedInputStream(tcpSocket.getInputStream());
+        } catch (IOException e) {
+            log.error("Error opening input stream on tcp socket", e);
         }
-        return addrList;
+        try {
+            outputStream.write(message.toBytes());
+        } catch (IOException e) {
+            log.error("Error on write to tcp socket", e);
+        }
+//        try {
+//            int res = inFromServer.read(in);
+//            if(res != -1){
+//                log.warn("Target input byte array too small, as there was data left to be read; {} bytes", res);
+//            }
+//        } catch (IOException e) {
+//            log.error("Error on read from tcp socket", e);
+//        }
+        return in;
+
     }
 
     @Override
@@ -140,16 +106,15 @@ public class BulbBridgeHardwareAdapter_LIFX implements BulbBridgeHardwareAdapter
             BulbsPrincipal principal,
             BulbsContextUserId contextUserId,
             BulbsPlatform platform) throws BulbBridgeHwException {
-        sendDatagramMessage(
-                new LifxMessage(LifxPacketType.REQ_PAN_GATEWAY,
-                        new LifxMessagePayload(new byte[0]) {
-
-                        }),
-                lanMulticastAddress(), LIFX_STD_PORT);
-
-        DatagramPacket datagramPacket = retrieveDatagramMessage();
-        LifxMessage lifxMessage = LifxMessage.fromBytes(datagramPacket.getData());
-        log.debug(":) -- ", lifxMessage.rawDataToString());
+//        sendDatagramMessage(
+//                new LifxMessage<>(
+//                        LifxPacketType.REQ_PAN_GATEWAY, LifxMessagePayload.emptyPayload(),
+//                        lanMulticastAddress(), LIFX_STD_PORT, null ) //TODO: Add constructor not expecting mac address
+//        );
+//
+//        DatagramPacket datagramPacket = retrieveDatagramMessage();
+//        LifxMessage lifxMessage = LifxMessage.fromBytes(datagramPacket.getData());
+//        log.debug(":) -- ", lifxMessage.rawDataToString());
         return null;
     }
     @Override

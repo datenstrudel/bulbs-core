@@ -28,11 +28,15 @@ public abstract class LifxMessagePayload {
                 return LifxMessagePayload.emptyPayload();
             case RESP_PAN_GATEWAY:
                 return new RespGetPanGateway(rawData);
+            case RESP_POWER_STATE:
+                return new RespPowerState(rawData);
+
             default:
                 throw new UnsupportedOperationException("Cannot construct LifxMessagePayload by type: " + type);
         }
     }
 
+    //~ ///////////////////////////////////////////////////////////////////
     public byte[] toBytes() {
         return this.data;
     }
@@ -55,7 +59,6 @@ public abstract class LifxMessagePayload {
         if (!Arrays.equals(data, that.data)) return false;
         return true;
     }
-
     @Override
     public int hashCode() {
         return data != null ? Arrays.hashCode(data) : 0;

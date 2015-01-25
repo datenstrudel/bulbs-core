@@ -4,6 +4,7 @@ import net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.InetAddress;
 import java.nio.ByteBuffer;
 import java.time.Instant;
 import java.util.Arrays;
@@ -38,6 +39,10 @@ public class LifxMessage<T extends LifxMessagePayload> {
     //~ //////////////////////////////////////////////////////////////////////////////////
     private byte[] rawData = null;
 
+    //~ Meta data (not part of message body //////////////////////////////////////////////
+    private InetAddress address;
+    private int port;
+
     //~ //////////////////////////////////////////////////////////////////////////////////
     public LifxMessage() {
     }
@@ -46,7 +51,16 @@ public class LifxMessage<T extends LifxMessagePayload> {
         this.payload = payload;
         setSize(calcSize());
     }
-    public static LifxMessage fromBytes(byte[] input) {
+    public LifxMessage(LifxPacketType packetType, T payload, InetAddress address, int port, byte[] targetMacAddress ) {
+        this.packet_type = packetType.getProtocolValue();
+        this.payload = payload;
+        this.address = address;
+        this.port = port;
+//        this.target_mac_address = targetMacAddress;
+        this.site = targetMacAddress;
+        setSize(calcSize());
+    }
+    public static LifxMessage fromBytes(byte[] input, InetAddress senderAddress, int senderPort) {
         LifxMessage res = new LifxMessage();
         res.rawData = input;
 
@@ -120,8 +134,20 @@ public class LifxMessage<T extends LifxMessagePayload> {
         return res.toString();
     }
 
+    public byte[] getTarget_mac_address() {
+        return target_mac_address;
+    }
     public T getPayload() {
         return payload;
+    }
+    public InetAddress getAddress() {
+        return address;
+    }
+    public int getPort() {
+        return port;
+    }
+    public LifxPacketType getType() {
+        return LifxPacketType.fromProtocolValue(packet_type.toInt());
     }
 
     private void setSize(int size) {
