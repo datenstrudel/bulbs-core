@@ -11,6 +11,7 @@ import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbState;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbsPlatform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.net.SocketFactory;
 import java.io.*;
@@ -28,76 +29,15 @@ public class BulbBridgeHardwareAdapter_LIFX implements BulbBridgeHardwareAdapter
     private final BulbCmdTranslator_LIFX cmdTranslator = new BulbCmdTranslator_LIFX();
     private final UdpLifxMessageTransportManager transportManager;
 
-    private DatagramSocket udpSocket;
-    private Socket tcpSocket;
 
     //~ ///////////////////////////////////////////////////////////////////////
-    public BulbBridgeHardwareAdapter_LIFX() {
-        this.transportManager = new UdpLifxMessageTransportManager();
+    @Autowired
+    public BulbBridgeHardwareAdapter_LIFX(UdpLifxMessageTransportManager transportManager) {
+        this.transportManager = transportManager;
     }
+
 
     //~ ///////////////////////////////////////////////////////////////////////
-
-    private Socket provideNewTcpSocket(InetAddress addr, int port) throws BulbBridgeHwException {
-        try {
-            this.tcpSocket = SocketFactory.getDefault().createSocket(addr, port);
-            this.tcpSocket.setSoTimeout(3000);
-            return this.tcpSocket;
-        } catch (IOException e) {
-            throw new BulbBridgeHwException(e.getMessage(), e);
-        }
-    }
-
-
-//    //FIXME make private!
-//    public void sendDatagramMessage(LifxMessage message ) throws BulbBridgeHwException {
-////        this.udpSocket = provideNewUdpSocket(LIFX_STD_PORT);
-//        log.debug("|-- Going to send data on udpSocket address [{}} and port [{}]..", message.getAddress(), message.getPort());
-//        log.debug(" -- " + message.toBytes());
-//        DatagramPacket packet = new DatagramPacket(
-//                message.toBytes(), message.toBytes().length, message.getAddress(), message.getPort()
-//        );
-//        try {
-//            udpSocket.send(packet);
-//        } catch (IOException e) {
-//            throw new BulbBridgeHwException(e.getMessage(), e);
-//        }
-//    }
-    //FIXME make private!
-    public byte[] sendAndReceiveTcpMessage(LifxMessage message) throws BulbBridgeHwException {
-        this.tcpSocket = provideNewTcpSocket(message.getAddress(), message.getPort());
-        log.debug("|-- Going to send data on tcpSocket at address [{}} and port [{}]..", message.getAddress(), message.getPort());
-        log.debug(" -- " + message);
-
-        OutputStream outputStream = null;
-        BufferedInputStream inFromServer = null;
-        byte[] in = new byte[84]; // 32 + 52
-        try {
-            outputStream = tcpSocket.getOutputStream();
-        } catch (IOException e) {
-            log.error("Error opening output stream on tcp socket", e);
-        }
-        try {
-            inFromServer = new BufferedInputStream(tcpSocket.getInputStream());
-        } catch (IOException e) {
-            log.error("Error opening input stream on tcp socket", e);
-        }
-        try {
-            outputStream.write(message.toBytes());
-        } catch (IOException e) {
-            log.error("Error on write to tcp socket", e);
-        }
-//        try {
-//            int res = inFromServer.read(in);
-//            if(res != -1){
-//                log.warn("Target input byte array too small, as there was data left to be read; {} bytes", res);
-//            }
-//        } catch (IOException e) {
-//            log.error("Error on read from tcp socket", e);
-//        }
-        return in;
-
-    }
 
     @Override
     public BulbBridge toBridge(

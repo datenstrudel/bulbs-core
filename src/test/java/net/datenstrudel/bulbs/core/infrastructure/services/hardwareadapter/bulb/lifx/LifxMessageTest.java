@@ -3,7 +3,6 @@ package net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb
 import net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.lifx.payload.LifxMessagePayload;
 import net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.lifx.payload.RespGetPanGateway;
 import org.junit.Test;
-import sun.invoke.empty.Empty;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
@@ -18,7 +17,7 @@ public class LifxMessageTest {
 
         byte[] bytes = testInst.toBytes();
 
-        LifxMessage lifxMessage = LifxMessage.fromBytes(bytes);
+        LifxMessage lifxMessage = LifxMessage.fromBytes(bytes, null, 0);
         assertThat(lifxMessage, is(testInst));
 
     }

@@ -12,7 +12,7 @@ public abstract class LifxMessagePayload {
 
     protected byte[] data;
 
-    public LifxMessagePayload() {
+    protected LifxMessagePayload() {
     }
     public LifxMessagePayload(byte[] data) {
         this.data = data;
@@ -38,10 +38,18 @@ public abstract class LifxMessagePayload {
 
     //~ ///////////////////////////////////////////////////////////////////
     public byte[] toBytes() {
+        if(this.data == null)
+            throw new IllegalStateException("Binary data representation not found. Must be set on init! ");
         return this.data;
     }
     public int size() {
+        if(this.data == null)
+            throw new IllegalStateException("Binary data representation not found. Must be set on init! ");
         return this.data.length;
+    }
+
+    protected void setData(byte[] data) {
+        this.data = data;
     }
 
     public String dataToString() {

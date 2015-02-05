@@ -112,7 +112,6 @@ public class LifxMessage<T extends LifxMessagePayload> {
     public byte[] toBytes() {
         if(this.rawData != null) return rawData;
         ByteBuffer res = ByteBuffer.allocate(this.size.toInt());
-        System.out.println("-> Writing binary..");
         res.put(BT.Uint16.fromInt(res.capacity()).getData_LE() );
         res.put(this.protocol.getData());
         res.put(this.reserved1.getData());

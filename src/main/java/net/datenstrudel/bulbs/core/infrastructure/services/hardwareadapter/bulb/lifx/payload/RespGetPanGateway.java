@@ -14,8 +14,6 @@ public class RespGetPanGateway extends LifxMessagePayload {
     private int port;
     private Service service;
 
-    private RespGetPanGateway() {
-    }
     public RespGetPanGateway(byte[] data) {
         super(data);
         decodeFromRawdata();
@@ -23,6 +21,8 @@ public class RespGetPanGateway extends LifxMessagePayload {
     public RespGetPanGateway(int port, Service service) {
         this.port = port;
         this.service = service;
+        byte[] rawData = ByteBuffer.allocate(5).put(service.getValue()).put(BT.Uint32.fromInt(port).getData_LE()).array();
+        setData(rawData);
     }
 
     private void decodeFromRawdata() {
@@ -43,6 +43,10 @@ public class RespGetPanGateway extends LifxMessagePayload {
             if(!res.isPresent()) throw new IllegalArgumentException("Service not found for given value: " + value);
             return res.get();
         }
+
+        public byte getValue() {
+            return value;
+        }
     }
 
     @Override
@@ -51,5 +55,26 @@ public class RespGetPanGateway extends LifxMessagePayload {
                 "port=" + port +
                 ", service=" + service +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        RespGetPanGateway that = (RespGetPanGateway) o;
+
+        if (port != that.port) return false;
+        if (service != that.service) return false;
+
+        return true;
+    }
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + port;
+        result = 31 * result + (service != null ? service.hashCode() : 0);
+        return result;
     }
 }

@@ -99,6 +99,12 @@ public class BT {
         public byte[] getData() {
             return data;
         }
+        public byte[] getData_LE() {
+            return  ByteBuffer.allocate(4)
+                    .order(ByteOrder.LITTLE_ENDIAN)
+                    .putInt(this.toInt())
+                    .array();
+        }
 
         public int toInt() {
             return ByteBuffer.wrap(data).getInt();

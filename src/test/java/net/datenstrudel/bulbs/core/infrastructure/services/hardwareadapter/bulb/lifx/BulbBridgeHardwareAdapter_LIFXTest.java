@@ -14,7 +14,7 @@ import java.net.InetAddress;
 public class BulbBridgeHardwareAdapter_LIFXTest {
 
     public static final Logger log = LoggerFactory.getLogger(BulbBridgeHardwareAdapter_LIFXTest.class);
-    BulbBridgeHardwareAdapter_LIFX hwAdapter = new BulbBridgeHardwareAdapter_LIFX();
+//    BulbBridgeHardwareAdapter_LIFX hwAdapter = new BulbBridgeHardwareAdapter_LIFX();
 
     @Test
     public void playAndTry() throws Exception {
