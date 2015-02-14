@@ -12,7 +12,7 @@ import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 @Configuration
 @ComponentScan(basePackages = {
         "net.datenstrudel.bulbs.core.infrastructure.services.scheduling",
-        "net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb"
+        "net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter"
 }, excludeFilters = @ComponentScan.Filter(Configuration.class) )
 public class InfrastructureServicesConfig {
 

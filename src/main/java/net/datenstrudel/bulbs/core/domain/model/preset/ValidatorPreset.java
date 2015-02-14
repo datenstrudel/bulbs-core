@@ -3,10 +3,6 @@ package net.datenstrudel.bulbs.core.domain.model.preset;
 import net.datenstrudel.bulbs.core.domain.model.preset.ValidatorPreset.NotificationHandlerPreset;
 import net.datenstrudel.bulbs.shared.domain.validation.ValidationException;
 import net.datenstrudel.bulbs.shared.domain.validation.Validator;
-/**
- *
- * @author Thomas Wendzinski
- */
 public class ValidatorPreset extends Validator<NotificationHandlerPreset> {
 
     //~ Member(s) //////////////////////////////////////////////////////////////

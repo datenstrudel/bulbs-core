@@ -360,10 +360,8 @@ public class BulbBridge extends Entity<BulbBridge, BulbBridgeId> {
         updateBulbsOnlineState(_idsRef);
     }
     protected void updateBulbsOnlineState(BulbId[] idsFoundRecently) throws BulbBridgeHwException{
-        Set<BulbId> idsRef;
-        if(idsFoundRecently == null || idsFoundRecently.length == 0)
-            idsRef = new HashSet<>();
-        else idsRef = Sets.newHashSet(idsFoundRecently);
+        if(idsFoundRecently == null || idsFoundRecently.length == 0) return;
+        Set<BulbId> idsRef = Sets.newHashSet(idsFoundRecently);
         for (Bulb el : this.bulbs) {
             if(idsRef.contains(el.getId())){
 //                el.changedOnlineState(true); // that the bridge returns the bulb doesn't mean it is actually reachable and online

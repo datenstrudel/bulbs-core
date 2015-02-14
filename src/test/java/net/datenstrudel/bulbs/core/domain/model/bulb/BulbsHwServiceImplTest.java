@@ -12,8 +12,13 @@ import net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.
 import net.datenstrudel.bulbs.shared.domain.model.bulb.*;
 import net.datenstrudel.bulbs.shared.domain.model.color.ColorRGB;
 import net.datenstrudel.bulbs.shared.domain.model.identity.AppId;
-import org.easymock.EasyMock;
-import org.junit.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.internal.verification.VerificationModeFactory;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -21,40 +26,39 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.UUID;
 
-import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.*;
 
 /**
  *
  * @author Thomas Wendzinski
  */
+@RunWith(MockitoJUnitRunner.class)
 public class BulbsHwServiceImplTest {
     
     //~ Member(s) //////////////////////////////////////////////////////////////
     boolean initialized = false;
     BulbsHwServiceImpl instance2Test = new BulbsHwServiceImpl();
+
+    @Mock
     BulbBridgeHardwareAdapter mk_hwAdapter;
-    
+
+    @Mock
     DomainEventStore mk_eventStore;
-    
+
     BulbBridgeAddress T_BRIDGE_ADDRESS = new BulbBridgeAddress("localhost", 0);
 
     DomainServiceLocator serviceLocator;
+    @Mock
     DomainServiceLocator mk_domainServiceLocator;
     
     public BulbsHwServiceImplTest() {
     }
-    
-    @BeforeClass
-    public static void setUpClass() {
-    }
-    @AfterClass
-    public static void tearDownClass() {
-    }
-    
+
     @Before
     public void setUp() {
-        mk_hwAdapter = EasyMock.createMock(BulbBridgeHardwareAdapter.class);
         ReflectionTestUtils.setField(
                 instance2Test, 
                 "hwAdapter_Rest", 
@@ -67,12 +71,9 @@ public class BulbsHwServiceImplTest {
                 instance2Test, 
                 "asyncExecutor", 
                 new SimpleAsyncTaskExecutor("testBulbsHwService_")); 
-        mk_eventStore = createMock(DomainEventStore.class);
-        
+
         ReflectionTestUtils.setField(new BulbsCoreEventProcessor(), "eventStore", 
                 mk_eventStore);
-
-        mk_domainServiceLocator = createMock(DomainServiceLocator.class);
         serviceLocator = new DomainServiceLocator();
         ReflectionTestUtils.setField(serviceLocator, "instance", mk_domainServiceLocator);
     }
@@ -214,26 +215,26 @@ public class BulbsHwServiceImplTest {
                 "testPrincipalUsernam", new AppId("testCore"), "brId", 
                 BulbsPrincipalState.REGISTERED);
         BulbsPlatform platform = BulbsPlatform.PHILIPS_HUE;
-        expect(mk_domainServiceLocator.getBeanInternal(DomainEventStore.class)).andReturn(mk_eventStore).anyTimes();
-        expect(mk_domainServiceLocator.getBeanInternal(DomainEventPublisherDeferrer.class)).andReturn(null).anyTimes();
-        expect(mk_eventStore.store(isA(DomainEvent.class))).andReturn(-1l).anyTimes();
-        expect(mk_hwAdapter.applyBulbState(
-                isA(BulbId.class), eq(T_BRIDGE_ADDRESS),
-                eq(principal),
-                isA(BulbState.class),
-                isA(BulbsPlatform.class))).andReturn(
-                    new InvocationResponse("OK", false))
-                .times(1, COUNT_STATES);
-        replay(mk_hwAdapter, mk_eventStore, mk_domainServiceLocator);
+        when(mk_domainServiceLocator.getBeanInternal(DomainEventStore.class)).thenReturn(mk_eventStore);
+        when(mk_domainServiceLocator.getBeanInternal(DomainEventPublisherDeferrer.class)).thenReturn(null);
+        when(mk_eventStore.store(any(DomainEvent.class))).thenReturn(-1l);
+
         instance2Test.executeBulbActuation(T_BRIDGE_ADDRESS, principal, command, platform);
+
         try{
             Thread.sleep(80);
         }catch(InterruptedException iex){}
+
         instance2Test.cancelActuation(bId);
         try{
             Thread.sleep(1000);
         }catch(InterruptedException iex){}
-        verify(mk_hwAdapter);
+        verify(mk_hwAdapter, VerificationModeFactory.atLeast(1)).applyBulbState(
+                any(BulbId.class), eq(T_BRIDGE_ADDRESS),
+                eq(principal),
+                any(BulbState.class),
+                any(BulbsPlatform.class)
+        );
         Map<Object, CmdHwExecutor> execs = (Map) ReflectionTestUtils.getField(instance2Test, "runningExecutions");
         assertTrue(execs.get(bId).isExecutionFinished());
         
@@ -258,26 +259,24 @@ public class BulbsHwServiceImplTest {
                 "testPrincipalUsernam", new AppId("testCore"), "brId", 
                 BulbsPrincipalState.REGISTERED);
         BulbsPlatform platform = BulbsPlatform.PHILIPS_HUE;
-        expect(mk_domainServiceLocator.getBeanInternal(DomainEventStore.class)).andReturn(mk_eventStore).anyTimes();
-        expect(mk_domainServiceLocator.getBeanInternal(DomainEventPublisherDeferrer.class)).andReturn(null).anyTimes();
-        expect(mk_eventStore.store(isA(DomainEvent.class))).andReturn(-1l).anyTimes();
-        expect(mk_hwAdapter.applyBulbState(
-                isA(BulbId.class), eq(T_BRIDGE_ADDRESS), 
-                eq(principal),
-                isA(BulbState.class),
-                isA(BulbsPlatform.class))).andReturn(
-                    new InvocationResponse("OK", false))
-                .times(1, COUNT_STATES);
-        expect(mk_eventStore.store(isA(DomainEvent.class))).andReturn(1l).anyTimes();
-        replay(mk_hwAdapter, mk_eventStore, mk_domainServiceLocator);
+        when(mk_domainServiceLocator.getBeanInternal(DomainEventStore.class)).thenReturn(mk_eventStore);
+        when(mk_domainServiceLocator.getBeanInternal(DomainEventPublisherDeferrer.class)).thenReturn(null);
+        when(mk_eventStore.store(any(DomainEvent.class))).thenReturn(-1l);
+        when(mk_eventStore.store(any(DomainEvent.class))).thenReturn(1l);
+
         instance2Test.executeBulbActuation(T_BRIDGE_ADDRESS, principal, command, platform);
-        
+
         Map<Object, CmdHwExecutor> execs = (Map) ReflectionTestUtils.getField(instance2Test, "runningExecutions");
         assertTrue(!execs.get(bId).isExecutionFinished());
-        
+
         try{
             Thread.sleep(1000);
         }catch(InterruptedException iex){}
-        verify(mk_hwAdapter);
+        verify(mk_hwAdapter, atLeast(1)).applyBulbState(
+                any(BulbId.class), eq(T_BRIDGE_ADDRESS),
+                eq(principal),
+                any(BulbState.class),
+                any(BulbsPlatform.class)
+        );
     }
 }

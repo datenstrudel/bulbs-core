@@ -2,8 +2,6 @@ package net.datenstrudel.bulbs.core.domain.model.preset;
 
 import net.datenstrudel.bulbs.core.domain.model.bulb.AbstractActuatorCmd;
 import net.datenstrudel.bulbs.shared.domain.model.Entity;
-import org.springframework.data.annotation.Id;
-import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -11,11 +9,8 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Wraps the whole state of a {@link net.datenstrudel.bulbs.core.domain.model.bulb.Bulb]. Can be used as to manage sort of
- * presets.
- * @author Thomas Wendzinski
- * @version 1.0
- * @updated 08-Jun-2013 22:54:59
+ * Wraps the whole state (transitions) of {@link net.datenstrudel.bulbs.core.domain.model.bulb.Bulb]s.
+ * Can be used as to manage sort of presets.
  */
 public class Preset extends Entity<Preset, PresetId> {
 

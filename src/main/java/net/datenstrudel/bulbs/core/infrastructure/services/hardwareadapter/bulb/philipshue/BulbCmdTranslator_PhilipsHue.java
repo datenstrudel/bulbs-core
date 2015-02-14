@@ -39,12 +39,12 @@ public class BulbCmdTranslator_PhilipsHue implements BulbCmdTranslator_HTTP {
     //~ Method(s) //////////////////////////////////////////////////////////////
     //~ From JSON ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     @Override
-    public BulbBridge bridgeFromJson(
-            String json, 
+    public BulbBridge bridgeFromPayload(
+            String json,
             BulbBridgeId bridgeId,
             BulbBridgeAddress localAddress,
             BulbsContextUserId contextUserId
-            ) {
+    ) {
         Map<String, Object> d = gson.fromJson(
                 json, 
                 new TypeToken<Map<String, Object>>(){}.getType());
@@ -71,7 +71,7 @@ public class BulbCmdTranslator_PhilipsHue implements BulbCmdTranslator_HTTP {
         return res;
     }
     @Override
-    public BulbId[] bulbIdsFromJson(String json, BulbBridgeId bridgeId) {
+    public BulbId[] bulbIdsFromPayload(String json, BulbBridgeId bridgeId) {
         Map<String, Object> d = gson.fromJson(
                 json, 
                 new TypeToken<Map<String, Object>>(){}.getType());
@@ -83,7 +83,7 @@ public class BulbCmdTranslator_PhilipsHue implements BulbCmdTranslator_HTTP {
         return res;
     }
     @Override
-    public Bulb bulbFromJson(String json, BulbBridge parentBridge, BulbId bulbId) {
+    public Bulb bulbFromPayload(String json, BulbBridge parentBridge, BulbId bulbId) {
         Map<String, Object> d = gson.fromJson(
                 json, 
                 new TypeToken<Map<String, Object>>(){}.getType());
@@ -110,7 +110,7 @@ public class BulbCmdTranslator_PhilipsHue implements BulbCmdTranslator_HTTP {
         return res;
     }
     @Override
-    public BulbState stateFromJson(String json) {
+    public BulbState stateFromPayload(String json) {
         Map<String, Object> d = gson.fromJson(
                 json, 
                 new TypeToken<Map<String, Object>>(){}.getType());
@@ -185,17 +185,15 @@ public class BulbCmdTranslator_PhilipsHue implements BulbCmdTranslator_HTTP {
         switch(colormode){
             case "hs":
                 color = new ColorHSB(                     // HUE specific scales
-                        ((Number) d.get("bri")).floatValue(),
-                        ((Number) d.get("hue")).floatValue()/ (65535 / 360f),
-                        ((Number) d.get("sat")).floatValue());
+                        ((Number) d.get("hue")).floatValue()/ (65535 / 360f), ((Number) d.get("sat")).floatValue(), ((Number) d.get("bri")).floatValue()
+                );
                 break;
             case "ct": // TODO: Create correct Color type
             case "xy": // TODO: Create correct Color type
             default:
                 color = new ColorHSB(                     // HUE specific scales
-                        ((Number) d.get("bri")).floatValue(),
-                        ((Number) d.get("hue")).floatValue()/ (65535 / 360f),
-                        ((Number) d.get("sat")).floatValue());
+                        ((Number) d.get("hue")).floatValue()/ (65535 / 360f), ((Number) d.get("sat")).floatValue(), ((Number) d.get("bri")).floatValue()
+                );
         }
         BulbState res = new BulbState(
                 color, 

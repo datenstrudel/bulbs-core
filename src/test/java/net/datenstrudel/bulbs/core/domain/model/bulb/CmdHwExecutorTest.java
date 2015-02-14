@@ -14,7 +14,6 @@ import net.datenstrudel.bulbs.core.domain.model.infrastructure.DomainServiceLoca
 import net.datenstrudel.bulbs.core.domain.model.messaging.DomainEvent;
 import net.datenstrudel.bulbs.core.domain.model.messaging.DomainEventPublisherDeferrer;
 import net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.BulbBridgeHardwareAdapter;
-import net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.BulbCmdTranslator_HTTP;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbBridgeAddress;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbState;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbsPlatform;
@@ -24,25 +23,36 @@ import net.datenstrudel.bulbs.shared.domain.model.identity.AppId;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.LinkedList;
 
-import static org.easymock.EasyMock.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.*;
 
 /**
  *
  * @author Thomas Wendzinski
  */
+@RunWith(MockitoJUnitRunner.class)
 public class CmdHwExecutorTest {
-    
+
+    @Mock
     BulbBridgeHardwareAdapter mk_hwAdapter;
+    @Mock
     DomainEventStore mk_eventStore;
     BulbBridgeAddress T_BRIDGE_ADDRESS = new BulbBridgeAddress("localhost", 0);
     BulbsPlatform mk_BulbsPlatform = BulbsPlatform._EMULATED;
+
+    @Mock
     DomainServiceLocator mk_domainServiceLocator;
+
     DomainServiceLocator serviceLocator;
     
     public CmdHwExecutorTest() {
@@ -50,11 +60,10 @@ public class CmdHwExecutorTest {
     
     @Before
     public void setUp() {
-        mk_hwAdapter = createMock(BulbBridgeHardwareAdapter.class);
-        mk_eventStore = createMock(DomainEventStore.class);
+//        mk_hwAdapter = createMock(BulbBridgeHardwareAdapter.class);
+//        mk_eventStore = createMock(DomainEventStore.class);
         ReflectionTestUtils.setField(new BulbsCoreEventProcessor(), "eventStore", 
                 mk_eventStore);
-        mk_domainServiceLocator = createMock(DomainServiceLocator.class);
 
         serviceLocator = new DomainServiceLocator();
         ReflectionTestUtils.setField(serviceLocator, "instance", mk_domainServiceLocator);
@@ -108,20 +117,19 @@ public class CmdHwExecutorTest {
 
         instance = new CmdHwExecutor(T_BRIDGE_ADDRESS, principal, command, mk_hwAdapter, mk_BulbsPlatform);
 
-        expect(mk_domainServiceLocator.getBeanInternal(DomainEventStore.class)).andReturn(mk_eventStore).anyTimes();
-        expect(mk_domainServiceLocator.getBeanInternal(DomainEventPublisherDeferrer.class)).andReturn(null).anyTimes();
-        expect(mk_eventStore.store(isA(DomainEvent.class))).andReturn(-1l).anyTimes();
-        expect(mk_hwAdapter.applyBulbState(
-                isA(BulbId.class), eq(T_BRIDGE_ADDRESS),
-                eq(principal),
-                isA(BulbState.class),
-                isA(BulbsPlatform.class))).andReturn(
-                new InvocationResponse("OK", false))
-                .times(COUNT_STATES);
-        replay(mk_hwAdapter, mk_eventStore, mk_domainServiceLocator);
-        
+        when(mk_domainServiceLocator.getBeanInternal(DomainEventStore.class)).thenReturn(mk_eventStore);
+        when(mk_domainServiceLocator.getBeanInternal(DomainEventPublisherDeferrer.class)).thenReturn(null);
+        when(mk_eventStore.store(any(DomainEvent.class))).thenReturn(-1l);
+
+
+//        replay(mk_hwAdapter, mk_eventStore, mk_domainServiceLocator);
+
         instance.run();
-        verify(mk_hwAdapter);
+        verify(mk_hwAdapter, atLeast(COUNT_STATES)).applyBulbState(
+                any(BulbId.class), eq(T_BRIDGE_ADDRESS),
+                eq(principal),
+                any(BulbState.class),
+                any(BulbsPlatform.class));
     }
     public void testRun_WithLoop() throws Exception{
         //TODO: Implement Me!

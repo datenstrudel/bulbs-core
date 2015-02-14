@@ -3,6 +3,8 @@ package net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
@@ -14,7 +16,25 @@ public class BT {
 
     private static final Logger log = LoggerFactory.getLogger(BT.class);
 
+    public static int scale(Uint16 in, int maxOut) {
+        BigDecimal divide = BigDecimal.valueOf(in.toInt())
+                .divide(BigDecimal.valueOf(Uint16.MAX.toInt()), 2, BigDecimal.ROUND_HALF_EVEN);
+        return divide.multiply( BigDecimal.valueOf(maxOut)).intValue();
+    }
+    public static float scale(Uint16 in, float maxOut) {
+        BigDecimal divide = BigDecimal.valueOf(in.toInt())
+                .divide(BigDecimal.valueOf(Uint16.MAX.toInt()), 2, BigDecimal.ROUND_HALF_EVEN);
+        return divide.multiply( BigDecimal.valueOf(maxOut) ).floatValue();
+    }
+
+    public static Uint16 scale(float in, float maxIn) {
+        BigDecimal divide = BigDecimal.valueOf(in)
+                .divide(BigDecimal.valueOf(maxIn), 32, BigDecimal.ROUND_HALF_EVEN);
+        return Uint16.fromInt(divide.multiply(BigDecimal.valueOf(Uint16.MAX.toInt())).intValue());
+    }
+
     public static class Uint16{
+        public static final Uint16 MAX = Uint16.fromInt(0xffff);
         private byte data[];
 
         private Uint16(byte[] data) {
@@ -45,7 +65,6 @@ public class BT {
         public byte[] getData_LE() {
             return new byte[]{data[1], data[0]};
         }
-
         public int toInt() {
             return ((ByteBuffer) ByteBuffer.allocate(4).put(new byte[2]).put(data).flip()).getInt();
         }
@@ -56,7 +75,6 @@ public class BT {
                     toInt() +
                     '}';
         }
-
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
@@ -174,6 +192,41 @@ public class BT {
         @Override
         public int hashCode() {
             return Arrays.hashCode(data);
+        }
+    }
+
+    public static class CharArray{
+        byte[] data;
+
+        private CharArray(byte[] data) {
+            this.data = data;
+        }
+
+        public static CharArray fromBytes(byte[] data) {
+            return new CharArray(data);
+        }
+        public static CharArray fromString(String in) {
+            return new CharArray(in.getBytes());
+        }
+        public String toString() {
+            try {
+                return new String(data, "UTF-8").trim();
+            } catch (UnsupportedEncodingException e) {
+                throw new RuntimeException(e.getMessage(), e);
+            }
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            CharArray charArray = (CharArray) o;
+            if (!Arrays.equals(data, charArray.data)) return false;
+            return true;
+        }
+        @Override
+        public int hashCode() {
+            return data != null ? Arrays.hashCode(data) : 0;
         }
     }
 

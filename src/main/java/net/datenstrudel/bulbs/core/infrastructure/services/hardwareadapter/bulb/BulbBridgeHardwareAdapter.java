@@ -75,7 +75,7 @@ public interface BulbBridgeHardwareAdapter {
             Map<String, Object> attributes,
             BulbsPlatform platform) throws BulbBridgeHwException;
     
-    public InvocationResponse applyBulbState(
+    public void applyBulbState(
             BulbId bulbId,
             BulbBridgeAddress address,
             BulbsPrincipal principal,

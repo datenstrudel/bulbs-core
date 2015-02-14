@@ -4,6 +4,7 @@ import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbBridgeHwException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Component;
@@ -14,7 +15,6 @@ import java.net.*;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.FutureTask;
 
 /**
  * Created by Thomas Wendzinski.
@@ -24,7 +24,7 @@ public class UdpLifxMessageTransportManager {
 
     public static final Logger log = LoggerFactory.getLogger(UdpLifxMessageTransportManager.class);
     public static final int LIFX_STD_PORT = 56700;
-    public static final int SOCKET_TIMEOUT = 100;
+    public static final int SOCKET_TIMEOUT = 600;
 
     private final List<InetAddress> LOCAL_ADDRESSES;
     private final TaskExecutor listenerExecutor;
@@ -35,7 +35,7 @@ public class UdpLifxMessageTransportManager {
     private volatile boolean listening = false;
 
     @Autowired
-    public UdpLifxMessageTransportManager(TaskExecutor taskExecutor) {
+    public UdpLifxMessageTransportManager(@Qualifier("taskExecutor") AsyncTaskExecutor taskExecutor) {
         this.listenerExecutor = taskExecutor;
         try {
             this.LOCAL_ADDRESSES = allLocalAddresses();
@@ -46,9 +46,8 @@ public class UdpLifxMessageTransportManager {
     @PostConstruct
     public void init() {
         StringJoiner joiner = new StringJoiner(" ; ");
-        this.LOCAL_ADDRESSES.stream().forEach( a -> joiner.add(a.getHostAddress()));
+        this.LOCAL_ADDRESSES.stream().forEach(a -> joiner.add(a.getHostAddress()));
         log.info("Local adresses found: {}", joiner.toString());
-
     }
 
     //~ ////////////////////////////////////////////////////////////////////////////
@@ -119,10 +118,9 @@ public class UdpLifxMessageTransportManager {
      * @throws BulbBridgeHwException
      */
     private Optional<LifxMessage> retrieveDatagramMessage() throws BulbBridgeHwException {
-        byte[] respPayload = new byte[64];
+        byte[] respPayload = new byte[200];
         DatagramPacket destPacket = new DatagramPacket(respPayload, respPayload.length);
         try {
-
             this.udpSocket.receive(destPacket);
             LifxMessage res = LifxMessage.fromBytes(
                     destPacket.getData(), destPacket.getAddress(), destPacket.getPort());
@@ -131,26 +129,16 @@ public class UdpLifxMessageTransportManager {
                 log.debug("Message has been discarded from address: {}", destPacket.getAddress());
                 return Optional.empty();
             }
-            log.debug(":) -- Retrieved packet from address [{}]", destPacket.getAddress());
+            log.debug(":) -- Retrieved packet of {} Bytes from address [{}]", destPacket.getLength(), destPacket.getAddress());
+//            log.debug(":) -- {}", res);
             return Optional.of(res);
         }catch(SocketTimeoutException e){
-            log.info(":( .. receive timeout..");
+//            log.info(":( .. receive timeout..");
             return Optional.empty();
         } catch (IOException e) {
             throw new BulbBridgeHwException(e.getMessage(), e);
         }
 
-    }
-
-    protected DatagramSocket provideNewUdpSocket(int port) throws BulbBridgeHwException {
-        if( !this.udpSocket.isClosed() && this.udpSocket.isConnected() ) return udpSocket;
-        try {
-            this.udpSocket = new DatagramSocket(port);
-            this.udpSocket.setSoTimeout(SOCKET_TIMEOUT);
-            return udpSocket;
-        } catch (SocketException e) {
-            throw new BulbBridgeHwException(e.getMessage(), e);
-        }
     }
     private List<InetAddress> allLocalAddresses() throws SocketException {
         List<InetAddress> addrList = new LinkedList<>();
@@ -166,6 +154,16 @@ public class UdpLifxMessageTransportManager {
             }
         }
         return addrList;
+    }
+    protected DatagramSocket provideNewUdpSocket(int port) throws BulbBridgeHwException {
+        if( this.udpSocket != null && !this.udpSocket.isClosed() ) return udpSocket;
+        try {
+            this.udpSocket = new DatagramSocket(port);
+            this.udpSocket.setSoTimeout(SOCKET_TIMEOUT);
+            return udpSocket;
+        } catch (SocketException e) {
+            throw new BulbBridgeHwException(e.getMessage(), e);
+        }
     }
     private boolean ignorePacket(DatagramPacket packet){
         return LOCAL_ADDRESSES.contains( packet.getAddress() );
@@ -187,15 +185,15 @@ public class UdpLifxMessageTransportManager {
         public void run() {
             log.debug("|-> Listen executor started.");
             while(!clientsWaiting.isEmpty()){
-                log.debug("Clients waiting before: {}", clientsWaiting.size());
+//                log.debug("Clients waiting before: {}", clientsWaiting.size());
                 clientsWaiting.forEachKey(200, key -> suspensionTime.putIfAbsent(key, System.currentTimeMillis()));
-                log.debug("Clients waiting: {}", clientsWaiting.size());
-                log.debug("Listen for answers.. ");
+//                log.debug("Clients waiting: {}", clientsWaiting.size());
+//                log.debug("Listen for answers.. ");
                 listenForNewMessage();
-                log.debug("Clients waiting: {}", clientsWaiting.size());
-                log.debug("Serving answers.. ");
+//                log.debug("Clients waiting: {}", clientsWaiting.size());
+//                log.debug("Serving answers.. ");
                 resolveSuspendedMessages();
-                log.debug("Clients waiting after: {}", clientsWaiting.size());
+//                log.debug("Clients waiting after: {}", clientsWaiting.size());
                 try {
                     Thread.sleep(100l);
                 } catch (InterruptedException e) {
@@ -238,6 +236,7 @@ public class UdpLifxMessageTransportManager {
                         LifxMessage[] suspMsg = suspendedMessages.remove(packetType);
                         if (suspMsg != null && System.currentTimeMillis() - suspensionTime.get(packetType) < SUSPENSION_TIMEOUT_MS) {
                             clientsWaiting.remove(packetType).complete(suspMsg);
+                            log.debug("Message resolved: {}", suspMsg);
                         }else{
                             clientsWaiting.remove(packetType).completeExceptionally(
                                     new BulbBridgeHwException("No answer received within time frame"));
@@ -253,18 +252,19 @@ public class UdpLifxMessageTransportManager {
                         LifxMessage[] suspMsg = suspendedMessages.remove(packetType);
                         if (suspMsg != null) {
                             result.complete(suspMsg);
+                            log.debug("Message resolved: {}", suspMsg);
                         } else {
-                            log.debug("Hit message awaiting timeout {}", packetType);
+//                            log.debug("Hit message awaiting timeout {}", packetType);
                             result.completeExceptionally(new BulbBridgeHwException("No answer received within time frame"));
                         }
                     }else{
-                        log.debug("Dropping messages for type {}", packetType);
+//                        log.debug("Dropping messages for type {}", packetType);
                         suspendedMessages.remove(packetType); // dismiss message having no client waiting
                     }
                     resolvedPacketTypes.add(packetType);
                 }
             });
-            resolvedPacketTypes.forEach( f -> { suspensionTime.remove(f); log.debug(" [RR] Resolved PacketType[{}]", f); });
+            resolvedPacketTypes.forEach( f -> suspensionTime.remove(f) );
         }
     }
 

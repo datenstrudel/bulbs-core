@@ -6,9 +6,6 @@ import net.datenstrudel.bulbs.core.domain.model.infrastructure.BCoreBaseReposito
 import java.util.Set;
 
 /**
- * @author Thomas Wendzinski
- * @version 1.0
- * @created 08-Jun-2013 22:51:42
  */
 public interface PresetRepository extends BCoreBaseRepository<Preset, PresetId>, PresetRepositoryExt{
 

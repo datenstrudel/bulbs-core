@@ -4,7 +4,6 @@ import net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.
 import net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.lifx.payload.RespGetPanGateway;
 import net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.lifx.payload.RespPowerState;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbBridgeHwException;
-import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,15 +11,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.mockito.stubbing.*;
+import org.mockito.stubbing.Answer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
-import org.springframework.core.task.SyncTaskExecutor;
-import org.springframework.core.task.TaskExecutor;
 
-import javax.xml.crypto.Data;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.Inet4Address;
@@ -31,7 +27,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Matchers.isA;
@@ -65,7 +60,7 @@ public class UdpLifxMessageTransportManagerTest {
 
     @Test
     public void sendAndReceiveAggregated_msgTypeYieldsMany_networkDeliversSameMessage() throws Exception {
-        LifxMessage answer = new LifxMessage(LifxPacketType.RESP_PAN_GATEWAY, new RespGetPanGateway(1, RespGetPanGateway.Service.UDP));
+        LifxMessage answer = LifxMessage.messageFrom(new RespGetPanGateway(1, RespGetPanGateway.Service.UDP));
         final int[] count = new int[]{1};
         doAnswer(inv -> {
             if (count[0] > 2) {
@@ -77,10 +72,9 @@ public class UdpLifxMessageTransportManagerTest {
             return destPacket;
         }).when(udpSocket).receive(any(DatagramPacket.class));
 
-        CompletableFuture<LifxMessage[]> res = transport.sendAndReceiveAggregated(new LifxMessage<>(
-                        LifxPacketType.REQ_PAN_GATEWAY,
-                        LifxMessagePayload.emptyPayload(),
-                        Inet4Address.getByName("192.168.1.255"), 56700, new byte[6]
+        CompletableFuture<LifxMessage[]> res = transport.sendAndReceiveAggregated(LifxMessage.messageFrom(
+                        LifxMessagePayload.emptyPayload(LifxPacketType.REQ_PAN_GATEWAY),
+                        Inet4Address.getByName("192.168.1.255"), 56700
                 ), LifxPacketType.RESP_PAN_GATEWAY
         );
 
@@ -104,10 +98,9 @@ public class UdpLifxMessageTransportManagerTest {
             return destPacket;
         }).when(udpSocket).receive(any(DatagramPacket.class));
 
-        CompletableFuture<LifxMessage[]> res = transport.sendAndReceiveAggregated(new LifxMessage<>(
-                        LifxPacketType.REQ_PAN_GATEWAY,
-                        LifxMessagePayload.emptyPayload(),
-                        Inet4Address.getByName("192.168.1.255"), 56700, new byte[6]
+        CompletableFuture<LifxMessage[]> res = transport.sendAndReceiveAggregated(LifxMessage.messageFrom(
+                        LifxMessagePayload.emptyPayload(LifxPacketType.REQ_PAN_GATEWAY),
+                        Inet4Address.getByName("192.168.1.255"), 56700
                 ), LifxPacketType.RESP_PAN_GATEWAY
         );
 
@@ -132,10 +125,9 @@ public class UdpLifxMessageTransportManagerTest {
             return destPacket;
         }).when(udpSocket).receive(any(DatagramPacket.class));
 
-        CompletableFuture<LifxMessage[]> res = transport.sendAndReceiveAggregated(new LifxMessage<>(
-                        LifxPacketType.REQ_POWER_STATE,
-                        LifxMessagePayload.emptyPayload(),
-                        Inet4Address.getByName("192.168.1.255"), 56700, new byte[6]
+        CompletableFuture<LifxMessage[]> res = transport.sendAndReceiveAggregated(LifxMessage.messageFrom(
+                        LifxMessagePayload.emptyPayload(LifxPacketType.REQ_PAN_GATEWAY),
+                        Inet4Address.getByName("192.168.1.255"), 56700
                 ), LifxPacketType.RESP_POWER_STATE
         );
 
@@ -144,8 +136,8 @@ public class UdpLifxMessageTransportManagerTest {
     }
     @Test
     public void sendAndReceiveAggregated_manyAccumulated() throws Exception {
-        LifxMessage answer_0 = new LifxMessage(LifxPacketType.RESP_PAN_GATEWAY, new RespGetPanGateway(1, RespGetPanGateway.Service.UDP));
-        LifxMessage answer_1 = new LifxMessage(LifxPacketType.RESP_POWER_STATE, new RespPowerState(RespPowerState.Power.ON));
+        LifxMessage answer_0 = LifxMessage.messageFrom( new RespGetPanGateway(1, RespGetPanGateway.Service.UDP));
+        LifxMessage answer_1 = LifxMessage.messageFrom( new RespPowerState(RespPowerState.Power.ON));
         final int[] countMockInv = new int[]{0};
         doAnswer(inv -> {
             countMockInv[0] += 1;
@@ -164,16 +156,14 @@ public class UdpLifxMessageTransportManagerTest {
             }
         }).when(udpSocket).receive(any(DatagramPacket.class));
 
-        CompletableFuture<LifxMessage[]> res_0 = transport.sendAndReceiveAggregated(new LifxMessage<>(
-                        LifxPacketType.REQ_PAN_GATEWAY,
-                        LifxMessagePayload.emptyPayload(),
-                        Inet4Address.getByName("192.168.1.255"), 56700, new byte[6]
+        CompletableFuture<LifxMessage[]> res_0 = transport.sendAndReceiveAggregated(LifxMessage.messageFrom(
+                        LifxMessagePayload.emptyPayload(LifxPacketType.REQ_PAN_GATEWAY),
+                        Inet4Address.getByName("192.168.1.255"), 56700
                 ), LifxPacketType.RESP_PAN_GATEWAY
         );
-        CompletableFuture<LifxMessage[]> res_1 = transport.sendAndReceiveAggregated(new LifxMessage<>(
-                        LifxPacketType.REQ_POWER_STATE,
-                        LifxMessagePayload.emptyPayload(),
-                        Inet4Address.getByName("192.168.1.255"), 56700, new byte[6]
+        CompletableFuture<LifxMessage[]> res_1 = transport.sendAndReceiveAggregated(LifxMessage.messageFrom(
+                        LifxMessagePayload.emptyPayload(LifxPacketType.REQ_PAN_GATEWAY),
+                        Inet4Address.getByName("192.168.1.255"), 56700
                 ), LifxPacketType.RESP_POWER_STATE
         );
 
@@ -192,46 +182,51 @@ public class UdpLifxMessageTransportManagerTest {
     }
     @Test
     public void sendAndReceiveAggregated_manyArriveDeferredWithinTimeout() throws Exception {
-        LifxMessage answer_0 = new LifxMessage(LifxPacketType.RESP_PAN_GATEWAY, new RespGetPanGateway(1, RespGetPanGateway.Service.UDP));
-        LifxMessage answer_1 = new LifxMessage(LifxPacketType.RESP_POWER_STATE, new RespPowerState(RespPowerState.Power.ON));
+        LifxMessage answer_0 = LifxMessage.messageFrom(new RespGetPanGateway(1, RespGetPanGateway.Service.UDP));
+        LifxMessage answer_1 = LifxMessage.messageFrom(new RespPowerState(RespPowerState.Power.ON));
         final int[] countMockInv = new int[]{0};
         int maxTimeoutEach_ms = UdpLifxMessageTransportManager.SOCKET_TIMEOUT / 2 - 10;
-        doAnswer(inv -> {
-            countMockInv[0] += 1;
-            if(countMockInv[0] < 2){ // Provided once
-                DatagramPacket destPacket = (DatagramPacket) inv.getArguments()[0];
-                destPacket.setData(answer_1.toBytes());
-                log.info("- [M] Serving mocked answer [{}].", answer_1.getType());
-                Thread.sleep(maxTimeoutEach_ms);
-                return destPacket;
-            }else if (countMockInv[0] < 4){ // Provided many times
-                DatagramPacket destPacket = (DatagramPacket) inv.getArguments()[0];
-                destPacket.setData(answer_0.toBytes());
-                log.info("- [M] Serving mocked answer [{}].", answer_0.getType());
-                Thread.sleep(maxTimeoutEach_ms);
-                return destPacket;
-            }else{
-                throw new SocketTimeoutException("Intended timeout");
-            }
-        }).when(udpSocket).receive(any(DatagramPacket.class));
+        doAnswer(new Answer() {
+                     @Override
+                     public Object answer(InvocationOnMock inv) throws Throwable{
+//                     inv -> {
+                         countMockInv[0] += 1;
+                         if(countMockInv[0] < 2){ // Provided once
+                             DatagramPacket destPacket = (DatagramPacket) inv.getArguments()[0];
+                             destPacket.setData(answer_1.toBytes());
+                             log.info("- [M] Serving mocked answer [{}].", answer_1.getType());
+                             Thread.sleep(maxTimeoutEach_ms);
+                             return destPacket;
+                         }else if (countMockInv[0] < 4){ // Provided many times
+                             DatagramPacket destPacket = (DatagramPacket) inv.getArguments()[0];
+                             destPacket.setData(answer_0.toBytes());
+                             log.info("- [M] Serving mocked answer [{}].", answer_0.getType());
+                             Thread.sleep(maxTimeoutEach_ms);
+                             return destPacket;
+                         }else{
+                             throw new SocketTimeoutException("Intended timeout");
+                         }
+                     }
 
-        CompletableFuture<LifxMessage[]> res_0 = transport.sendAndReceiveAggregated(new LifxMessage<>(
-                        LifxPacketType.REQ_PAN_GATEWAY,
-                        LifxMessagePayload.emptyPayload(),
-                        Inet4Address.getByName("192.168.1.255"), 56700, new byte[6]
+                 }
+
+        ).when(udpSocket).receive(any(DatagramPacket.class));
+
+        CompletableFuture<LifxMessage[]> res_0 = transport.sendAndReceiveAggregated(LifxMessage.messageFrom(
+                        LifxMessagePayload.emptyPayload(LifxPacketType.REQ_PAN_GATEWAY),
+                        Inet4Address.getByName("192.168.1.255"), 56700
                 ), LifxPacketType.RESP_PAN_GATEWAY
         );
-        CompletableFuture<LifxMessage[]> res_1 = transport.sendAndReceiveAggregated(new LifxMessage<>(
-                        LifxPacketType.REQ_POWER_STATE,
-                        LifxMessagePayload.emptyPayload(),
-                        Inet4Address.getByName("192.168.1.255"), 56700, new byte[6]
+        CompletableFuture<LifxMessage[]> res_1 = transport.sendAndReceiveAggregated(LifxMessage.messageFrom(
+                        LifxMessagePayload.emptyPayload(LifxPacketType.REQ_PAN_GATEWAY),
+                        Inet4Address.getByName("192.168.1.255"), 56700
                 ), LifxPacketType.RESP_POWER_STATE
         );
 
-        LifxMessage actualRes_1 = res_0.get(2, TimeUnit.SECONDS)[0];
+        LifxMessage actualRes_1 = res_0.get(5, TimeUnit.SECONDS)[0];
         log.info("Received actual result 0: " + actualRes_1);
         log.info("Received actual result 0 size: " + res_0.get().length);
-        LifxMessage actualRes_0 = res_1.get(2, TimeUnit.SECONDS)[0];
+        LifxMessage actualRes_0 = res_1.get(5, TimeUnit.SECONDS)[0];
         log.info("Received actual result 1: " + actualRes_0);
         log.info("Received actual result 1 size: " + res_1.get().length);
 
@@ -243,51 +238,54 @@ public class UdpLifxMessageTransportManagerTest {
     }
     @Test
     public void sendAndReceiveAggregated_manyArriveDeferredOutsideTimeout() throws Exception {
-//        LifxMessage answer_0 = new LifxMessage(LifxPacketType.RESP_PAN_GATEWAY, new RespGetPanGateway(1, RespGetPanGateway.Service.UDP));
-        LifxMessage answer_1 = new LifxMessage(LifxPacketType.RESP_POWER_STATE, new RespPowerState(RespPowerState.Power.ON));
+//        LifxMessage answer_0 = LifxMessage.messageFrom(new RespGetPanGateway(1, RespGetPanGateway.Service.UDP));
+        LifxMessage answer_1 = LifxMessage.messageFrom(new RespPowerState(RespPowerState.Power.ON));
         final int[] countMockInv = new int[]{0};
-        doAnswer(inv -> {
-            countMockInv[0] += 1;
-            if(countMockInv[0] < 2){ // Provided once
-                DatagramPacket destPacket = (DatagramPacket) inv.getArguments()[0];
-                log.info("- [M] Serving mocked answer [{}].", answer_1.getType());
-                destPacket.setData(answer_1.toBytes()); // Note, we return 2nd answer first!
-                Thread.sleep(UdpLifxMessageTransportManager.SOCKET_TIMEOUT + 1000); // Provoke transport's timeout
-                return destPacket;
-            }else if (countMockInv[0] < 10){ // Provided many times
-                DatagramPacket destPacket = (DatagramPacket) inv.getArguments()[0];
-                LifxMessage answer_0 = new LifxMessage(LifxPacketType.RESP_PAN_GATEWAY, new RespGetPanGateway(countMockInv[0], RespGetPanGateway.Service.UDP));
-                destPacket.setData(answer_0.toBytes());
-                log.info("- [M] Serving mocked answer [{}].", answer_0.getType());
-                Thread.sleep(UdpLifxMessageTransportManager.SOCKET_TIMEOUT + 1000);
-                return destPacket;
-            }else{
-                throw new SocketTimeoutException("Intended timeout");
+
+        doAnswer(new Answer() {
+            @Override
+            public Object answer(InvocationOnMock inv) throws Throwable {
+                countMockInv[0] += 1;
+                if(countMockInv[0] < 2){ // Provided once
+                    DatagramPacket destPacket = (DatagramPacket) inv.getArguments()[0];
+                    log.info("- [M] Serving mocked answer [{}].", answer_1.getType());
+                    destPacket.setData(answer_1.toBytes()); // Note, we return 2nd answer first!
+                    Thread.sleep(UdpLifxMessageTransportManager.SOCKET_TIMEOUT + 1000); // Provoke transport's timeout
+                    return destPacket;
+                }else if (countMockInv[0] < 10){ // Provided many times
+                    DatagramPacket destPacket = (DatagramPacket) inv.getArguments()[0];
+                    RespGetPanGateway payload = new RespGetPanGateway(countMockInv[0], RespGetPanGateway.Service.UDP);
+                    LifxMessage<RespGetPanGateway> lifxMessage0 = LifxMessage.messageFrom(payload);
+                    destPacket.setData(lifxMessage0.toBytes());
+                    log.info("- [M] Serving mocked answer ["+lifxMessage0.getType()+"]." );
+                    Thread.sleep(UdpLifxMessageTransportManager.SOCKET_TIMEOUT + 1000);
+                    return destPacket;
+                }else{
+                    throw new SocketTimeoutException("Intended timeout");
+                }
             }
         }).when(udpSocket).receive(any(DatagramPacket.class));
 
-        CompletableFuture<LifxMessage[]> res_0 = transport.sendAndReceiveAggregated(new LifxMessage<>(
-                        LifxPacketType.REQ_PAN_GATEWAY,
-                        LifxMessagePayload.emptyPayload(),
-                        Inet4Address.getByName("192.168.1.255"), 56700, new byte[6]
+        CompletableFuture<LifxMessage[]> res_0 = transport.sendAndReceiveAggregated(LifxMessage.messageFrom(
+                        LifxMessagePayload.emptyPayload(LifxPacketType.REQ_PAN_GATEWAY),
+                        Inet4Address.getByName("192.168.1.255"), 56700
                 ), LifxPacketType.RESP_PAN_GATEWAY
         );
-        CompletableFuture<LifxMessage[]> res_1 = transport.sendAndReceiveAggregated(new LifxMessage<>(
-                        LifxPacketType.REQ_POWER_STATE,
-                        LifxMessagePayload.emptyPayload(),
-                        Inet4Address.getByName("192.168.1.255"), 56700, new byte[6]
+        CompletableFuture<LifxMessage[]> res_1 = transport.sendAndReceiveAggregated(LifxMessage.messageFrom(
+                        LifxMessagePayload.emptyPayload(LifxPacketType.REQ_PAN_GATEWAY),
+                        Inet4Address.getByName("192.168.1.255"), 56700
                 ), LifxPacketType.RESP_POWER_STATE
         );
 
         boolean success_0 = false;
         boolean success_1 = false;
         try{
-            res_0.get();
+            res_0.get(3, TimeUnit.SECONDS);
         }catch (ExecutionException e){
             success_0 = true;
         }
         try{
-            res_1.get();
+            res_1.get(3, TimeUnit.SECONDS);
         }catch (ExecutionException e){
             success_1 = true;
         }

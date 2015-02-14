@@ -13,6 +13,7 @@ import net.datenstrudel.bulbs.core.domain.model.scheduling.ScheduledActuationId;
 import net.datenstrudel.bulbs.core.domain.model.scheduling.ScheduledActuationRepository;
 import net.datenstrudel.bulbs.core.infrastructure.PersistenceConfig;
 import net.datenstrudel.bulbs.core.infrastructure.services.InfrastructureServicesConfig;
+import net.datenstrudel.bulbs.core.testConfigs.InfrastructureServicesTestConfig;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.CommandPriority;
 import net.datenstrudel.bulbs.shared.domain.model.scheduling.PointInTimeTrigger;
 import org.easymock.EasyMock;
@@ -40,7 +41,8 @@ import static org.junit.Assert.*;
     classes = {
             TestConfig.class,
             PersistenceConfig.class,
-            InfrastructureServicesConfig.class
+            InfrastructureServicesConfig.class,
+            InfrastructureServicesTestConfig.class
     })
 public class ScheduledActuationRepositoryImplIT {
     

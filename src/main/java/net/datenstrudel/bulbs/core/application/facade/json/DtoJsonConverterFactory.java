@@ -2,7 +2,6 @@ package net.datenstrudel.bulbs.core.application.facade.json;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 import net.datenstrudel.bulbs.shared.commonTypeConverters.TypeConverterDate;
 import net.datenstrudel.bulbs.shared.commonTypeConverters.TypeHierarchyAdapterColor;
 import net.datenstrudel.bulbs.shared.commonTypeConverters.TypeHierarchyAdapterSimpleClassname;
@@ -12,9 +11,8 @@ import net.datenstrudel.bulbs.shared.domain.model.scheduling.DaysOfWeekTrigger;
 import net.datenstrudel.bulbs.shared.domain.model.scheduling.IntervalTrigger;
 import net.datenstrudel.bulbs.shared.domain.model.scheduling.PointInTimeTrigger;
 import net.datenstrudel.bulbs.shared.domain.model.scheduling.Trigger;
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;
+
 import java.util.Date;
-import java.util.Map;
 
 /**
  *
@@ -33,7 +31,7 @@ public class DtoJsonConverterFactory {
                     DaysOfWeekTrigger.class
             ))
             .create();
-    private static final TypeToken TYPE_TK__MAP = new TypeToken<Map<String, Object>>(){};
+//    private static final TypeToken TYPE_TK__MAP = new TypeToken<Map<String, Object>>(){};
 
     //~ Construction ///////////////////////////////////////////////////////////
     //~ Method(s) //////////////////////////////////////////////////////////////

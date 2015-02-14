@@ -88,7 +88,7 @@ public class BulbBridgeHardwareAdapter_REST implements BulbBridgeHardwareAdapter
         BulbCmdTranslator_HTTP cmdTranslator = translatorForPlatform(platform);
         HttpCommand cmd = cmdTranslator.toBridgeFromHwInterfaceCmd(address, principal);
         ResponseEntity<String> resp = executeHttpCmd(cmd, cmdTranslator);
-        return cmdTranslator.bridgeFromJson(
+        return cmdTranslator.bridgeFromPayload(
                 resp.getBody(), bridgeId, address, contextUserId);
     }
 
@@ -157,7 +157,7 @@ public class BulbBridgeHardwareAdapter_REST implements BulbBridgeHardwareAdapter
         HttpCommand cmd = cmdTranslator.toBulbsFromHwInterfaceCmd(
                 parentBridge.getLocalAddress(), principal);
         ResponseEntity<String> resp = executeHttpCmd(cmd, cmdTranslator);
-        BulbId[] bulbIds = cmdTranslator.bulbIdsFromJson(resp.getBody(), parentBridge.getId());
+        BulbId[] bulbIds = cmdTranslator.bulbIdsFromPayload(resp.getBody(), parentBridge.getId());
         return bulbIds;
     }
     
@@ -186,7 +186,7 @@ public class BulbBridgeHardwareAdapter_REST implements BulbBridgeHardwareAdapter
         HttpCommand cmd = cmdTranslator.toBulbFromHwInterfaceCmd(
                 bulbId, parentBridge.getLocalAddress(), principal);
         ResponseEntity<String> resp = executeHttpCmd(cmd, cmdTranslator);
-        return cmdTranslator.bulbFromJson(resp.getBody(), parentBridge, bulbId);
+        return cmdTranslator.bulbFromPayload(resp.getBody(), parentBridge, bulbId);
     }
     
     @Override
@@ -205,7 +205,7 @@ public class BulbBridgeHardwareAdapter_REST implements BulbBridgeHardwareAdapter
     }
     
     @Override
-    public InvocationResponse applyBulbState(
+    public void applyBulbState(
             BulbId bulbId,
             BulbBridgeAddress address,
             BulbsPrincipal principal,
@@ -215,8 +215,9 @@ public class BulbBridgeHardwareAdapter_REST implements BulbBridgeHardwareAdapter
         BulbCmdTranslator_HTTP cmdTranslator = translatorForPlatform(platform);
         HttpCommand cmd = cmdTranslator.toApplyBulbStateCmd(bulbId, address, principal, state);
         ResponseEntity<String> resp = executeHttpCmd(cmd, cmdTranslator);
-        
-        return cmdTranslator.responseFromHardwareInvocation(resp.getBody());
+        if(!resp.getStatusCode().is2xxSuccessful()) {
+            throw new BulbBridgeHwException(resp.getStatusCode().value(), resp.getStatusCode().name(), resp.getBody());
+        }
     }
 
     //~ Private Artifact(s) ////////////////////////////////////////////////////

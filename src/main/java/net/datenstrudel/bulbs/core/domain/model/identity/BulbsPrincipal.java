@@ -99,8 +99,8 @@ public class BulbsPrincipal implements ValueObject<BulbsPrincipal>, Serializable
     //~ Private Artifact(s) ////////////////////////////////////////////////////
     private void setUsername(String username) {
         if(username == null) throw new IllegalArgumentException("Username must not be null!");
-        if(username.length() > 40 || username.length() < 10)
-            throw new IllegalArgumentException("Username must be of length betweeen 10 and 40");
+        if(username.length() > 40 || username.length() < 2)
+            throw new IllegalArgumentException("Username must be of length betweeen 2 and 40");
         this.username = username;
     }
     private void setAppId(AppId appType) {

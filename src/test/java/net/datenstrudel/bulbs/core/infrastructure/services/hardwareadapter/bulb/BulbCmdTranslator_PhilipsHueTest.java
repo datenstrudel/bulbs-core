@@ -11,7 +11,9 @@ import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbsPlatform;
 import net.datenstrudel.bulbs.shared.domain.model.color.ColorHSB;
 import net.datenstrudel.bulbs.shared.domain.model.color.ColorRGB;
 import net.datenstrudel.bulbs.shared.domain.model.identity.AppId;
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;import org.junit.Test;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -38,7 +40,7 @@ public class BulbCmdTranslator_PhilipsHueTest {
     
     @Test
     public void testBridgeFromJson() {
-        System.out.println("bridgeFromJson");
+        System.out.println("bridgeFromPayload");
         String json = "{\n" +
         "    \"proxyport\": 0,\n" +
         "    \"utc\": \"2012-10-29T12:00:00\",\n" +
@@ -68,7 +70,7 @@ public class BulbCmdTranslator_PhilipsHueTest {
         BulbBridge expResult = null;
         BulbBridgeId bridgeId = new BulbBridgeId(UUID.randomUUID().toString());
         BulbsContextUserId contextUserId = new BulbsContextUserId("userUuid");
-        BulbBridge result = instance.bridgeFromJson(json, bridgeId, T_BRIDGE_ADDRESS, contextUserId);
+        BulbBridge result = instance.bridgeFromPayload(json, bridgeId, T_BRIDGE_ADDRESS, contextUserId);
         
         assertEquals(bridgeId, result.getId());
         assertEquals("00:17:88:00:00:00", result.getMacAddress());
@@ -91,12 +93,12 @@ public class BulbCmdTranslator_PhilipsHueTest {
             "}";
         BulbBridgeId testBridgeId = new BulbBridgeId("testBridgeUUID");
         BulbId[] expResult = new BulbId[]{new BulbId(testBridgeId, 1), new BulbId(testBridgeId, 2) };
-        BulbId[] result = instance.bulbIdsFromJson(json, testBridgeId);
+        BulbId[] result = instance.bulbIdsFromPayload(json, testBridgeId);
         assertArrayEquals(expResult, result);
     }
     @Test
     public void testBulbFromJson() {
-        System.out.println("bulbFromJson");
+        System.out.println("bulbFromPayload");
         String json = "{\n" +
         "    \"state\": {\n" +
         "        \"hue\": 50000,\n" +
@@ -133,20 +135,20 @@ public class BulbCmdTranslator_PhilipsHueTest {
         Bulb expResult = new Bulb(
                 new BulbId(parentBridge.getId(), 1),
                 BulbsPlatform.PHILIPS_HUE, "LC 1", parentBridge, 
-                new BulbState(new ColorHSB(1f, 1f, 0f), true),
+                new BulbState(new ColorHSB(1f, 0f, 1f), true),
                 true,
                 new HashMap<String, Object>(){{
                     put("swversion", "1.0.3");
                     put("type", "Living Colors");
                 }});
-        Bulb result = instance.bulbFromJson(json, parentBridge, new BulbId(parentBridge.getId(), 1));
+        Bulb result = instance.bulbFromPayload(json, parentBridge, new BulbId(parentBridge.getId(), 1));
         assertEquals(expResult, result);
         assertEquals(expResult.getName(), result.getName());
         
     }
     @Test
     public void testStateFromJson() {
-        System.out.println("stateFromJson");
+        System.out.println("stateFromPayload");
         String json = "{\n" +
         "        \"hue\": 65535,\n" +
         "        \"on\": true,\n" +
@@ -159,8 +161,8 @@ public class BulbCmdTranslator_PhilipsHueTest {
         "        \"reachable\": true,\n" +
         "        \"colormode\": \"hs\"\n" +
         "    }";
-        BulbState expResult = new BulbState(new ColorHSB(255f, 360f, 0f), true);
-        BulbState result = instance.stateFromJson(json);
+        BulbState expResult = new BulbState(new ColorHSB(360f, 0f, 255f), true);
+        BulbState result = instance.stateFromPayload(json);
         assertEquals(expResult, result);
     }
     @Test

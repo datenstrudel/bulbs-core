@@ -35,11 +35,16 @@ public class BulbsHwServiceImpl implements BulbsHwService{
     @Autowired
     @Qualifier(value = "bulbBridgeHardwareAdapter_Emulated")
     private BulbBridgeHardwareAdapter hwAdapter_Emulated;
+
+    @Autowired
+    @Qualifier("bulbBridgeHardwareAdapter_LIFX")
+    private BulbBridgeHardwareAdapter hwAdapter_Lifx;
+
     @Autowired
     @Qualifier("taskExecutor")
     private AsyncTaskExecutor asyncExecutor;
-    
-    private static final Map<Object, CmdHwExecutor> runningExecutions 
+
+    private static final Map<Object, CmdHwExecutor> runningExecutions
             = new ConcurrentHashMap<>();
 
     //~ Construction ///////////////////////////////////////////////////////////
@@ -188,6 +193,8 @@ public class BulbsHwServiceImpl implements BulbsHwService{
                 return hwAdapter_Emulated;
             case PHILIPS_HUE:
                 return hwAdapter_Rest;
+            case LIFX:
+                return hwAdapter_Lifx;
             default:
                 throw new UnsupportedOperationException("Platform not supported: " + platform);
         }

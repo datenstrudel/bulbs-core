@@ -1,11 +1,10 @@
 package net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.lifx;
 
 import net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.lifx.payload.LifxMessagePayload;
-import net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.lifx.payload.RespGetPanGateway;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 
 public class LifxMessageTest {
 
@@ -13,7 +12,7 @@ public class LifxMessageTest {
     public void toBytesFromBytesConsistent() throws Exception {
 
         LifxMessage<LifxMessagePayload.EmptyPayload> testInst =
-                new LifxMessage<>(LifxPacketType.REQ_PAN_GATEWAY, LifxMessagePayload.emptyPayload());
+                LifxMessage.messageFrom(LifxMessagePayload.emptyPayload(LifxPacketType.REQ_PAN_GATEWAY));
 
         byte[] bytes = testInst.toBytes();
 

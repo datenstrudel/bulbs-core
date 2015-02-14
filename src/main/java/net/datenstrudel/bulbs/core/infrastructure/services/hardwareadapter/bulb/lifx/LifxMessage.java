@@ -12,9 +12,10 @@ import java.util.Date;
 import java.util.StringJoiner;
 
 /**
+ * /**
  * The message whose binary representation is supposed to be sent over a network channel
  *
- * @param T the actual payload type, depending on <code>packet_type</code>, e.g. {@link net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.lifx.LifxPacketType LifxPacketType}
+ * @param <T> extends LifxMessagePayload the actual payload type, depending on <code>packet_type</code>, e.g. {@link net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.lifx.LifxPacketType LifxPacketType}
  */
 public class LifxMessage<T extends LifxMessagePayload> {
 
@@ -25,9 +26,9 @@ public class LifxMessage<T extends LifxMessagePayload> {
     private BT.Uint16 size;                                            // LE
     private BT.Uint16 protocol          = BT.Uint16.fromInt(52);       // the actual version - 52
     private BT.Uint32 reserved1         = BT.Uint32.fromInt(0);        // Always 0x0000
-    private byte[] target_mac_address   = new byte[6];
+    private MacAddress target_mac_address = MacAddress.empty();
     private BT.Uint16 reserved2         = BT.Uint16.fromInt(0);
-    private byte[] site                 = new byte[6];                 // MAC address of gateway PAN controller bulb
+    private MacAddress site             = MacAddress.empty();          // MAC address of gateway PAN controller bulb
     private byte[] routing              = new byte[2];                 // Always 0x00
     private BT.Uint64 timestamp         = BT.Uint64.fromLong(new Date(0l).getTime());
     private BT.Uint16 packet_type;                                     // LE
@@ -46,18 +47,78 @@ public class LifxMessage<T extends LifxMessagePayload> {
     //~ //////////////////////////////////////////////////////////////////////////////////
     public LifxMessage() {
     }
+
+    public LifxMessage(T payload) {
+        this.packet_type = payload.getPacketType().getProtocolValue();
+        this.payload = payload;
+        setSize(calcSize());
+    }
+    @Deprecated
+    public LifxMessage(T payload, InetAddress address, int port, String targetMacAddress ) {
+        this.packet_type = payload.getPacketType().getProtocolValue();
+        this.payload = payload;
+        this.address = address;
+        this.port = port;
+//        this.target_mac_address = targetMacAddress;
+        setSite( MacAddress.fromString(targetMacAddress));
+        setSize(calcSize());
+    }
+
+    protected static <T extends LifxMessagePayload> LifxMessage<T>  messageFrom(
+            T payload, InetAddress address, int port, MacAddress targetMacAddress ) {
+        LifxMessage res = new LifxMessage(payload);
+        res.packet_type = payload.getPacketType().getProtocolValue();
+        res.payload = payload;
+        res.address = address;
+        res.port = port;
+        res.setSite( targetMacAddress );
+        res.setSize(res.calcSize());
+        return res;
+    }
+    protected static <T extends LifxMessagePayload> LifxMessage<T>  messageFrom(
+            T payload, InetAddress address, int port, String targetMacAddress ) {
+        LifxMessage res = new LifxMessage(payload);
+        res.packet_type = payload.getPacketType().getProtocolValue();
+        res.payload = payload;
+        res.address = address;
+        res.port = port;
+        res.setSite(targetMacAddress != null &&
+                targetMacAddress.length() > 0
+                ? MacAddress.fromString(targetMacAddress)
+                : MacAddress.empty());
+        res.setSize(res.calcSize());
+        return res;
+    }
+    protected static <T extends LifxMessagePayload> LifxMessage<T>  messageFrom(
+            T payload, InetAddress address, int port ) {
+        LifxMessage res = new LifxMessage(payload);
+        res.packet_type = payload.getPacketType().getProtocolValue();
+        res.payload = payload;
+        res.address = address;
+        res.port = port;
+        res.setSize(res.calcSize());
+        return res;
+    }
+    protected static <T extends LifxMessagePayload> LifxMessage<T> messageFrom(T payload ) {
+        LifxMessage res = new LifxMessage(payload);
+        res.packet_type = payload.getPacketType().getProtocolValue();
+        res.payload = payload;
+        res.setSize(res.calcSize());
+        return res;
+    }
+
+
+    @Deprecated
     public LifxMessage(LifxPacketType packetType, T payload) {
         this.packet_type = packetType.getProtocolValue();
         this.payload = payload;
         setSize(calcSize());
     }
-    public LifxMessage(LifxPacketType packetType, T payload, InetAddress address, int port, byte[] targetMacAddress ) {
+    public LifxMessage(LifxPacketType packetType, T payload, InetAddress address, int port) {
         this.packet_type = packetType.getProtocolValue();
         this.payload = payload;
         this.address = address;
         this.port = port;
-//        this.target_mac_address = targetMacAddress;
-        this.site = targetMacAddress;
         setSize(calcSize());
     }
     public static LifxMessage fromBytes(byte[] input, InetAddress senderAddress, int senderPort) {
@@ -80,13 +141,17 @@ public class LifxMessage<T extends LifxMessagePayload> {
         buffer.get(tmp);
         res.reserved1 = BT.Uint32.fromBytes(tmp);
 
-        buffer.get(res.target_mac_address);
+        tmp = new byte[6];
+        buffer.get(tmp);
+        res.target_mac_address = MacAddress.fromBytes(tmp);
 
         tmp = new byte[2];
         buffer.get(tmp);
         res.reserved2 = BT.Uint16.fromBytes(tmp);
 
-        buffer.get(res.site);
+        tmp = new byte[6];
+        buffer.get(tmp);
+        res.site = MacAddress.fromBytes(tmp);
 
         buffer.get(res.routing);
 
@@ -106,6 +171,8 @@ public class LifxMessage<T extends LifxMessagePayload> {
         res.payload = LifxMessagePayload.fromRawData(
                 LifxPacketType.fromProtocolValue(res.packet_type.toInt()),
                 Arrays.copyOfRange(input, SIZE_HEADER, input.length));
+        res.address = senderAddress;
+        res.port = senderPort;
         return res;
     }
 
@@ -115,9 +182,9 @@ public class LifxMessage<T extends LifxMessagePayload> {
         res.put(BT.Uint16.fromInt(res.capacity()).getData_LE() );
         res.put(this.protocol.getData());
         res.put(this.reserved1.getData());
-        res.put(this.target_mac_address);
+        res.put(this.target_mac_address.getBytes());
         res.put(this.reserved2.getData());
-        res.put(this.site);
+        res.put(this.site.getBytes());
         res.put(this.routing);
         res.put(this.timestamp.getData());
         res.put(this.packet_type.getData_LE());
@@ -133,8 +200,11 @@ public class LifxMessage<T extends LifxMessagePayload> {
         return res.toString();
     }
 
-    public byte[] getTarget_mac_address() {
+    public MacAddress getTarget_mac_address() {
         return target_mac_address;
+    }
+    public MacAddress getMacAddress() {
+        return this.site;
     }
     public T getPayload() {
         return payload;
@@ -156,14 +226,18 @@ public class LifxMessage<T extends LifxMessagePayload> {
         return this.payload.size() + SIZE_HEADER;
     }
 
+    public void setSite(MacAddress site) {
+        this.site = site;
+    }
+
     @Override
     public String toString() {
         return "LifxMessage{" +
                 "packet_type=" + LifxPacketType.fromProtocolValue(packet_type.toInt()) +
                 ", size=" + size +
                 ", protocol=" + protocol.toInt() +
-                ", target_mac_address=" + Arrays.toString(target_mac_address) +
-                ", site=" + Arrays.toString(site) +
+                ", target_mac_address=" + target_mac_address +
+                ", site=" + site +
                 ", routing=" + Arrays.toString(routing) +
                 ", timestamp=" + Instant.ofEpochMilli(timestamp.toLong()).toString() +
                 ", payload=" + payload +
@@ -175,8 +249,8 @@ public class LifxMessage<T extends LifxMessagePayload> {
         log.info(" -- packet_type=" + LifxPacketType.fromProtocolValue(packet_type.toInt()) );
         log.info(" -- size=" + size.toInt() );
         log.info(" -- protocol=" + protocol.toInt() );
-        log.info(" -- target_mac_address=" + Arrays.toString(target_mac_address) );
-        log.info(" -- site=" + Arrays.toString(site) );
+        log.info(" -- target_mac_address=" + target_mac_address );
+        log.info(" -- site=" + site );
         log.info(" -- routing=" + Arrays.toString(routing) );
         log.info(" -- timestamp=" + Instant.ofEpochMilli(timestamp.toLong()).toString() );
         log.info(" -- payload=" + payload );
@@ -198,9 +272,9 @@ public class LifxMessage<T extends LifxMessagePayload> {
         if (reserved2 != null ? !reserved2.equals(that.reserved2) : that.reserved2 != null) return false;
         if (reserved3 != null ? !reserved3.equals(that.reserved3) : that.reserved3 != null) return false;
         if (!Arrays.equals(routing, that.routing)) return false;
-        if (!Arrays.equals(site, that.site)) return false;
+        if (!Arrays.equals(site.getBytes(), that.site.getBytes())) return false;
         if (size != null ? !size.equals(that.size) : that.size != null) return false;
-        if (!Arrays.equals(target_mac_address, that.target_mac_address)) return false;
+        if (!Arrays.equals(target_mac_address.getBytes(), that.target_mac_address.getBytes())) return false;
         if (timestamp != null ? !timestamp.equals(that.timestamp) : that.timestamp != null) return false;
 
         return true;
@@ -211,9 +285,9 @@ public class LifxMessage<T extends LifxMessagePayload> {
         int result = size != null ? size.hashCode() : 0;
         result = 31 * result + (protocol != null ? protocol.hashCode() : 0);
         result = 31 * result + (reserved1 != null ? reserved1.hashCode() : 0);
-        result = 31 * result + (target_mac_address != null ? Arrays.hashCode(target_mac_address) : 0);
+        result = 31 * result + (target_mac_address != null ? Arrays.hashCode(target_mac_address.getBytes()) : 0);
         result = 31 * result + (reserved2 != null ? reserved2.hashCode() : 0);
-        result = 31 * result + (site != null ? Arrays.hashCode(site) : 0);
+        result = 31 * result + (site != null ? Arrays.hashCode(site.getBytes()) : 0);
         result = 31 * result + (routing != null ? Arrays.hashCode(routing) : 0);
         result = 31 * result + (timestamp != null ? timestamp.hashCode() : 0);
         result = 31 * result + (packet_type != null ? packet_type.hashCode() : 0);

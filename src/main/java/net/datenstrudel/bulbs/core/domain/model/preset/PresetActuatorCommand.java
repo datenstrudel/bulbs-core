@@ -7,10 +7,9 @@ import net.datenstrudel.bulbs.shared.domain.model.bulb.CommandPriority;
 import net.datenstrudel.bulbs.shared.domain.model.identity.AppId;
 
 /**
- *
- * @author Thomas Wendzinski
+ * Triggers a preset to be executed.
  */
-public class PresetActuatorCommand 
+public class PresetActuatorCommand
         extends AbstractActuatorCmd<PresetActuatorCommand> {
 
     //~ Member(s) //////////////////////////////////////////////////////////////
@@ -48,8 +47,6 @@ public class PresetActuatorCommand
         actuatorService.execute(this);
     }
     
-    
-
     @Override
     public boolean sameValueAs(PresetActuatorCommand other) {
         if(other == null)return false;

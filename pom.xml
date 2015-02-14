@@ -31,7 +31,7 @@
         <start-class>net.datenstrudel.bulbs.core.main.Main</start-class>
         <skipIT>false</skipIT>
         <maven.javadoc.skip>true</maven.javadoc.skip>
-        <bulbs-shared.version>1.1</bulbs-shared.version>
+        <bulbs-shared.version>1.2-SNAPSHOT</bulbs-shared.version>
     </properties>
 
   <repositories>
@@ -424,10 +424,10 @@
                             </excludes>
                             <excludedGroups>net.datenstrudel.bulbs.core.IntegrationTest</excludedGroups>
                             <useSystemClassLoader>false</useSystemClassLoader>
-                            <threadCount>10</threadCount>
-                            <parallel>classes</parallel>
+                            <!--<threadCount>10</threadCount>-->
+                            <!--<parallel>classes</parallel>-->
                             <forkCount>4</forkCount>
-                            <reuseForks>true</reuseForks>
+                            <reuseForks>false</reuseForks>
                         </configuration>
                     </execution>
                     <execution>

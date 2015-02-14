@@ -14,16 +14,16 @@ import java.util.Set;
  *
  * In/Out types produced to be uniformly processed by a corresponding
  * {@link net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.BulbBridgeHardwareAdapter BulbBridgeHardwareAdapter}
- * @param I Input type, e.g. payload from hardware
- * @param O Output type, payload sent to hardware
+ * @param <I> Input type, e.g. payload from hardware
+ * @param <O> Output type, payload sent to hardware
  */
 public interface BulbCmdTranslator<I,O> {
 
-    public BulbBridge bridgeFromJson(I payload, BulbBridgeId bridgeId, BulbBridgeAddress localAddress,
-                                     BulbsContextUserId contextUserId);
-    public BulbId[] bulbIdsFromJson(I payload, BulbBridgeId bridgeId);
-    public Bulb bulbFromJson(I payload, BulbBridge parentBridge, BulbId bulbId);
-    public BulbState stateFromJson(I payload);
+    public BulbBridge bridgeFromPayload(I payload, BulbBridgeId bridgeId, BulbBridgeAddress localAddress,
+                                        BulbsContextUserId contextUserId);
+    public BulbId[] bulbIdsFromPayload(I payload, BulbBridgeId bridgeId);
+    public Bulb bulbFromPayload(I payload, BulbBridge parentBridge, BulbId bulbId);
+    public BulbState stateFromPayload(I payload);
     public Set<BulbsPrincipal> bulbsPrincipalsFromJson(I payload, BulbBridgeId bridgeId);
     public HwResponse responseFromJson(I payload, HttpStatus httpStatuscode);
     public InvocationResponse responseFromHardwareInvocation(I payload);

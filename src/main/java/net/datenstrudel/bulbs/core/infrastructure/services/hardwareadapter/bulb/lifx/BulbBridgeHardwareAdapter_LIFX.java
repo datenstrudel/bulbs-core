@@ -12,16 +12,16 @@ import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbsPlatform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import javax.net.SocketFactory;
-import java.io.*;
-import java.net.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
-/**
- * Created by Thomas Wendzinski.
- */
+@Component
 public class BulbBridgeHardwareAdapter_LIFX implements BulbBridgeHardwareAdapter {
 
     public static final Logger log = LoggerFactory.getLogger(BulbBridgeHardwareAdapter_LIFX.class);
@@ -36,9 +36,7 @@ public class BulbBridgeHardwareAdapter_LIFX implements BulbBridgeHardwareAdapter
         this.transportManager = transportManager;
     }
 
-
     //~ ///////////////////////////////////////////////////////////////////////
-
     @Override
     public BulbBridge toBridge(
             BulbBridgeAddress address,
@@ -46,23 +44,23 @@ public class BulbBridgeHardwareAdapter_LIFX implements BulbBridgeHardwareAdapter
             BulbsPrincipal principal,
             BulbsContextUserId contextUserId,
             BulbsPlatform platform) throws BulbBridgeHwException {
-//        sendDatagramMessage(
-//                new LifxMessage<>(
-//                        LifxPacketType.REQ_PAN_GATEWAY, LifxMessagePayload.emptyPayload(),
-//                        lanMulticastAddress(), LIFX_STD_PORT, null ) //TODO: Add constructor not expecting mac address
-//        );
-//
-//        DatagramPacket datagramPacket = retrieveDatagramMessage();
-//        LifxMessage lifxMessage = LifxMessage.fromBytes(datagramPacket.getData());
-//        log.debug(":) -- ", lifxMessage.rawDataToString());
-        return null;
+
+        CompletableFuture<LifxMessage[]> completableFuture = transportManager.sendAndReceiveAggregated(
+                LifxMessage.messageFrom(
+                        LifxMessagePayload.emptyPayload(LifxPacketType.REQ_PAN_GATEWAY),
+                        address.toBroadcastAddress(), address.getPort()
+                ), LifxPacketType.RESP_PAN_GATEWAY
+        );
+
+        LifxMessage[] messages = readFromFuture(completableFuture);
+        return cmdTranslator.bridgeFromPayload(messages[0], bridgeId, address, contextUserId);
     }
     @Override
     public InvocationResponse discoverNewBulbs(
             BulbBridgeAddress address,
             BulbsPrincipal principal,
             BulbsPlatform platform) throws BulbBridgeHwException {
-        return null;
+        return new InvocationResponse("Not supported by Lifx", false);
     }
     @Override
     public HwResponse modifyBridgeAttributes(
@@ -70,7 +68,7 @@ public class BulbBridgeHardwareAdapter_LIFX implements BulbBridgeHardwareAdapter
             BulbsPrincipal principal,
             Map<String, Object> attributes,
             BulbsPlatform platform) throws BulbBridgeHwException {
-        return null;
+        throw new UnsupportedOperationException("Implement me!");
     }
     @Override
     public Set<BulbsPrincipal> toBulbsPrincipals(
@@ -79,7 +77,6 @@ public class BulbBridgeHardwareAdapter_LIFX implements BulbBridgeHardwareAdapter
             BulbsPlatform platform) throws BulbBridgeHwException {
         return null;
     }
-
     @Override
     public InvocationResponse createBulbsPrincipal(
             BulbBridgeAddress address,
@@ -87,7 +84,6 @@ public class BulbBridgeHardwareAdapter_LIFX implements BulbBridgeHardwareAdapter
             BulbsPlatform platform) throws BulbBridgeHwException {
         return null;
     }
-
     @Override
     public HwResponse removeBulbsPrincipal(
             BulbBridgeAddress address,
@@ -102,15 +98,38 @@ public class BulbBridgeHardwareAdapter_LIFX implements BulbBridgeHardwareAdapter
             BulbBridge parentBridge,
             BulbsPrincipal principal,
             BulbsPlatform platform) throws BulbBridgeHwException {
-        return new BulbId[0];
-    }
 
+        Bulb[] bulbs = toBulbs(parentBridge, principal, platform);
+        BulbId[] res = new BulbId[bulbs.length];
+        for (int i = 0; i < bulbs.length; i++) {
+            res[i] = bulbs[i].getId();
+        }
+        return res;
+    }
     @Override
     public Bulb[] toBulbs(
             BulbBridge parentBridge,
             BulbsPrincipal principal,
             BulbsPlatform platform) throws BulbBridgeHwException {
-        return new Bulb[0];
+
+        BulbBridgeAddress address = parentBridge.getLocalAddress();
+        CompletableFuture<LifxMessage[]> completableFuture = transportManager.sendAndReceiveAggregated(
+                LifxMessage.messageFrom(
+                        LifxMessagePayload.emptyPayload(LifxPacketType.REQ_LIGHT_STATE),
+                        address.toInetAddress(), address.getPort(), address.getMacAddress().get()),
+                        LifxPacketType.RESP_LIGHT_STATE
+        );
+
+        LifxMessage[] messages = readFromFuture(completableFuture);
+        List<Bulb> bulbs = new ArrayList<>(messages.length);
+        for (LifxMessage message : messages) {
+            bulbs.add(cmdTranslator.bulbFromPayload(
+                    message, parentBridge,
+                    new BulbId(parentBridge.getId(), message.getMacAddress().toString().hashCode())));
+        }
+        Bulb[] res = new Bulb[bulbs.size()];
+        bulbs.toArray(res);
+        return res;
     }
 
     @Override
@@ -119,7 +138,7 @@ public class BulbBridgeHardwareAdapter_LIFX implements BulbBridgeHardwareAdapter
             BulbBridge parentBridge,
             BulbsPrincipal principal,
             BulbsPlatform platform) throws BulbBridgeHwException {
-        return null;
+        throw new UnsupportedOperationException("Not supported.");
     }
 
     @Override
@@ -129,16 +148,34 @@ public class BulbBridgeHardwareAdapter_LIFX implements BulbBridgeHardwareAdapter
             BulbsPrincipal principal,
             Map<String, Object> attributes,
             BulbsPlatform platform) throws BulbBridgeHwException {
-        return null;
+        throw new UnsupportedOperationException("Not supported.");
     }
 
     @Override
-    public InvocationResponse applyBulbState(
+    public void applyBulbState(
             BulbId bulbId,
             BulbBridgeAddress address,
             BulbsPrincipal principal,
             BulbState state,
             BulbsPlatform platform) throws BulbBridgeHwException {
-        return null;
+
+        transportManager.sendAndReceiveAggregated(
+                cmdTranslator.toApplyBulbStateCmd(bulbId, address, principal, state),
+                LifxPacketType.RESP_POWER_STATE
+        );
+    }
+
+    public LifxMessage[] readFromFuture(CompletableFuture<LifxMessage[]> in) throws BulbBridgeHwException {
+        try {
+            return in.get();
+        }catch (ExecutionException e) {
+            if(e.getCause() instanceof BulbBridgeHwException){
+                throw (BulbBridgeHwException) e.getCause();
+            }else {
+                throw new BulbBridgeHwException(e.getMessage(), e);
+            }
+        }catch(InterruptedException e) {
+            throw new BulbBridgeHwException(e.getMessage());
+        }
     }
 }
