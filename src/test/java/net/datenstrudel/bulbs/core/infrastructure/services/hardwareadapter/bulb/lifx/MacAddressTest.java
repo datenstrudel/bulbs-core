@@ -9,8 +9,15 @@ public class MacAddressTest {
 
     @Test
     public void testToString() throws Exception {
-        byte[] origMax = new byte[]{-48, 115, -43, 1, -78, 17};
-        MacAddress addr = MacAddress.fromBytes(origMax);
-        assertThat(MacAddress.fromString(addr.toString()).getBytes(), is(origMax));
+        byte[] origMac = new byte[]{-48, 115, -43, 1, -78, 17};
+        MacAddress addr = MacAddress.fromBytes(origMac);
+        assertThat(MacAddress.fromString(addr.toString()).getBytes(), is(origMac));
+    }
+
+    @Test
+    public void fromString() throws Exception{
+        String origMac = "11:22:33:44:55:66";
+        MacAddress addr = MacAddress.fromString(origMac);
+        assertThat(addr.toString(), is(origMac));
     }
 }

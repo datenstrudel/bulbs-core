@@ -10,6 +10,8 @@ public enum LifxPacketType {
     REQ_POWER_STATE     (0x14, false),
     REQ_SET_POWER_STATE (0x15, false),
     RESP_POWER_STATE    (0x16, true),
+    REQ_SET_BULB_LABEL  (0x18, false),
+    RESP_BULB_LABEL     (0x19, true),
 
     REQ_LIGHT_STATE     (0x65, false, true),
     REQ_SET_LIGHT_COLOR (0x66, false, false),

@@ -116,7 +116,7 @@ public class BulbBridgeHardwareAdapter_LIFX implements BulbBridgeHardwareAdapter
         CompletableFuture<LifxMessage[]> completableFuture = transportManager.sendAndReceiveAggregated(
                 LifxMessage.messageFrom(
                         LifxMessagePayload.emptyPayload(LifxPacketType.REQ_LIGHT_STATE),
-                        address.toInetAddress(), address.getPort(), address.getMacAddress().get()),
+                        address.toInetAddress(), address.getPort(), address.macAddress().get()),
                         LifxPacketType.RESP_LIGHT_STATE
         );
 
@@ -148,7 +148,12 @@ public class BulbBridgeHardwareAdapter_LIFX implements BulbBridgeHardwareAdapter
             BulbsPrincipal principal,
             Map<String, Object> attributes,
             BulbsPlatform platform) throws BulbBridgeHwException {
-        throw new UnsupportedOperationException("Not supported.");
+
+        LifxMessage messageOut = cmdTranslator.toModifyBulbAttributesCmd(bulbId, address, principal, attributes);
+        transportManager.send(
+                messageOut
+        );
+        return new InvocationResponse("", false);
     }
 
     @Override
@@ -159,9 +164,8 @@ public class BulbBridgeHardwareAdapter_LIFX implements BulbBridgeHardwareAdapter
             BulbState state,
             BulbsPlatform platform) throws BulbBridgeHwException {
 
-        transportManager.sendAndReceiveAggregated(
-                cmdTranslator.toApplyBulbStateCmd(bulbId, address, principal, state),
-                LifxPacketType.RESP_POWER_STATE
+        transportManager.send(
+                cmdTranslator.toApplyBulbStateCmd(bulbId, address, principal, state)
         );
     }
 

@@ -23,7 +23,7 @@ public class MacAddress {
         if(mac == null || mac.isEmpty()) throw new IllegalArgumentException("Mac address must not be empty!");
 
         byte[] bytes = new BigInteger(mac.replaceAll(":", ""), 16).toByteArray();
-        return new MacAddress(Arrays.copyOfRange(bytes, 1, bytes.length));
+        return new MacAddress(Arrays.copyOfRange(bytes, bytes.length > 6 ? 1 : 0, bytes.length));
     }
 
     public String toString(){

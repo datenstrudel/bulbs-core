@@ -4,12 +4,15 @@ import net.datenstrudel.bulbs.core.domain.model.bulb.*;
 import net.datenstrudel.bulbs.core.domain.model.identity.BulbsContextUserId;
 import net.datenstrudel.bulbs.core.domain.model.identity.BulbsPrincipal;
 import net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.BulbCmdTranslator;
+import net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.lifx.payload.BulbLabelPayload;
 import net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.lifx.payload.ReqSetLightColor;
 import net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.lifx.payload.RespLightState;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbBridgeAddress;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbState;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbsPlatform;
 import net.datenstrudel.bulbs.shared.domain.model.color.ColorHSB;
+import net.datenstrudel.bulbs.shared.domain.model.color.ColorRGB;
+import net.datenstrudel.bulbs.shared.domain.model.color.ColorScheme;
 import org.springframework.http.HttpStatus;
 
 import java.util.HashMap;
@@ -124,7 +127,12 @@ public class BulbCmdTranslator_LIFX implements BulbCmdTranslator<LifxMessage, Li
     }
     @Override
     public LifxMessage toModifyBulbAttributesCmd(BulbId bulbId, BulbBridgeAddress address, BulbsPrincipal principal, Map<String, Object> attributes) {
-        return null;
+        String name = (String) attributes.get("name");
+        if(name == null)
+            throw new UnsupportedOperationException("Attribute(s) supplied not supported to be changed by lifx" + attributes.keySet());
+        return LifxMessage.messageFrom(
+                BulbLabelPayload.newSetBulblabelPayload(name),
+                address.toInetAddress(), address.getPort(), MacAddress.fromString(address.macAddress().get()));
     }
     @Override
     public LifxMessage toApplyBulbStateCmd(BulbId bulbId, BulbBridgeAddress address, BulbsPrincipal principal, BulbState state) {
@@ -134,6 +142,8 @@ public class BulbCmdTranslator_LIFX implements BulbCmdTranslator<LifxMessage, Li
                 color = (ColorHSB) state.getColor();
                 break;
             case RGB:
+                color = ColorScheme.RGBtoHSB((ColorRGB)state.getColor());
+                break;
             case TEMP:
             default:
                 throw new UnsupportedOperationException(
@@ -145,9 +155,9 @@ public class BulbCmdTranslator_LIFX implements BulbCmdTranslator<LifxMessage, Li
                         BT.scale(color.getHue(), 360f),
                         BT.scale(color.getSaturation(), 255f),
                         BT.scale(color.getBrightness(), 255f),
-                        BT.Uint32.fromInt(3000) // Fixme What is it? Could be ms
+                        BT.Uint32.fromInt(3000) // Fixme What is it? Could be ms/10
                 ),
-                address.toInetAddress(), address.getPort(), MacAddress.fromString(address.getMacAddress().get()));
+                address.toInetAddress(), address.getPort(), MacAddress.fromString(address.macAddress().get()));
     }
 
 }

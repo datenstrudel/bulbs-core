@@ -54,7 +54,7 @@ public class UdpLifxMessageTransportManagerTest {
     @Before
     public void init() throws BulbBridgeHwException {
         transport = spy(transport_init);
-        doReturn(udpSocket).when(transport).provideNewUdpSocket(isA(Integer.class));
+        doReturn(udpSocket).when(transport).provideSocketIfNecessary(isA(Integer.class));
         transport.init();
     }
 

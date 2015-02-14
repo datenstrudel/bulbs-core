@@ -55,10 +55,14 @@ public class UdpLifxMessageTransportManager {
             LifxMessage<?> messageOut, LifxPacketType expectedResponseType) throws BulbBridgeHwException {
 
         CompletableFuture<LifxMessage[]> res = new CompletableFuture<>();
-        provideNewUdpSocket(LIFX_STD_PORT);
+        provideSocketIfNecessary(LIFX_STD_PORT);
         sendDatagramMessage(messageOut);
         listenForAnswersOf(messageOut, expectedResponseType, res);
         return res;
+    }
+    public void send(LifxMessage<?> messageOut) throws BulbBridgeHwException {
+        provideSocketIfNecessary(LIFX_STD_PORT);
+        sendDatagramMessage(messageOut);
     }
 
     public InetAddress lanMulticastAddress() throws BulbBridgeHwException {
@@ -155,7 +159,7 @@ public class UdpLifxMessageTransportManager {
         }
         return addrList;
     }
-    protected DatagramSocket provideNewUdpSocket(int port) throws BulbBridgeHwException {
+    protected DatagramSocket provideSocketIfNecessary(int port) throws BulbBridgeHwException {
         if( this.udpSocket != null && !this.udpSocket.isClosed() ) return udpSocket;
         try {
             this.udpSocket = new DatagramSocket(port);

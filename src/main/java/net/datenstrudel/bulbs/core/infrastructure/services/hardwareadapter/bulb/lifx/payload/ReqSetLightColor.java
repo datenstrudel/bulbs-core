@@ -59,4 +59,20 @@ public class ReqSetLightColor extends LifxMessagePayload {
         res.put(fade_time.getData_LE());
         return res.array();
     }
+
+    public BT.Uint16 getBrightness() {
+        return brightness;
+    }
+    public BT.Uint32 getFade_time() {
+        return fade_time;
+    }
+    public BT.Uint16 getHue() {
+        return hue;
+    }
+    public BT.Uint16 getKelvin() {
+        return kelvin;
+    }
+    public BT.Uint16 getSaturation() {
+        return saturation;
+    }
 }

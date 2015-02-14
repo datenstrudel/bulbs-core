@@ -36,6 +36,9 @@ public abstract class LifxMessagePayload {
                 return new RespPowerState(rawData);
             case RESP_LIGHT_STATE:
                 return new RespLightState(rawData);
+            case RESP_BULB_LABEL:
+                return BulbLabelPayload.fromRawData(rawData);
+
             default:
                 throw new UnsupportedOperationException("Cannot construct LifxMessagePayload by type: " + type);
         }
