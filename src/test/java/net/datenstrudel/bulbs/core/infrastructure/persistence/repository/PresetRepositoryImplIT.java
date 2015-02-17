@@ -16,11 +16,11 @@ import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbState;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.CommandPriority;
 import net.datenstrudel.bulbs.shared.domain.model.color.ColorRGB;
 import org.hamcrest.Matchers;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ContextConfiguration;
@@ -147,7 +147,7 @@ public class PresetRepositoryImplIT {
         res.addState(
                 new BulbActuatorCommand(
                         new BulbId(
-                                new BulbBridgeId("testPresets__bridgeUuid"), 0), 
+                                new BulbBridgeId("testPresets__bridgeUuid"), "0"),
                         AppIdCore.instance(), 
                         "testPresets__userApiKey", 
                         CommandPriority.override(), 

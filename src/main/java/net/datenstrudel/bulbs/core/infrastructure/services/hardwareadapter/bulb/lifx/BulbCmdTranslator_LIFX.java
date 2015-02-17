@@ -132,7 +132,9 @@ public class BulbCmdTranslator_LIFX implements BulbCmdTranslator<LifxMessage, Li
             throw new UnsupportedOperationException("Attribute(s) supplied not supported to be changed by lifx" + attributes.keySet());
         return LifxMessage.messageFrom(
                 BulbLabelPayload.newSetBulblabelPayload(name),
-                address.toInetAddress(), address.getPort(), MacAddress.fromString(address.macAddress().get()), null); // FIXME!!
+                address.toInetAddress(), address.getPort(),
+                MacAddress.fromString(address.macAddress().get()),
+                MacAddress.fromString(bulbId.getLocalId()));
     }
     @Override
     public LifxMessage toApplyBulbStateCmd(BulbId bulbId, BulbBridgeAddress address, BulbsPrincipal principal, BulbState state) {
@@ -158,7 +160,9 @@ public class BulbCmdTranslator_LIFX implements BulbCmdTranslator<LifxMessage, Li
                         BT.scale(color.getBrightness(), 255f),
                         BT.Uint32.fromInt(3000) // FixMe What is it? Could be ms/10
                 ),
-                address.toInetAddress(), address.getPort(), MacAddress.fromString(address.macAddress().get() ), null); // FIXME!!
+                address.toInetAddress(), address.getPort(),
+                MacAddress.fromString(address.macAddress().get() ),
+                MacAddress.fromString(bulbId.getLocalId()));
     }
 
 }

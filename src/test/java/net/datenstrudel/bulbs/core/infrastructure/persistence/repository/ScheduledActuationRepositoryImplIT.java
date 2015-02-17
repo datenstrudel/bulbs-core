@@ -155,11 +155,11 @@ public class ScheduledActuationRepositoryImplIT {
         if(withStates){
             final List<AbstractActuatorCmd> states = new ArrayList<>();
             final BulbBridgeId bridgeId = new BulbBridgeId("testSchedActRep_bridgeId_0");
-            states.add(new BulbActuatorCommand(new BulbId(bridgeId, 1), AppIdCore.instance(), "testUserApiKey", 
+            states.add(new BulbActuatorCommand(new BulbId(bridgeId, "1"), AppIdCore.instance(), "testUserApiKey",
                     new CommandPriority(0), new LinkedList<>()));
-            states.add(new BulbActuatorCommand(new BulbId(bridgeId, 2), AppIdCore.instance(), "testUserApiKey",
+            states.add(new BulbActuatorCommand(new BulbId(bridgeId, "2"), AppIdCore.instance(), "testUserApiKey",
                     new CommandPriority(0), new LinkedList<>()));
-            states.add(new BulbActuatorCommand(new BulbId(bridgeId, 3), AppIdCore.instance(), "testUserApiKey",
+            states.add(new BulbActuatorCommand(new BulbId(bridgeId, "3"), AppIdCore.instance(), "testUserApiKey",
                     new CommandPriority(0), new LinkedList<>()));
             res.setNewStates(states, mk_jobCoordinator);
         }

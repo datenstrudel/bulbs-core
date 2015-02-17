@@ -122,7 +122,7 @@ public class BulbBridgeRepositoryImplIT {
         System.out.println("save_many");
         int numBulbs = 100;
         final BulbBridge bulbBridge = aTestBridge(numBulbs);
-        final Bulb firstBulb = bulbBridge.bulbById(new BulbId(bulbBridge.getId(), 1));
+        final Bulb firstBulb = bulbBridge.bulbById(new BulbId(bulbBridge.getId(), "1"));
         Long start;
         BulbBridge res;
         
@@ -161,7 +161,7 @@ public class BulbBridgeRepositoryImplIT {
         
         assertEquals(expResult, result);
 
-        Bulb el = result.bulbById(new BulbId(result.getId(), 1));
+        Bulb el = result.bulbById(new BulbId(result.getId(), "1"));
         assertEquals(firstBulb.getId(), el.getId());
         assertEquals(firstBulb.getBulbAttributes(), el.getBulbAttributes());
         assertEquals(firstBulb.getState(), el.getState());
@@ -197,7 +197,7 @@ public class BulbBridgeRepositoryImplIT {
         bulbBridge.setBulbs(new HashSet<Bulb>(){{
             for (int i = 1; i < numBulbs+1; i++) {
                 add(new Bulb(
-                        new BulbId(bulbBridge.getId(), i),
+                        new BulbId(bulbBridge.getId(), ""+i),
                         BulbsPlatform.PHILIPS_HUE, 
                         "testBulb_"+i, 
                         bulbBridge, 

@@ -93,7 +93,7 @@ public class ModelFacadeOutPortTest {
     private Bulb domainObjectInstance(){
         BulbBridgeId bridgeId = new BulbBridgeId("testBulbRdigeUUId");
         Bulb domainObject = new Bulb(
-                new BulbId(bridgeId, 1), 
+                new BulbId(bridgeId, "1"),
                 BulbsPlatform._EMULATED, 
                 "testBulb", 
                 new BulbBridge(bridgeId, 

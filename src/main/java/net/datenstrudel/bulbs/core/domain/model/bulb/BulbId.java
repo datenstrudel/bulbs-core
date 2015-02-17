@@ -11,7 +11,7 @@ import java.io.Serializable;
  */
 public class BulbId implements ValueObject<BulbId>, Serializable{
 
-	private Integer localId;
+	private String localId;
     private BulbBridgeId bridgeId;
 
 	private BulbId(){}
@@ -20,12 +20,12 @@ public class BulbId implements ValueObject<BulbId>, Serializable{
      * @param bridgeId parent bridge id
      * @param localId local id within <code>bridgeId</code>'s corresponding entity
      */
-    public BulbId(BulbBridgeId bridgeId, Integer localId) {
+    public BulbId(BulbBridgeId bridgeId, String localId) {
         this.bridgeId = bridgeId;
         this.localId = localId;
     }
 
-    public Integer getLocalId() {
+    public String getLocalId() {
         return localId;
     }
     public BulbBridgeId getBridgeId() {
@@ -38,7 +38,7 @@ public class BulbId implements ValueObject<BulbId>, Serializable{
     public static BulbId fromSerialized(String in){
         if(in.length() < 37)throw new ValidationException("Id was too short");
         String bridgeUuId = in.substring(0, 36);
-        Integer localId = Integer.valueOf(in.substring(36));
+        String localId = in.substring(36);
         return new BulbId(new BulbBridgeId(bridgeUuId), localId);
     }
 

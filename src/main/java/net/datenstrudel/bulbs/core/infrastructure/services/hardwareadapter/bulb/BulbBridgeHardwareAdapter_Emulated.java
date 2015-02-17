@@ -58,7 +58,7 @@ public class BulbBridgeHardwareAdapter_Emulated implements BulbBridgeHardwareAda
         log.info("|-- NoOp.");
         BulbBridge bridge = this.knownBridges.get(address);
         Bulb newBulb = new Bulb(
-                new BulbId(bridge.getId(), bridge.getBulbs().size() + 1),
+                new BulbId(bridge.getId(), ""+bridge.getBulbs().size() + "1"),
                 BulbsPlatform._EMULATED, 
                 "EmulatedBulbName_"+ (bridge.getBulbs().size() + 1) +"__" + bridge.getName(),
                 bridge, 
@@ -233,7 +233,7 @@ public class BulbBridgeHardwareAdapter_Emulated implements BulbBridgeHardwareAda
         Set<Bulb> bulbs = new HashSet<>();
         
         bulbs.add(new Bulb(
-                new BulbId(parentBridge.getId(), 1),
+                new BulbId(parentBridge.getId(), "1"),
                 BulbsPlatform._EMULATED, 
                 "EmulatedBulbName_1__" + parentBridge.getName(),
                 parentBridge, 
@@ -241,7 +241,7 @@ public class BulbBridgeHardwareAdapter_Emulated implements BulbBridgeHardwareAda
                 true, 
                 new HashMap<>()));
         bulbs.add(new Bulb(
-                new BulbId(parentBridge.getId(), 2),
+                new BulbId(parentBridge.getId(), "2"),
                 BulbsPlatform._EMULATED, 
                 "EmulatedBulbName_2__" + parentBridge.getName(),
                 parentBridge, 

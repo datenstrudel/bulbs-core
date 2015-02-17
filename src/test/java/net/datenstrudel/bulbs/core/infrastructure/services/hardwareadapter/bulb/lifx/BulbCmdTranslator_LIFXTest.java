@@ -21,7 +21,7 @@ public class BulbCmdTranslator_LIFXTest {
     BulbCmdTranslator_LIFX translator = new BulbCmdTranslator_LIFX();
 
     final BulbBridgeId BRIDGE_ID = new BulbBridgeId("test_Bridgeuuid");
-    final BulbId BULB_ID = new BulbId(BRIDGE_ID, 13);
+    final BulbId BULB_ID = new BulbId(BRIDGE_ID, "13");
     final BulbBridgeAddress ADDRESS = new BulbBridgeAddress("192.168.1.1", 1234, "FF:FF:FF:FF:FF:FF");
     final BulbsPrincipal PRINCIPAL = new BulbsPrincipal("test_principalNAme", AppIdCore.instance(), BRIDGE_ID.getUuId(), BulbsPrincipalState.REGISTERED);
 

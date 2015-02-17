@@ -199,7 +199,7 @@ public class BulbsHwServiceImplTest {
     public void testCancelActuation() throws BulbBridgeHwException {
         System.out.println("testCancelActuation");
         final int COUNT_STATES = 50;
-        BulbId bId = new BulbId(new BulbBridgeId("brId"), 1);
+        BulbId bId = new BulbId(new BulbBridgeId("brId"), "1");
         BulbActuatorCommand command = new BulbActuatorCommand(
                 bId,
                 new AppId("testApp"), "testUserApiKey", CommandPriority.standard(),
@@ -244,7 +244,7 @@ public class BulbsHwServiceImplTest {
     public void testExecuteBulbActuation() throws Exception {
         System.out.println("executeBulbActuation");
         final int COUNT_STATES = 50;
-         BulbId bId = new BulbId(new BulbBridgeId("brId"), 1);
+         BulbId bId = new BulbId(new BulbBridgeId("brId"), "1");
         BulbActuatorCommand command = new BulbActuatorCommand(
                 bId,
                 new AppId("testApp"), "testUserApiKey", CommandPriority.standard(),

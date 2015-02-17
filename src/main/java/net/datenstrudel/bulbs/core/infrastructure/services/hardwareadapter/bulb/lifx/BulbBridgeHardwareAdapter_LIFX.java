@@ -126,7 +126,7 @@ public class BulbBridgeHardwareAdapter_LIFX implements BulbBridgeHardwareAdapter
         for (LifxMessage message : messages) {
             bulbs.add(cmdTranslator.bulbFromPayload(
                     message, parentBridge,
-                    new BulbId(parentBridge.getId(), message.getGatewayMacAddress().toString().hashCode())));
+                    new BulbId(parentBridge.getId(), message.getTarget_mac_address().toString()) ) );
         }
         Bulb[] res = new Bulb[bulbs.size()];
         bulbs.toArray(res);
@@ -172,7 +172,10 @@ public class BulbBridgeHardwareAdapter_LIFX implements BulbBridgeHardwareAdapter
         if(previousState == null || state.getEnabled() != previousState.getEnabled()){
             PowerStatePayload pwrPayload = PowerStatePayload.newModificationCommand(powerFromBulbstate(state));
             messageOutPower = LifxMessage.messageFrom(
-                    pwrPayload, address.toInetAddress(), address.getPort(), address.macAddress().get());
+                    pwrPayload, address.toInetAddress(), address.getPort(),
+                    MacAddress.fromString(address.macAddress().get()),
+                    MacAddress.fromString(bulbId.getLocalId())
+            );
         }
 
         if(messageOutPower != null) transportManager.send(messageOutPower);

@@ -101,7 +101,7 @@ public class CmdHwExecutorTest {
 
         final int COUNT_STATES = 50;
         BulbActuatorCommand command = new BulbActuatorCommand(
-                new BulbId(new BulbBridgeId("brId"), 1),
+                new BulbId(new BulbBridgeId("brId"), "1"),
                 new AppId("testApp"), "testUserApiKey", CommandPriority.standard(),
                 new LinkedList<BulbState>(){{
                     for (int i = 0; i < COUNT_STATES; i++) {

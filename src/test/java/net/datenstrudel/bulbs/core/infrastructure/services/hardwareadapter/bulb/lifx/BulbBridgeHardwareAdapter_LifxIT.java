@@ -56,7 +56,7 @@ public class BulbBridgeHardwareAdapter_LifxIT {
     public void applyBulbState_noColorNoPowerStateDiffNoMessageSent() throws Exception {
         BulbBridgeId bridgeID = new BulbBridgeId("test_bridgeUuid");
         BulbBridgeAddress address = new BulbBridgeAddress("192.168.1.4", -1);
-        BulbId bulbId = new BulbId(bridgeID, 14);
+        BulbId bulbId = new BulbId(bridgeID, "14");
         BulbsPrincipal principal = new BulbsPrincipal("test_User", AppIdCore.instance(), bridgeID.getUuId(), BulbsPrincipalState.REGISTERED);
         hwAdapter.applyBulbState(
                 bulbId, address, principal, new BulbState(true), BulbsPlatform.LIFX, new BulbState(true));
@@ -67,7 +67,7 @@ public class BulbBridgeHardwareAdapter_LifxIT {
     public void applyBulbState_prevStateNullPowerStateSetOnly() throws Exception {
         BulbBridgeId bridgeID = new BulbBridgeId("test_bridgeUuid");
         BulbBridgeAddress address = new BulbBridgeAddress("192.168.1.4", -1, "11:22:33:44:55:66");
-        BulbId bulbId = new BulbId(bridgeID, 14);
+        BulbId bulbId = new BulbId(bridgeID, "14");
         BulbsPrincipal principal = new BulbsPrincipal("test_User", AppIdCore.instance(), bridgeID.getUuId(), BulbsPrincipalState.REGISTERED);
         doAnswer( inv -> {
             assertThat(inv.getArguments()[0], is(notNullValue()));
@@ -85,7 +85,7 @@ public class BulbBridgeHardwareAdapter_LifxIT {
     public void applyBulbState_prevStateDiffsNewState_PowerStateSetOnly() throws Exception {
         BulbBridgeId bridgeID = new BulbBridgeId("test_bridgeUuid");
         BulbBridgeAddress address = new BulbBridgeAddress("192.168.1.4", -1, "11:22:33:44:55:66");
-        BulbId bulbId = new BulbId(bridgeID, 14);
+        BulbId bulbId = new BulbId(bridgeID, "14");
         BulbsPrincipal principal = new BulbsPrincipal("test_User", AppIdCore.instance(), bridgeID.getUuId(), BulbsPrincipalState.REGISTERED);
         doAnswer( inv -> {
             assertThat(inv.getArguments()[0], is(notNullValue()));
@@ -103,7 +103,7 @@ public class BulbBridgeHardwareAdapter_LifxIT {
     public void applyBulbState() throws Exception {
         BulbBridgeId bridgeID = new BulbBridgeId("test_bridgeUuid");
         BulbBridgeAddress address = new BulbBridgeAddress("192.168.1.4", -1, "11:22:33:44:55:66");
-        BulbId bulbId = new BulbId(bridgeID, 14);
+        BulbId bulbId = new BulbId(bridgeID, "14");
         BulbsPrincipal principal = new BulbsPrincipal("test_User", AppIdCore.instance(), bridgeID.getUuId(), BulbsPrincipalState.REGISTERED);
         doAnswer( inv -> {
             assertThat(inv.getArguments()[0], is(notNullValue()));

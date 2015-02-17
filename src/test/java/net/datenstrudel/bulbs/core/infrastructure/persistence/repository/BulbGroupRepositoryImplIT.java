@@ -8,9 +8,11 @@ import net.datenstrudel.bulbs.core.domain.model.group.BulbGroupId;
 import net.datenstrudel.bulbs.core.domain.model.group.BulbGroupRepository;
 import net.datenstrudel.bulbs.core.domain.model.identity.BulbsContextUserId;
 import net.datenstrudel.bulbs.core.infrastructure.PersistenceConfig;
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;import org.junit.Before;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ContextConfiguration;
@@ -122,8 +124,8 @@ public class BulbGroupRepositoryImplIT {
     private BulbGroup newTestBulbGroup(){
         BulbGroupId groupId = instance.nextIdentity(new BulbsContextUserId(UUID.randomUUID().toString()));
         BulbGroup expResult = new BulbGroup(groupId, "TestLoadById__GroupName");
-        expResult.addBulb(new BulbId(new BulbBridgeId("TestLoadById__BulbIdBridge"), 0));
-        expResult.addBulb(new BulbId(new BulbBridgeId("TestLoadById__BulbIdBridge"), 1));
+        expResult.addBulb(new BulbId(new BulbBridgeId("TestLoadById__BulbIdBridge"), "0"));
+        expResult.addBulb(new BulbId(new BulbBridgeId("TestLoadById__BulbIdBridge"), "1"));
         return expResult;
     }
 }

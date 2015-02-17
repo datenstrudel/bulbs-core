@@ -92,7 +92,7 @@ public class BulbCmdTranslator_PhilipsHueTest {
             "    }\n" +
             "}";
         BulbBridgeId testBridgeId = new BulbBridgeId("testBridgeUUID");
-        BulbId[] expResult = new BulbId[]{new BulbId(testBridgeId, 1), new BulbId(testBridgeId, 2) };
+        BulbId[] expResult = new BulbId[]{new BulbId(testBridgeId, "1"), new BulbId(testBridgeId, "2") };
         BulbId[] result = instance.bulbIdsFromPayload(json, testBridgeId);
         assertArrayEquals(expResult, result);
     }
@@ -133,7 +133,7 @@ public class BulbCmdTranslator_PhilipsHueTest {
                 BulbsPlatform.PHILIPS_HUE, T_BRIDGE_ADDRESS, 
                 null, null, null);
         Bulb expResult = new Bulb(
-                new BulbId(parentBridge.getId(), 1),
+                new BulbId(parentBridge.getId(), "1"),
                 BulbsPlatform.PHILIPS_HUE, "LC 1", parentBridge, 
                 new BulbState(new ColorHSB(1f, 0f, 1f), true),
                 true,
@@ -141,7 +141,7 @@ public class BulbCmdTranslator_PhilipsHueTest {
                     put("swversion", "1.0.3");
                     put("type", "Living Colors");
                 }});
-        Bulb result = instance.bulbFromPayload(json, parentBridge, new BulbId(parentBridge.getId(), 1));
+        Bulb result = instance.bulbFromPayload(json, parentBridge, new BulbId(parentBridge.getId(), "1"));
         assertEquals(expResult, result);
         assertEquals(expResult.getName(), result.getName());
         
@@ -315,7 +315,7 @@ public class BulbCmdTranslator_PhilipsHueTest {
     @Test
     public void testToApplyBulbStateCmd() {
         System.out.println("toApplyBulbStateCmd");
-        Integer bulbId = 17;
+        String bulbId = "17";
         BulbState state = new BulbState(new ColorRGB(0, 255, 0), true);
         HttpCommand expResult = new HttpCommand(
                 "http://localhost:0/api/{username}/lights/{bulbIdLocal}/state", 
@@ -323,7 +323,7 @@ public class BulbCmdTranslator_PhilipsHueTest {
                 new HttpEntity<>("{\"transitiontime\":3,\"sat\":1,\"bri\":1,\"hue\":60,\"on\":true}"), 
                 new HashMap<String, Object>(){{
                     put("username", "test_username");
-                    put("bulbIdLocal", 17);
+                    put("bulbIdLocal", "17");
                 }});
         HttpCommand result = instance.toApplyBulbStateCmd(
                 new BulbId(new BulbBridgeId(""), bulbId), 
@@ -336,7 +336,7 @@ public class BulbCmdTranslator_PhilipsHueTest {
     @Test
     public void testToApplyBulbStateCmd__EnabledOnly() {
         System.out.println("toApplyBulbStateCmd");
-        Integer bulbId = 17;
+        String bulbId = "17";
         BulbState state = new BulbState(true);
         HttpCommand expResult = new HttpCommand(
                 "http://localhost:0/api/{username}/lights/{bulbIdLocal}/state", 
@@ -344,7 +344,7 @@ public class BulbCmdTranslator_PhilipsHueTest {
                 new HttpEntity<>("{\"transitiontime\":3,\"on\":true}"), 
                 new HashMap<String, Object>(){{
                     put("username", "test_username");
-                    put("bulbIdLocal", 17);
+                    put("bulbIdLocal", "17");
                 }});
         HttpCommand result = instance.toApplyBulbStateCmd(
                 new BulbId(new BulbBridgeId(""), bulbId), 

@@ -78,7 +78,7 @@ public class BulbCmdTranslator_PhilipsHue implements BulbCmdTranslator_HTTP {
         BulbId[] res = new BulbId[d.size()];
         int i = 0;
         for (String id : d.keySet()) {
-            res[i++] = new BulbId(bridgeId, Integer.valueOf(id));
+            res[i++] = new BulbId(bridgeId, id);
         }
         return res;
     }
@@ -88,9 +88,9 @@ public class BulbCmdTranslator_PhilipsHue implements BulbCmdTranslator_HTTP {
                 json, 
                 new TypeToken<Map<String, Object>>(){}.getType());
         Map<String, Object> attributes = new HashMap<>();
-        attributes.put("type", (String)d.get("type"));
-        attributes.put("modelid", (String)d.get("modelid"));
-        attributes.put("swversion", (String)d.get("swversion"));
+        attributes.put("type", d.get("type"));
+        attributes.put("modelid", d.get("modelid"));
+        attributes.put("swversion", d.get("swversion"));
 //        attributes.put("reachable", (String)d.get("reachable"));
         
         Map<String, Object> dState = (Map<String, Object>) d.get("state");

@@ -157,7 +157,7 @@ public class ActuatorDomainServiceImplTest {
         Set<BulbId> entityIds = new HashSet<>();
         for (BulbBridgeId brId : bridgeIds) {
             for (int i = 0; i < 2; i++) {
-                entityIds.add(new BulbId(brId, i));
+                entityIds.add(new BulbId(brId, ""+i));
             }
         }
         ActuationCancelCommand res = new ActuationCancelCommand(
