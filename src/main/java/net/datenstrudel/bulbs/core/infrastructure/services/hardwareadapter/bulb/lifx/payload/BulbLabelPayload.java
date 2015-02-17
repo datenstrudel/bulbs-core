@@ -1,7 +1,7 @@
 package net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.lifx.payload;
 
 import net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.lifx.BT;
-import net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.lifx.LifxPacketType;
+import net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.lifx.LifxMessageType;
 
 import java.util.Arrays;
 
@@ -13,16 +13,16 @@ public class BulbLabelPayload extends LifxMessagePayload {
     private static final int MAX_LENGTH = 32;
     BT.CharArray bulbLabel;
 
-    private BulbLabelPayload(LifxPacketType packetType) {
+    private BulbLabelPayload(LifxMessageType packetType) {
         super(packetType);
     }
 
-    private BulbLabelPayload(LifxPacketType packetType, byte[] data) {
+    private BulbLabelPayload(LifxMessageType packetType, byte[] data) {
         super(packetType, data);
     }
 
     public static BulbLabelPayload newSetBulblabelPayload(String newLabel) {
-        BulbLabelPayload res = new BulbLabelPayload(LifxPacketType.REQ_SET_BULB_LABEL);
+        BulbLabelPayload res = new BulbLabelPayload(LifxMessageType.REQ_SET_BULB_LABEL);
         res.bulbLabel = BT.CharArray.fromString(newLabel);
         if(res.bulbLabel.getData().length > MAX_LENGTH) {
             res.bulbLabel = BT.CharArray.fromBytes(Arrays.copyOf(res.bulbLabel.getData(), MAX_LENGTH));
@@ -30,7 +30,7 @@ public class BulbLabelPayload extends LifxMessagePayload {
         return res;
     }
     public static BulbLabelPayload fromRawData(byte[] payload) {
-        BulbLabelPayload res = new BulbLabelPayload(LifxPacketType.RESP_BULB_LABEL, payload);
+        BulbLabelPayload res = new BulbLabelPayload(LifxMessageType.RESP_BULB_LABEL, payload);
         res.bulbLabel = BT.CharArray.fromBytes(payload);
         return res;
     }

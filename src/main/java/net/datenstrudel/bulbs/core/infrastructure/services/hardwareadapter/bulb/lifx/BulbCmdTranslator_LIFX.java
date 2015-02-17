@@ -57,7 +57,7 @@ public class BulbCmdTranslator_LIFX implements BulbCmdTranslator<LifxMessage, Li
         RespLightState resp = (RespLightState) payload.getPayload();
         Bulb res = new Bulb(bulbId, BulbsPlatform.LIFX,
                 new String(resp.getBulbLabel().toString()), parentBridge,
-                stateFrom(resp), false, new HashMap<>());
+                stateFrom(resp), true, new HashMap<>());
         return res;
     }
 
@@ -136,6 +136,7 @@ public class BulbCmdTranslator_LIFX implements BulbCmdTranslator<LifxMessage, Li
     }
     @Override
     public LifxMessage toApplyBulbStateCmd(BulbId bulbId, BulbBridgeAddress address, BulbsPrincipal principal, BulbState state) {
+        if(state.getColor() == null) return null;
         ColorHSB color;
         switch ( state.getColor().colorScheme() ){
             case HSB:
@@ -155,7 +156,7 @@ public class BulbCmdTranslator_LIFX implements BulbCmdTranslator<LifxMessage, Li
                         BT.scale(color.getHue(), 360f),
                         BT.scale(color.getSaturation(), 255f),
                         BT.scale(color.getBrightness(), 255f),
-                        BT.Uint32.fromInt(3000) // Fixme What is it? Could be ms/10
+                        BT.Uint32.fromInt(3000) // FixMe What is it? Could be ms/10
                 ),
                 address.toInetAddress(), address.getPort(), MacAddress.fromString(address.macAddress().get()));
     }

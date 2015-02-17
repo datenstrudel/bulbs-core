@@ -195,7 +195,7 @@ public class BulbBridgeHardwareAdapter_Emulated implements BulbBridgeHardwareAda
             BulbBridgeAddress address,
             BulbsPrincipal principal,
             BulbState state,
-            BulbsPlatform platform) throws BulbBridgeHwException {
+            BulbsPlatform platform, BulbState previousState) throws BulbBridgeHwException {
         log.info("Applying state["+state+"] emulated - noOp");
         
         Bulb bulb = Iterables.find(this.knownBulbs.get(address), new Predicate<Bulb>() {

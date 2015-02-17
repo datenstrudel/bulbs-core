@@ -115,7 +115,8 @@ public class CmdHwExecutorTest {
                 "testPrincipalUsernam", new AppId("testCore"), "brId", 
                 BulbsPrincipalState.REGISTERED);
 
-        instance = new CmdHwExecutor(T_BRIDGE_ADDRESS, principal, command, mk_hwAdapter, mk_BulbsPlatform);
+        BulbState prevState = new BulbState(false);
+        instance = new CmdHwExecutor(T_BRIDGE_ADDRESS, principal, command, prevState, mk_hwAdapter, mk_BulbsPlatform);
 
         when(mk_domainServiceLocator.getBeanInternal(DomainEventStore.class)).thenReturn(mk_eventStore);
         when(mk_domainServiceLocator.getBeanInternal(DomainEventPublisherDeferrer.class)).thenReturn(null);
@@ -125,11 +126,20 @@ public class CmdHwExecutorTest {
 //        replay(mk_hwAdapter, mk_eventStore, mk_domainServiceLocator);
 
         instance.run();
+        verify(mk_hwAdapter, atMost(1)).applyBulbState(
+                any(BulbId.class), eq(T_BRIDGE_ADDRESS),
+                eq(principal),
+                any(BulbState.class),
+                any(BulbsPlatform.class),
+                eq(prevState)
+        );
         verify(mk_hwAdapter, atLeast(COUNT_STATES)).applyBulbState(
                 any(BulbId.class), eq(T_BRIDGE_ADDRESS),
                 eq(principal),
                 any(BulbState.class),
-                any(BulbsPlatform.class));
+                any(BulbsPlatform.class),
+                any(BulbState.class)
+        );
     }
     public void testRun_WithLoop() throws Exception{
         //TODO: Implement Me!

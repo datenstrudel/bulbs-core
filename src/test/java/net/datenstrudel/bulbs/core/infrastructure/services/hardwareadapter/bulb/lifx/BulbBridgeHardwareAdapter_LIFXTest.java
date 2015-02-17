@@ -77,21 +77,9 @@ public class BulbBridgeHardwareAdapter_LIFXTest {
                 bulb_0.getBridge().getLocalAddress(),
                 principal,
                 new BulbState(new ColorHSB(45f, 255f, 100f), true),
-                BulbsPlatform.LIFX);
+                BulbsPlatform.LIFX, null );
 
         Thread.sleep(3500);
-
-
     }
-
-
-//    byte[] pwrStateIn = hwAdapter.sendAndReceiveTcpMessage(
-//            new LifxMessage(
-//                    LifxPacketType.REQ_POWER_STATE,
-//                    LifxMessagePayload.emptyPayload(),
-//                    InetAddress.getByName("192.168.1.5"),
-//                    56700,
-//                    discoveryRes.getTarget_mac_address())
-//    );
 }
 

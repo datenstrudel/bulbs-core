@@ -8,6 +8,7 @@ import net.datenstrudel.bulbs.core.infrastructure.Runnable_EventPublishingAware;
 import net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.BulbBridgeHardwareAdapter;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbBridgeAddress;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbBridgeHwException;
+import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbState;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbsPlatform;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -159,14 +160,15 @@ public class BulbsHwServiceImpl implements BulbsHwService{
             
     @Override
     public void executeBulbActuation(
-            final BulbBridgeAddress address, 
-            final BulbsPrincipal principal, 
-            final BulbActuatorCommand command, 
+            final BulbBridgeAddress address,
+            final BulbsPrincipal principal,
+            final BulbActuatorCommand command,
+            final BulbState previousState,
             final BulbsPlatform platform) throws BulbBridgeHwException {
         if(command.getStates().isEmpty())return;
         
         CmdHwExecutor exec = new CmdHwExecutor(
-                address, principal, command, 
+                address, principal, command, previousState,
                 hwAdapterForPlatform(platform), 
                 platform);
         CmdHwExecutor runningExec;

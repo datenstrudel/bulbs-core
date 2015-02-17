@@ -210,7 +210,7 @@ public class BulbBridgeHardwareAdapter_REST implements BulbBridgeHardwareAdapter
             BulbBridgeAddress address,
             BulbsPrincipal principal,
             BulbState state,
-            BulbsPlatform platform) throws BulbBridgeHwException {
+            BulbsPlatform platform, BulbState previousState) throws BulbBridgeHwException {
 
         BulbCmdTranslator_HTTP cmdTranslator = translatorForPlatform(platform);
         HttpCommand cmd = cmdTranslator.toApplyBulbStateCmd(bulbId, address, principal, state);

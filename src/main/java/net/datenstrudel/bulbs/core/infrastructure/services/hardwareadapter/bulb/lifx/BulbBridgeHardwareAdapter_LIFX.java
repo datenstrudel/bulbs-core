@@ -5,6 +5,7 @@ import net.datenstrudel.bulbs.core.domain.model.identity.BulbsContextUserId;
 import net.datenstrudel.bulbs.core.domain.model.identity.BulbsPrincipal;
 import net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.BulbBridgeHardwareAdapter;
 import net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.lifx.payload.LifxMessagePayload;
+import net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.lifx.payload.PowerStatePayload;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbBridgeAddress;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbBridgeHwException;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbState;
@@ -47,9 +48,9 @@ public class BulbBridgeHardwareAdapter_LIFX implements BulbBridgeHardwareAdapter
 
         CompletableFuture<LifxMessage[]> completableFuture = transportManager.sendAndReceiveAggregated(
                 LifxMessage.messageFrom(
-                        LifxMessagePayload.emptyPayload(LifxPacketType.REQ_PAN_GATEWAY),
+                        LifxMessagePayload.emptyPayload(LifxMessageType.REQ_PAN_GATEWAY),
                         address.toBroadcastAddress(), address.getPort()
-                ), LifxPacketType.RESP_PAN_GATEWAY
+                ), LifxMessageType.RESP_PAN_GATEWAY
         );
 
         LifxMessage[] messages = readFromFuture(completableFuture);
@@ -115,9 +116,9 @@ public class BulbBridgeHardwareAdapter_LIFX implements BulbBridgeHardwareAdapter
         BulbBridgeAddress address = parentBridge.getLocalAddress();
         CompletableFuture<LifxMessage[]> completableFuture = transportManager.sendAndReceiveAggregated(
                 LifxMessage.messageFrom(
-                        LifxMessagePayload.emptyPayload(LifxPacketType.REQ_LIGHT_STATE),
+                        LifxMessagePayload.emptyPayload(LifxMessageType.REQ_LIGHT_STATE),
                         address.toInetAddress(), address.getPort(), address.macAddress().get()),
-                        LifxPacketType.RESP_LIGHT_STATE
+                        LifxMessageType.RESP_LIGHT_STATE
         );
 
         LifxMessage[] messages = readFromFuture(completableFuture);
@@ -162,11 +163,24 @@ public class BulbBridgeHardwareAdapter_LIFX implements BulbBridgeHardwareAdapter
             BulbBridgeAddress address,
             BulbsPrincipal principal,
             BulbState state,
-            BulbsPlatform platform) throws BulbBridgeHwException {
+            BulbsPlatform platform,
+            BulbState previousState) throws BulbBridgeHwException {
 
-        transportManager.send(
-                cmdTranslator.toApplyBulbStateCmd(bulbId, address, principal, state)
-        );
+        LifxMessage messageOutColor = cmdTranslator.toApplyBulbStateCmd(bulbId, address, principal, state);
+        LifxMessage messageOutPower = null;
+
+        if(previousState == null || state.getEnabled() != previousState.getEnabled()){
+            PowerStatePayload pwrPayload = PowerStatePayload.newModificationCommand(powerFromBulbstate(state));
+            messageOutPower = LifxMessage.messageFrom(
+                    pwrPayload, address.toInetAddress(), address.getPort(), address.macAddress().get());
+        }
+
+        if(messageOutPower != null) transportManager.send(messageOutPower);
+        if(messageOutColor != null) transportManager.send(messageOutColor);
+    }
+
+    private PowerStatePayload.Power powerFromBulbstate(BulbState state) {
+        return state.getEnabled() ? PowerStatePayload.Power.ON : PowerStatePayload.Power.OFF;
     }
 
     public LifxMessage[] readFromFuture(CompletableFuture<LifxMessage[]> in) throws BulbBridgeHwException {

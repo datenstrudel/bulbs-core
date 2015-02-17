@@ -3,7 +3,7 @@ package net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb
 import java.util.Arrays;
 import java.util.Optional;
 
-public enum LifxPacketType {
+public enum LifxMessageType {
 
     REQ_PAN_GATEWAY     (0x02, false, true),
     RESP_PAN_GATEWAY    (0x03, true, true),
@@ -22,17 +22,17 @@ public enum LifxPacketType {
     private final boolean inbound;
     private boolean yieldsManyResponsePackets = false;
 
-    private LifxPacketType(int protocolValue, boolean inbound) {
+    private LifxMessageType(int protocolValue, boolean inbound) {
         this.protocolValue = BT.Uint16.fromInt(protocolValue);
         this.inbound = inbound;
     }
-    private LifxPacketType(int protocolValue, boolean inbound, boolean yieldsManyResponsePackets) {
+    private LifxMessageType(int protocolValue, boolean inbound, boolean yieldsManyResponsePackets) {
         this.protocolValue = BT.Uint16.fromInt(protocolValue);
         this.yieldsManyResponsePackets = yieldsManyResponsePackets;
         this.inbound = inbound;
     }
-    public static LifxPacketType fromProtocolValue(int value) {
-        Optional<LifxPacketType> res = Arrays.stream(LifxPacketType.values())
+    public static LifxMessageType fromProtocolValue(int value) {
+        Optional<LifxMessageType> res = Arrays.stream(LifxMessageType.values())
                 .filter(v -> v.getProtocolValue().toInt() == value)
                 .findFirst();
         if(!res.isPresent()) throw new IllegalArgumentException("Couldn't find LifxPacketType by protocol value: " + value);

@@ -1,6 +1,6 @@
 package net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.lifx.payload;
 
-import net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.lifx.LifxPacketType;
+import net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.lifx.LifxMessageType;
 
 import java.util.Arrays;
 import java.util.StringJoiner;
@@ -11,13 +11,13 @@ import java.util.StringJoiner;
 public abstract class LifxMessagePayload {
 
     protected byte[] data;
-    protected LifxPacketType packetType;
+    protected LifxMessageType packetType;
 
     private LifxMessagePayload(){}
-    protected LifxMessagePayload(LifxPacketType packetType) {
+    protected LifxMessagePayload(LifxMessageType packetType) {
         this.packetType = packetType;
     }
-    protected LifxMessagePayload(LifxPacketType packetType, byte[] data) {
+    protected LifxMessagePayload(LifxMessageType packetType, byte[] data) {
         this.data = data;
         this.packetType = packetType;
     }
@@ -26,14 +26,14 @@ public abstract class LifxMessagePayload {
      * @param rawData binary payload representation, excluding message payload data
      * @return The decoded <code>LifxMessage</code> payload
      */
-    public static LifxMessagePayload fromRawData(LifxPacketType type, byte[] rawData) {
+    public static LifxMessagePayload fromRawData(LifxMessageType type, byte[] rawData) {
         switch (type) {
             case REQ_PAN_GATEWAY:
                 return LifxMessagePayload.emptyPayload(type);
             case RESP_PAN_GATEWAY:
                 return new RespGetPanGateway(rawData);
             case RESP_POWER_STATE:
-                return new RespPowerState(rawData);
+                return PowerStatePayload.fromRawDataResponse(rawData);
             case RESP_LIGHT_STATE:
                 return new RespLightState(rawData);
             case RESP_BULB_LABEL:
@@ -59,7 +59,7 @@ public abstract class LifxMessagePayload {
 
     protected abstract byte[] process2Bytes();
 
-    public LifxPacketType getPacketType() {
+    public LifxMessageType getPacketType() {
         return packetType;
     }
 
@@ -87,11 +87,11 @@ public abstract class LifxMessagePayload {
         return data != null ? Arrays.hashCode(data) : 0;
     }
 
-    public static EmptyPayload emptyPayload(LifxPacketType packetType) {
+    public static EmptyPayload emptyPayload(LifxMessageType packetType) {
         return new EmptyPayload(packetType);
     }
     public static class EmptyPayload extends LifxMessagePayload {
-        public EmptyPayload(LifxPacketType packetType) {
+        public EmptyPayload(LifxMessageType packetType) {
             super(packetType, new byte[0]);
         }
 

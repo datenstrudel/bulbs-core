@@ -70,6 +70,17 @@ public interface BulbCmdTranslator<I,O> {
             BulbBridgeAddress address,
             BulbsPrincipal principal,
             Map<String, Object> attributes);
+
+    /**
+     *
+     * @param bulbId
+     * @param address
+     * @param principal
+     * @param state this method handles absence of <code>state.color</code> and/or <code>state.enabled</code>
+     *              gracefully
+     * @return vendor implementation specific represantation of state manipulation command; <code>null</code>
+     * if not applicable
+     */
     public O toApplyBulbStateCmd(
             BulbId bulbId,
             BulbBridgeAddress address,

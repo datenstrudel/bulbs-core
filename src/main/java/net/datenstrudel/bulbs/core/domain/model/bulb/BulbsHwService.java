@@ -4,6 +4,7 @@ import net.datenstrudel.bulbs.core.domain.model.identity.BulbsContextUserId;
 import net.datenstrudel.bulbs.core.domain.model.identity.BulbsPrincipal;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbBridgeAddress;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbBridgeHwException;
+import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbState;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbsPlatform;
 
 import java.util.Map;
@@ -104,11 +105,21 @@ public interface BulbsHwService {
      * @param id 
      */
     public void cancelActuation(BulbId id);
-    
+
+    /**
+     * Execute a change of the state of the appliance addresed in the given <code>command</code>
+     * @param address The bridge address of the targeted appliance
+     * @param principal authentication principle against hardware
+     * @param command the actual state changing command
+     * @param previousState the current state before applying this call's command
+     * @param platform e.g. vendor specific kind of appliance
+     * @throws BulbBridgeHwException
+     */
     public void executeBulbActuation(
             BulbBridgeAddress address,
             BulbsPrincipal principal,
             BulbActuatorCommand command,
+            BulbState previousState,
             BulbsPlatform platform) throws BulbBridgeHwException;
     
 }

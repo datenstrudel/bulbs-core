@@ -247,12 +247,23 @@ public class BulbBridge extends Entity<BulbBridge, BulbBridgeId> {
         DomainEventPublisher.instance().publish(
                 new BulbBridgeSynced(getId().getUuId(), principal));
 	}
-    
+
+    /**
+     * This bridge couldn't be reached over net; This method sets any
+     * associated artifacts offline and emits a {@link net.datenstrudel.bulbs.core.domain.model.bulb.events.BulbBridgeSynced} event.
+     */
+    public void markRecursivelyOffline(BulbsPrincipal principal) {
+        setOnline(false);
+        this.bulbs.forEach( b -> b.changedOnlineState(false));
+        DomainEventPublisher.instance().publish(
+                new BulbBridgeSynced(getId().getUuId(), principal));
+    }
+
     //~ BULBS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     public Set<Bulb> getBulbs() {
         return bulbs;
     }
-    
+
     public Bulb bulbById(final BulbId bulbId){
         return Iterables.find(bulbs, new Predicate<Bulb>() {
             @Override
@@ -438,7 +449,7 @@ public class BulbBridge extends Entity<BulbBridge, BulbBridgeId> {
     public void setOnline(boolean online) {
         this.online = online;
     }
-    
+
     private void setPlatform(BulbsPlatform platform) {
         this.platform = platform;
     }

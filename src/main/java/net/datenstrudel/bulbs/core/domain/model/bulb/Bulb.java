@@ -166,7 +166,7 @@ public class Bulb extends Entity<Bulb, BulbId> implements Serializable{
 	 */
 	protected void execBulbActuation(BulbActuatorCommand cmd, BulbsPrincipal principal) throws BulbBridgeHwException{
         if(!this.priorityCoordinator.executionAllowedFor(cmd)) return;
-        bulbsHwService.executeBulbActuation(bridge.getLocalAddress(), principal, cmd, platform);
+        bulbsHwService.executeBulbActuation(bridge.getLocalAddress(), principal, cmd, this.state, platform);
 	}
     /**
      * Cancel any running actuation concerning <code>this</code>.

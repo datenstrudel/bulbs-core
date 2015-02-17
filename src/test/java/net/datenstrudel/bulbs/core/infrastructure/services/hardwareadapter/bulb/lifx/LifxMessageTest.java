@@ -12,7 +12,7 @@ public class LifxMessageTest {
     public void toBytesFromBytesConsistent() throws Exception {
 
         LifxMessage<LifxMessagePayload.EmptyPayload> testInst =
-                LifxMessage.messageFrom(LifxMessagePayload.emptyPayload(LifxPacketType.REQ_PAN_GATEWAY));
+                LifxMessage.messageFrom(LifxMessagePayload.emptyPayload(LifxMessageType.REQ_PAN_GATEWAY));
 
         byte[] bytes = testInst.toBytes();
 

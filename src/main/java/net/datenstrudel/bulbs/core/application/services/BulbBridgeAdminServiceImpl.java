@@ -8,7 +8,9 @@ import net.datenstrudel.bulbs.core.web.controller.util.AuthenticationException;
 import net.datenstrudel.bulbs.core.web.controller.util.NotAuthorizedException;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.*;
 import net.datenstrudel.bulbs.shared.domain.model.identity.AppId;
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -77,13 +79,13 @@ public class BulbBridgeAdminServiceImpl
         for (BulbBridge el : bridges) {
             try{
                 el.syncToHardwareState(user.principalFrom(el.getId()));
-                bridgeRepository.save(el);
             }catch(BulbBridgeHwException bbhwex){
                 log.info("Couldn't sync due to: " + bbhwex.getMessage());
+                el.markRecursivelyOffline(user.principalFrom(el.getId()));
             }
+            bridgeRepository.save(el);
         }
     }
-    
     
     @Override
     public Bulb loadBulb(BulbId bulbId, String userApiKey){

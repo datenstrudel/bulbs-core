@@ -15,7 +15,7 @@ import java.util.StringJoiner;
  * /**
  * The message whose binary representation is supposed to be sent over a network channel
  *
- * @param <T> extends LifxMessagePayload the actual payload type, depending on <code>packet_type</code>, e.g. {@link net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.lifx.LifxPacketType LifxPacketType}
+ * @param <T> extends LifxMessagePayload the actual payload type, depending on <code>packet_type</code>, e.g. {@link LifxMessageType LifxPacketType}
  */
 public class LifxMessage<T extends LifxMessagePayload> {
 
@@ -109,12 +109,12 @@ public class LifxMessage<T extends LifxMessagePayload> {
 
 
     @Deprecated
-    public LifxMessage(LifxPacketType packetType, T payload) {
+    public LifxMessage(LifxMessageType packetType, T payload) {
         this.packet_type = packetType.getProtocolValue();
         this.payload = payload;
         setSize(calcSize());
     }
-    public LifxMessage(LifxPacketType packetType, T payload, InetAddress address, int port) {
+    public LifxMessage(LifxMessageType packetType, T payload, InetAddress address, int port) {
         this.packet_type = packetType.getProtocolValue();
         this.payload = payload;
         this.address = address;
@@ -169,7 +169,7 @@ public class LifxMessage<T extends LifxMessagePayload> {
 
         //~ Decode Payload
         res.payload = LifxMessagePayload.fromRawData(
-                LifxPacketType.fromProtocolValue(res.packet_type.toInt()),
+                LifxMessageType.fromProtocolValue(res.packet_type.toInt()),
                 Arrays.copyOfRange(input, SIZE_HEADER, input.length));
         res.address = senderAddress;
         res.port = senderPort;
@@ -215,8 +215,8 @@ public class LifxMessage<T extends LifxMessagePayload> {
     public int getPort() {
         return port;
     }
-    public LifxPacketType getType() {
-        return LifxPacketType.fromProtocolValue(packet_type.toInt());
+    public LifxMessageType getType() {
+        return LifxMessageType.fromProtocolValue(packet_type.toInt());
     }
 
     private void setSize(int size) {
@@ -233,7 +233,7 @@ public class LifxMessage<T extends LifxMessagePayload> {
     @Override
     public String toString() {
         return "LifxMessage{" +
-                "packet_type=" + LifxPacketType.fromProtocolValue(packet_type.toInt()) +
+                "packet_type=" + LifxMessageType.fromProtocolValue(packet_type.toInt()) +
                 ", size=" + size +
                 ", protocol=" + protocol.toInt() +
                 ", target_mac_address=" + target_mac_address +
@@ -246,7 +246,7 @@ public class LifxMessage<T extends LifxMessagePayload> {
     }
     public void toStringConsole() {
         log.info("|-- LifxMessage{" );
-        log.info(" -- packet_type=" + LifxPacketType.fromProtocolValue(packet_type.toInt()) );
+        log.info(" -- packet_type=" + LifxMessageType.fromProtocolValue(packet_type.toInt()) );
         log.info(" -- size=" + size.toInt() );
         log.info(" -- protocol=" + protocol.toInt() );
         log.info(" -- target_mac_address=" + target_mac_address );

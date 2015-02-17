@@ -219,7 +219,7 @@ public class BulbsHwServiceImplTest {
         when(mk_domainServiceLocator.getBeanInternal(DomainEventPublisherDeferrer.class)).thenReturn(null);
         when(mk_eventStore.store(any(DomainEvent.class))).thenReturn(-1l);
 
-        instance2Test.executeBulbActuation(T_BRIDGE_ADDRESS, principal, command, platform);
+        instance2Test.executeBulbActuation(T_BRIDGE_ADDRESS, principal, command, null, platform);
 
         try{
             Thread.sleep(80);
@@ -233,7 +233,8 @@ public class BulbsHwServiceImplTest {
                 any(BulbId.class), eq(T_BRIDGE_ADDRESS),
                 eq(principal),
                 any(BulbState.class),
-                any(BulbsPlatform.class)
+                any(BulbsPlatform.class),
+                any(BulbState.class)
         );
         Map<Object, CmdHwExecutor> execs = (Map) ReflectionTestUtils.getField(instance2Test, "runningExecutions");
         assertTrue(execs.get(bId).isExecutionFinished());
@@ -264,7 +265,7 @@ public class BulbsHwServiceImplTest {
         when(mk_eventStore.store(any(DomainEvent.class))).thenReturn(-1l);
         when(mk_eventStore.store(any(DomainEvent.class))).thenReturn(1l);
 
-        instance2Test.executeBulbActuation(T_BRIDGE_ADDRESS, principal, command, platform);
+        instance2Test.executeBulbActuation(T_BRIDGE_ADDRESS, principal, command, null, platform);
 
         Map<Object, CmdHwExecutor> execs = (Map) ReflectionTestUtils.getField(instance2Test, "runningExecutions");
         assertTrue(!execs.get(bId).isExecutionFinished());
@@ -276,7 +277,8 @@ public class BulbsHwServiceImplTest {
                 any(BulbId.class), eq(T_BRIDGE_ADDRESS),
                 eq(principal),
                 any(BulbState.class),
-                any(BulbsPlatform.class)
+                any(BulbsPlatform.class),
+                any(BulbState.class)
         );
     }
 }

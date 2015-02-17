@@ -1,7 +1,7 @@
 package net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.lifx.payload;
 
 import net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.lifx.BT;
-import net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.lifx.LifxPacketType;
+import net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.lifx.LifxMessageType;
 
 import java.nio.ByteBuffer;
 
@@ -28,7 +28,7 @@ public class ReqSetLightColor extends LifxMessagePayload {
             BT.Uint16 saturation,
             BT.Uint16 brightness,
             BT.Uint32 fade_time) {
-        super(LifxPacketType.REQ_SET_LIGHT_COLOR);
+        super(LifxMessageType.REQ_SET_LIGHT_COLOR);
         this.hue = hue;
         this.saturation = saturation;
         this.brightness = brightness;
@@ -38,7 +38,7 @@ public class ReqSetLightColor extends LifxMessagePayload {
     public ReqSetLightColor(
             BT.Uint16 kelvin,
             BT.Uint32 fade_time) {
-        super(LifxPacketType.REQ_SET_LIGHT_COLOR);
+        super(LifxMessageType.REQ_SET_LIGHT_COLOR);
         this.kelvin = kelvin;
         this.fade_time = fade_time;
 

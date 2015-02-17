@@ -1,7 +1,7 @@
 package net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.lifx.payload;
 
 import net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.lifx.BT;
-import net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.lifx.LifxPacketType;
+import net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.lifx.LifxMessageType;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
@@ -16,11 +16,11 @@ public class RespGetPanGateway extends LifxMessagePayload {
     private Service service;
 
     public RespGetPanGateway( byte[] data) {
-        super(LifxPacketType.RESP_PAN_GATEWAY, data);
+        super(LifxMessageType.RESP_PAN_GATEWAY, data);
         decodeFromRawdata();
     }
     public RespGetPanGateway(int port, Service service) {
-        super(LifxPacketType.RESP_PAN_GATEWAY);
+        super(LifxMessageType.RESP_PAN_GATEWAY);
         this.port = port;
         this.service = service;
         byte[] rawData = ByteBuffer.allocate(5).put(service.getValue()).put(BT.Uint32.fromInt(port).getData_LE()).array();

@@ -1,7 +1,7 @@
 package net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.lifx.payload;
 
 import net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.lifx.BT;
-import net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.lifx.LifxPacketType;
+import net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.lifx.LifxMessageType;
 
 import java.nio.ByteBuffer;
 
@@ -20,10 +20,10 @@ public class RespLightState extends LifxMessagePayload {
     BT.Uint64 tags;
 
     public RespLightState() {
-        super(LifxPacketType.RESP_LIGHT_STATE);
+        super(LifxMessageType.RESP_LIGHT_STATE);
     }
     public RespLightState(byte[] data) {
-        super(LifxPacketType.RESP_LIGHT_STATE, data);
+        super(LifxMessageType.RESP_LIGHT_STATE, data);
         decodeFromRawdata();
     }
 

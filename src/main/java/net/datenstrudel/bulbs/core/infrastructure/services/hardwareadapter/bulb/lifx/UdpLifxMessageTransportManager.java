@@ -30,7 +30,7 @@ public class UdpLifxMessageTransportManager {
     private final TaskExecutor listenerExecutor;
     private DatagramSocket udpSocket;
 
-    private volatile ConcurrentHashMap<LifxPacketType, CompletableFuture<LifxMessage[]>> clientsWaiting
+    private volatile ConcurrentHashMap<LifxMessageType, CompletableFuture<LifxMessage[]>> clientsWaiting
             = new ConcurrentHashMap<>(3);
     private volatile boolean listening = false;
 
@@ -52,7 +52,7 @@ public class UdpLifxMessageTransportManager {
 
     //~ ////////////////////////////////////////////////////////////////////////////
     public CompletableFuture<LifxMessage[]> sendAndReceiveAggregated(
-            LifxMessage<?> messageOut, LifxPacketType expectedResponseType) throws BulbBridgeHwException {
+            LifxMessage<?> messageOut, LifxMessageType expectedResponseType) throws BulbBridgeHwException {
 
         CompletableFuture<LifxMessage[]> res = new CompletableFuture<>();
         provideSocketIfNecessary(LIFX_STD_PORT);
@@ -85,7 +85,7 @@ public class UdpLifxMessageTransportManager {
     //~ /////////////////////////////////////////////////////////////////////////////
     private void listenForAnswersOf(
             LifxMessage messageSent,
-            LifxPacketType expectedResponseType,
+            LifxMessageType expectedResponseType,
             CompletableFuture<LifxMessage[]> results) {
 
         this.clientsWaiting.put(expectedResponseType, results);
@@ -176,12 +176,12 @@ public class UdpLifxMessageTransportManager {
     private class UdpListenExcecutor implements Runnable {
 
         private final Integer SUSPENSION_TIMEOUT_MS = 1000;
-        private final Map<LifxPacketType, Long> suspensionTime = new HashMap<>(3);
-        private final Map<LifxPacketType, LifxMessage[]> suspendedMessages = new HashMap<>(10);
+        private final Map<LifxMessageType, Long> suspensionTime = new HashMap<>(3);
+        private final Map<LifxMessageType, LifxMessage[]> suspendedMessages = new HashMap<>(10);
 
-        private volatile ConcurrentHashMap<LifxPacketType, CompletableFuture<LifxMessage[]>> clientsWaiting;
+        private volatile ConcurrentHashMap<LifxMessageType, CompletableFuture<LifxMessage[]>> clientsWaiting;
 
-        public UdpListenExcecutor(ConcurrentHashMap<LifxPacketType, CompletableFuture<LifxMessage[]>> clientsWaiting) {
+        public UdpListenExcecutor(ConcurrentHashMap<LifxMessageType, CompletableFuture<LifxMessage[]>> clientsWaiting) {
             this.clientsWaiting = clientsWaiting;
         }
 
@@ -213,7 +213,7 @@ public class UdpLifxMessageTransportManager {
             try {
                 Optional<LifxMessage> message = retrieveDatagramMessage();
                 if(!message.isPresent()) return;
-                LifxPacketType packetType = message.get().getType();
+                LifxMessageType packetType = message.get().getType();
                 // If not expected, we do not wait for such messages
 //                if(!clientsWaiting.containsKey(packetType)) return;
                 suspendedMessages.merge(packetType, new LifxMessage[]{message.get()},
@@ -232,7 +232,7 @@ public class UdpLifxMessageTransportManager {
             }
         }
         private void resolveSuspendedMessages() {
-            final Set<LifxPacketType> resolvedPacketTypes = new HashSet<>(5);
+            final Set<LifxMessageType> resolvedPacketTypes = new HashSet<>(5);
             suspensionTime.forEach((packetType, time) -> {
                 // For that kind of response type: As soon as we got one message, we resolve
                 if (!packetType.isYieldsManyResponsePackets()) {

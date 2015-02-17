@@ -74,11 +74,10 @@ public interface BulbBridgeHardwareAdapter {
             BulbsPrincipal principal,
             Map<String, Object> attributes,
             BulbsPlatform platform) throws BulbBridgeHwException;
-    
     public void applyBulbState(
             BulbId bulbId,
             BulbBridgeAddress address,
             BulbsPrincipal principal,
             BulbState state,
-            BulbsPlatform platform) throws BulbBridgeHwException;
+            BulbsPlatform platform, BulbState previousState) throws BulbBridgeHwException;
 }

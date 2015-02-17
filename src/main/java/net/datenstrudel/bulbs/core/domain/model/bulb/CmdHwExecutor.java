@@ -33,6 +33,7 @@ public class CmdHwExecutor extends Runnable_EventPublishingAware {
     final BulbActuatorCommand command;
     final BulbBridgeHardwareAdapter hwAdapter;
     final BulbsPlatform platform;
+    final BulbState previousState;
     private volatile boolean executionFinished = false;
 
     //~ Construction ///////////////////////////////////////////////////////////
@@ -40,11 +41,13 @@ public class CmdHwExecutor extends Runnable_EventPublishingAware {
             final BulbBridgeAddress address,
             final BulbsPrincipal principal,
             final BulbActuatorCommand command,
+            final BulbState prevoiusState,
             final BulbBridgeHardwareAdapter hwAdapter,
             final BulbsPlatform platform) {
         this.address = address;
         this.principal = principal;
         this.command = command;
+        this.previousState = prevoiusState;
         this.hwAdapter = hwAdapter;
         this.platform = platform;
     }
@@ -61,13 +64,14 @@ public class CmdHwExecutor extends Runnable_EventPublishingAware {
     @Override
     public void execute() {
         BulbId bulbId = command.getBulbId();
-        BulbState prevState = null;
+        BulbState prevUserState = null;
+        BulbState prevState = this.previousState;
         List<BulbState> preProcessedStates;
         while (!isExecutionFinished()) {
             for (BulbState state : command.getStates()) {
                 // if(log.isDebugEnabled())log.debug("Apply to bridge: " + state);
-                if (state.getTransitionDelay() > 0 && prevState != null) {
-                    preProcessedStates = interpolatedStateTransition(prevState, state);
+                if (state.getTransitionDelay() > 0 && prevUserState != null) {
+                    preProcessedStates = interpolatedStateTransition(prevUserState, state);
                 } else {
                     preProcessedStates = new ArrayList<>(1);
                     preProcessedStates.add(state);
@@ -84,7 +88,8 @@ public class CmdHwExecutor extends Runnable_EventPublishingAware {
                     }
                     try {
                         hwAdapter.applyBulbState(
-                                bulbId, address, principal, state2Apply, platform);
+                                bulbId, address, principal, state2Apply, platform, prevState);
+                        prevState = state2Apply;
                         instance().publishDeferred(
                                 new BulbStateChanged(
                                         command.getBulbId().serialize(),
@@ -95,7 +100,7 @@ public class CmdHwExecutor extends Runnable_EventPublishingAware {
                         log.error("Error during command execution: " + ex.getMessage(), ex);
                     }
                 }
-                prevState = state;
+                prevUserState = state;
             }
             if (!command.isLoop() || command.getStates().size() < 2) this.executionFinished = true;
         }
