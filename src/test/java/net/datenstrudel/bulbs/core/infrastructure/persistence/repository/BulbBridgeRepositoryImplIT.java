@@ -9,9 +9,11 @@ import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbState;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbsPlatform;
 import net.datenstrudel.bulbs.shared.domain.model.color.ColorRGB;
 import net.datenstrudel.bulbs.shared.domain.model.identity.AppId;
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;import org.junit.Before;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.annotation.DirtiesContext;
@@ -142,7 +144,7 @@ public class BulbBridgeRepositoryImplIT {
 //        System.out.println("testStoreDuplicate");
 //        final BulbBridge bulbBridge = aTestBridge(1);
 //        final BulbBridge bulbBridge_dup = aTestBridge(1);
-//        ReflectionTestUtils.setField(bulbBridge_dup.getId(), "macAddress", bulbBridge.getId().getMacAddress());
+//        ReflectionTestUtils.setField(bulbBridge_dup.getId(), "macAddress", bulbBridge.getId().getGatewayMacAddress());
 //        ReflectionTestUtils.setField(bulbBridge_dup, "name", "nameDup");
 //        
 //        

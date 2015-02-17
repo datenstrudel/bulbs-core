@@ -72,7 +72,7 @@ public class BulbBridgeHardwareAdapter_LifxIT {
         doAnswer( inv -> {
             assertThat(inv.getArguments()[0], is(notNullValue()));
             LifxMessage<PowerStatePayload> msg = (LifxMessage)inv.getArguments()[0];
-            assertThat(msg.getMacAddress().toString(), is(address.macAddress().get()));
+            assertThat(msg.getGatewayMacAddress().toString(), is(address.macAddress().get()));
             assertThat(msg.getAddress(), is(address.toInetAddress()));
             assertThat(msg.getPayload().getState(), is(PowerStatePayload.Power.ON));
             return null;
@@ -90,7 +90,7 @@ public class BulbBridgeHardwareAdapter_LifxIT {
         doAnswer( inv -> {
             assertThat(inv.getArguments()[0], is(notNullValue()));
             LifxMessage<PowerStatePayload> msg = (LifxMessage)inv.getArguments()[0];
-            assertThat(msg.getMacAddress().toString(), is(address.macAddress().get()));
+            assertThat(msg.getGatewayMacAddress().toString(), is(address.macAddress().get()));
             assertThat(msg.getAddress(), is(address.toInetAddress()));
             assertThat(msg.getPayload().getState(), is(PowerStatePayload.Power.ON));
             return null;
@@ -108,7 +108,7 @@ public class BulbBridgeHardwareAdapter_LifxIT {
         doAnswer( inv -> {
             assertThat(inv.getArguments()[0], is(notNullValue()));
             LifxMessage<ReqSetLightColor> msg = (LifxMessage)inv.getArguments()[0];
-            assertThat(msg.getMacAddress().toString(), is(address.macAddress().get()));
+            assertThat(msg.getGatewayMacAddress().toString(), is(address.macAddress().get()));
             assertThat(msg.getAddress(), is(address.toInetAddress()));
             return null;
         }).when(mk_transport).send(any(LifxMessage.class));

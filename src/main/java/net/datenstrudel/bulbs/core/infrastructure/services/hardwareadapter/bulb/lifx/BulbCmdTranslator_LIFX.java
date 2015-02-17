@@ -33,9 +33,9 @@ public class BulbCmdTranslator_LIFX implements BulbCmdTranslator<LifxMessage, Li
 //        RespGetPanGateway resp = (RespGetPanGateway) payload.getPayload();
         BulbBridge res = new BulbBridge(
                 bridgeId,
-                payload.getMacAddress().toString(),
+                payload.getGatewayMacAddress().toString(),
                 BulbsPlatform.LIFX,
-                new BulbBridgeAddress(payload.getAddress().getHostAddress(), payload.getPort(), payload.getMacAddress().toString()),
+                new BulbBridgeAddress(payload.getAddress().getHostAddress(), payload.getPort(), payload.getGatewayMacAddress().toString()),
                 "LIFX_BRIDGE",
                 contextUserId,
                 new HashMap<>()
@@ -132,7 +132,7 @@ public class BulbCmdTranslator_LIFX implements BulbCmdTranslator<LifxMessage, Li
             throw new UnsupportedOperationException("Attribute(s) supplied not supported to be changed by lifx" + attributes.keySet());
         return LifxMessage.messageFrom(
                 BulbLabelPayload.newSetBulblabelPayload(name),
-                address.toInetAddress(), address.getPort(), MacAddress.fromString(address.macAddress().get()));
+                address.toInetAddress(), address.getPort(), MacAddress.fromString(address.macAddress().get()), null); // FIXME!!
     }
     @Override
     public LifxMessage toApplyBulbStateCmd(BulbId bulbId, BulbBridgeAddress address, BulbsPrincipal principal, BulbState state) {
@@ -158,7 +158,7 @@ public class BulbCmdTranslator_LIFX implements BulbCmdTranslator<LifxMessage, Li
                         BT.scale(color.getBrightness(), 255f),
                         BT.Uint32.fromInt(3000) // FixMe What is it? Could be ms/10
                 ),
-                address.toInetAddress(), address.getPort(), MacAddress.fromString(address.macAddress().get()));
+                address.toInetAddress(), address.getPort(), MacAddress.fromString(address.macAddress().get() ), null); // FIXME!!
     }
 
 }

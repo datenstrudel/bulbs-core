@@ -34,7 +34,7 @@ public class BulbCmdTranslator_LIFXTest {
                 BULB_ID, ADDRESS, PRINCIPAL, state);
 
         assertThat(res.getType(), is(LifxMessageType.REQ_SET_LIGHT_COLOR));
-        assertThat(res.getMacAddress().toString().toLowerCase(), is(ADDRESS.macAddress().get().toLowerCase()));
+        assertThat(res.getGatewayMacAddress().toString().toLowerCase(), is(ADDRESS.macAddress().get().toLowerCase()));
         assertThat(res.getAddress(), is(ADDRESS.toInetAddress()));
         assertThat(res.getPort(), is(ADDRESS.getPort()));
 
@@ -56,7 +56,7 @@ public class BulbCmdTranslator_LIFXTest {
                 BULB_ID, ADDRESS, PRINCIPAL, state);
 
         assertThat(res.getType(), is(LifxMessageType.REQ_SET_LIGHT_COLOR));
-        assertThat(res.getMacAddress().toString().toLowerCase(), is(ADDRESS.macAddress().get().toLowerCase()));
+        assertThat(res.getGatewayMacAddress().toString().toLowerCase(), is(ADDRESS.macAddress().get().toLowerCase()));
         assertThat(res.getAddress(), is(ADDRESS.toInetAddress()));
         assertThat(res.getPort(), is(ADDRESS.getPort()));
 

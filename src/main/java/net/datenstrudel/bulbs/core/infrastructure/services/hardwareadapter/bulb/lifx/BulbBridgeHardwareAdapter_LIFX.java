@@ -126,7 +126,7 @@ public class BulbBridgeHardwareAdapter_LIFX implements BulbBridgeHardwareAdapter
         for (LifxMessage message : messages) {
             bulbs.add(cmdTranslator.bulbFromPayload(
                     message, parentBridge,
-                    new BulbId(parentBridge.getId(), message.getMacAddress().toString().hashCode())));
+                    new BulbId(parentBridge.getId(), message.getGatewayMacAddress().toString().hashCode())));
         }
         Bulb[] res = new Bulb[bulbs.size()];
         bulbs.toArray(res);

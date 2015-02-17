@@ -65,13 +65,14 @@ public class LifxMessage<T extends LifxMessagePayload> {
     }
 
     protected static <T extends LifxMessagePayload> LifxMessage<T>  messageFrom(
-            T payload, InetAddress address, int port, MacAddress targetMacAddress ) {
+            T payload, InetAddress address, int port, MacAddress gatewayMacAddress, MacAddress targetMacAddress ) {
         LifxMessage res = new LifxMessage(payload);
         res.packet_type = payload.getPacketType().getProtocolValue();
         res.payload = payload;
         res.address = address;
         res.port = port;
-        res.setSite( targetMacAddress );
+        res.setSite( gatewayMacAddress );
+        res.setTarget_mac_address(targetMacAddress);
         res.setSize(res.calcSize());
         return res;
     }
@@ -203,7 +204,7 @@ public class LifxMessage<T extends LifxMessagePayload> {
     public MacAddress getTarget_mac_address() {
         return target_mac_address;
     }
-    public MacAddress getMacAddress() {
+    public MacAddress getGatewayMacAddress() {
         return this.site;
     }
     public T getPayload() {
@@ -226,8 +227,11 @@ public class LifxMessage<T extends LifxMessagePayload> {
         return this.payload.size() + SIZE_HEADER;
     }
 
-    public void setSite(MacAddress site) {
+    private void setSite(MacAddress site) {
         this.site = site;
+    }
+    private void setTarget_mac_address(MacAddress target_mac_address) {
+        this.target_mac_address = target_mac_address;
     }
 
     @Override

@@ -70,6 +70,7 @@ public class BulbsHwServiceImpl implements BulbsHwService{
             final BulbsPlatform platform) throws BulbBridgeHwException {
         hwAdapterForPlatform(platform).discoverNewBulbs(
                 address, principal, platform);
+        //FIXME: Put waiting into vendor specific implementation
         asyncExecutor.execute(new Runnable_EventPublishingAware() {
             @Override
             public void execute() {

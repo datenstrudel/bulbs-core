@@ -5,7 +5,7 @@ import java.util.Optional;
 
 public enum LifxMessageType {
 
-    REQ_PAN_GATEWAY     (0x02, false, true),
+    REQ_PAN_GATEWAY     (0x02, false),
     RESP_PAN_GATEWAY    (0x03, true, true),
     REQ_POWER_STATE     (0x14, false),
     REQ_SET_POWER_STATE (0x15, false),
@@ -13,9 +13,9 @@ public enum LifxMessageType {
     REQ_SET_BULB_LABEL  (0x18, false),
     RESP_BULB_LABEL     (0x19, true),
 
-    REQ_LIGHT_STATE     (0x65, false, true),
+    REQ_LIGHT_STATE     (0x65, false),
     REQ_SET_LIGHT_COLOR (0x66, false, false),
-    RESP_LIGHT_STATE    (0x6B, false),
+    RESP_LIGHT_STATE    (0x6B, false, true),
     ;
 
     private final BT.Uint16 protocolValue;
