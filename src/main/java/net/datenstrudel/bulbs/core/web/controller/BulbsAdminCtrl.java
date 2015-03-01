@@ -14,7 +14,9 @@ import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbBridgeHwException;
 import net.datenstrudel.bulbs.shared.domain.model.client.bulb.DtoBulb;
 import net.datenstrudel.bulbs.shared.domain.model.client.bulb.DtoBulbBridge;
 import net.datenstrudel.bulbs.shared.domain.model.client.common.DtoSingleValue;
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -135,7 +137,6 @@ public class BulbsAdminCtrl {
         
         String userApiKey =  ((BulbsContextUser)authentication.getPrincipal()).getApiKey();
         
-        log.info("Triggering Synchronization from Hardware to core model.. ");
         bulbBridgeAdminService.syncAllBridges(userApiKey);
         return "{msg:'OK. Changes are going to be populated via messaging..'}";
     }

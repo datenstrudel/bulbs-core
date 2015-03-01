@@ -11,11 +11,12 @@
     </root>
 
     <logger name="org.aspectj" level="INFO" />
-    <logger name="net.datenstrudel.bulbs.core" level="DEBUG" />
+    <logger name="net.datenstrudel.bulbs.core" level="INFO" />
+    <logger name="net.datenstrudel.bulbs.core.domain.model.bulb.CmdHwExecutor" level="DEBUG" />
     <logger name="net.datenstrudel.bulbs.core.web.filter" level="INFO" />
     <logger name="net.datenstrudel.bulbs.core.domain.model.messaging" level="info" />
     <logger name="net.datenstrudel.bulbs.core.application.messaging.notification" level="info" />
-    <logger name="net.datenstrudel.bulbs.core.application.messaging.notification.infrastructure.NotificationServiceRabbitMq" level="debug" />
+    <logger name="net.datenstrudel.bulbs.core.application.messaging.notification.infrastructure.NotificationServiceRabbitMq" level="info" />
     <logger name="net.datenstrudel.bulbs.core.application.messaging.notification.handling" level="info" />
     <logger name="org.springframework" level="INFO" />
     <logger name="org.springframework.beans" level="INFO" />

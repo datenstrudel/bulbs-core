@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 /**
  *
@@ -51,7 +52,7 @@ public class BulbBridgeHardwareAdapter_Emulated implements BulbBridgeHardwareAda
     }
 
     @Override
-    public InvocationResponse discoverNewBulbs(
+    public CompletableFuture<InvocationResponse> discoverNewBulbs(
             BulbBridgeAddress address,
             BulbsPrincipal principal,
             BulbsPlatform platform) throws BulbBridgeHwException {
@@ -67,7 +68,7 @@ public class BulbBridgeHardwareAdapter_Emulated implements BulbBridgeHardwareAda
                 new HashMap<>());
         bridge.getBulbs().add(newBulb);
         knownBulbs.get(address).add(newBulb);
-        return new InvocationResponse("Emulated Search Started.", false);
+        return CompletableFuture.completedFuture(new InvocationResponse("Emulated Search Started.", false));
     }
 
     @Override

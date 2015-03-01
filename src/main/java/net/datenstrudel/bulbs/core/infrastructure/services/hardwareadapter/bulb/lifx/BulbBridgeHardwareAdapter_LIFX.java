@@ -57,11 +57,11 @@ public class BulbBridgeHardwareAdapter_LIFX implements BulbBridgeHardwareAdapter
         return cmdTranslator.bridgeFromPayload(messages[0], bridgeId, address, contextUserId);
     }
     @Override
-    public InvocationResponse discoverNewBulbs(
+    public CompletableFuture<InvocationResponse> discoverNewBulbs(
             BulbBridgeAddress address,
             BulbsPrincipal principal,
             BulbsPlatform platform) throws BulbBridgeHwException {
-        return new InvocationResponse("Not supported by Lifx", false);
+        return CompletableFuture.completedFuture(new InvocationResponse("Not supported by Lifx", false));
     }
     @Override
     public HwResponse modifyBridgeAttributes(

@@ -32,6 +32,7 @@
         <skipIT>false</skipIT>
         <maven.javadoc.skip>true</maven.javadoc.skip>
         <bulbs-shared.version>1.2-SNAPSHOT</bulbs-shared.version>
+        <httpclient.version>4.3</httpclient.version>
     </properties>
 
   <repositories>
@@ -237,17 +238,17 @@
         <dependency>
           <groupId>org.apache.httpcomponents</groupId>
           <artifactId>httpclient-cache</artifactId>
-          <version>4.3</version>
+          <version>${httpclient.version}</version>
         </dependency>
         <dependency>
           <groupId>org.apache.httpcomponents</groupId>
           <artifactId>httpcore</artifactId>
-          <version>4.3</version>
+          <version>${httpclient.version}</version>
         </dependency>
         <dependency>
           <groupId>org.apache.httpcomponents</groupId>
           <artifactId>httpclient</artifactId>
-          <version>4.3</version>
+          <version>${httpclient.version}</version>
         </dependency>
         <dependency>
           <groupId>org.apache.commons</groupId>

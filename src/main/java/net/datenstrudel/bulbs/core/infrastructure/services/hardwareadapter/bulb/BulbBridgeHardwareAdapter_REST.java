@@ -3,16 +3,22 @@ package net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb
 import net.datenstrudel.bulbs.core.domain.model.bulb.*;
 import net.datenstrudel.bulbs.core.domain.model.identity.BulbsContextUserId;
 import net.datenstrudel.bulbs.core.domain.model.identity.BulbsPrincipal;
+import net.datenstrudel.bulbs.core.infrastructure.Runnable_EventPublishingAware;
 import net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.philipshue.BulbCmdTranslator_PhilipsHue;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbBridgeAddress;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbBridgeHwException;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbState;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbsPlatform;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
@@ -24,6 +30,7 @@ import org.springframework.web.client.RestTemplate;
 import javax.annotation.PostConstruct;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 /**
  *
@@ -31,49 +38,52 @@ import java.util.Set;
  */
 @Service(value="bulbBridgeHardwareAdapter_REST")
 public class BulbBridgeHardwareAdapter_REST implements BulbBridgeHardwareAdapter{
-    
+
     //~ Member(s) //////////////////////////////////////////////////////////////
     private static final Logger log = LoggerFactory.getLogger(BulbBridgeHardwareAdapter_REST.class);
-    private RestTemplate restService;
+    @Value("${hardwareAdapter.philipsHue.bulbDiscoveryWaitTimeMillis}")
+    private long bulbDiscoveryWaitTimeMs = 60000l;
+
+    private RestTemplate restClient;
+    @Autowired
+    @Qualifier("taskExecutor")
+    private AsyncTaskExecutor asyncExecutor;
     
     //~ Connection Params ~~~~~~~~~~~
-    int CONNECTIONS_MAX = 2;
+    @Value("${hardwareAdapter.philipsHue.maxTcpConnections}")
+    int connectionsMax;
     int CONNECTIONS__ROUTE_MAX = 100;
-//    int CONNECTION_TIMEOUT_MS = 40000;
+    int CONNECTION_TIMEOUT_MS = 1000;
+    int socketTimeout = 10000;
 //    int KEEP_ALIVE_MS = 2000;
     
     //~ Construction ///////////////////////////////////////////////////////////
-    public BulbBridgeHardwareAdapter_REST() {
-    
-    }
+    public BulbBridgeHardwareAdapter_REST() {}
     
     //~ Method(s) //////////////////////////////////////////////////////////////
     @PostConstruct
     public void init(){
         PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
-        connectionManager.setMaxTotal(CONNECTIONS_MAX);
+        connectionManager.setMaxTotal(connectionsMax);
         connectionManager.setDefaultMaxPerRoute(CONNECTIONS__ROUTE_MAX);
-//        connectionManager.setMaxPerRoute(new HttpRoute(new HttpHost(
-//                "google.com")), 20);
 
         CloseableHttpClient httpClient = HttpClientBuilder.create()
                 .setConnectionManager(connectionManager)
+//                .setDefaultConnectionConfig(ConnectionConfig.custom())
+//                .setDefaultSocketConfig(
+//                        SocketConfig.custom().setSoTimeout(5))
+                .setDefaultRequestConfig(
+                        RequestConfig.custom()
+                                .setConnectTimeout(CONNECTION_TIMEOUT_MS)
+                                .setConnectionRequestTimeout(CONNECTION_TIMEOUT_MS)
+                                .setSocketTimeout(socketTimeout)
+                                .build()
+                )
                 .build();
-                
-        // TODO: Apply new config!!
-//        httpClient.getParams().setIntParameter(
-//                CoreConnectionPNames.CONNECTION_TIMEOUT,
-//                CONNECTION_TIMEOUT_MS
-//        );
-//        httpClient.getParams().setIntParameter(
-//                CoreConnectionPNames.CONNECTION_TIMEOUT,
-//                KEEP_ALIVE_MS
-//        );
-        
+
         HttpComponentsClientHttpRequestFactory reFactory = new
             HttpComponentsClientHttpRequestFactory(httpClient);
-        
-        restService = new RestTemplate(reFactory);
+        restClient = new RestTemplate(reFactory);
     }
 
     //~ BRIDGE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -93,14 +103,27 @@ public class BulbBridgeHardwareAdapter_REST implements BulbBridgeHardwareAdapter
     }
 
     @Override
-    public InvocationResponse discoverNewBulbs(
+    public CompletableFuture<InvocationResponse> discoverNewBulbs(
             BulbBridgeAddress address,
             BulbsPrincipal principal,
             BulbsPlatform platform) throws BulbBridgeHwException {
         BulbCmdTranslator_HTTP cmdTranslator = translatorForPlatform(platform);
         HttpCommand cmd = cmdTranslator.toDiscoverNewBulbsCmd(address, principal);
         ResponseEntity<String> resp = executeHttpCmd(cmd, cmdTranslator);
-        return cmdTranslator.responseFromHardwareInvocation(resp.getBody());
+
+        final InvocationResponse response = cmdTranslator.responseFromHardwareInvocation(resp.getBody());
+        final CompletableFuture<InvocationResponse> res = new CompletableFuture<>();
+        asyncExecutor.execute(new Runnable_EventPublishingAware() {
+            @Override
+            public void execute() {
+                try{
+                    Thread.sleep(bulbDiscoveryWaitTimeMs);
+                }catch(InterruptedException iex){}
+                // We wait, as underlying hardware processes the search.
+                res.complete(response);
+            }
+        } );
+        return res;
     }
     
     @Override
@@ -228,7 +251,7 @@ public class BulbBridgeHardwareAdapter_REST implements BulbBridgeHardwareAdapter
             log.debug("|- Invocing HTTP Cmd: " + cmd);
         }
         try{
-            ResponseEntity<String> resp = restService.exchange(
+            ResponseEntity<String> resp = restClient.exchange(
                     cmd.getUrl(), 
                     cmd.getHttpMethod(), 
                     cmd.getEntity(), String.class, cmd.getUrlVariables());

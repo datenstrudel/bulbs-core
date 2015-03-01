@@ -10,6 +10,7 @@ import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbsPlatform;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Represents the hardware interface of a <code>BulbBridge</code> that is used in order to
@@ -27,8 +28,16 @@ public interface BulbBridgeHardwareAdapter {
             BulbsPrincipal principal,
             BulbsContextUserId contextUserId,
             BulbsPlatform platform)throws BulbBridgeHwException;
-            
-    public InvocationResponse discoverNewBulbs(
+
+    /**
+     * Performs lookup of new devices.
+     * @param address
+     * @param principal
+     * @param platform
+     * @return a future that implies that this discovery operation might be an async task.
+     * @throws BulbBridgeHwException
+     */
+    public CompletableFuture<InvocationResponse> discoverNewBulbs(
             BulbBridgeAddress address,
             BulbsPrincipal principal,
             BulbsPlatform platform) throws BulbBridgeHwException;

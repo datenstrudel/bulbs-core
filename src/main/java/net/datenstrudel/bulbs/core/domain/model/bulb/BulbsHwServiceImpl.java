@@ -4,7 +4,6 @@ import net.datenstrudel.bulbs.core.domain.model.bulb.events.BulbSearchFinished;
 import net.datenstrudel.bulbs.core.domain.model.identity.BulbsContextUserId;
 import net.datenstrudel.bulbs.core.domain.model.identity.BulbsPrincipal;
 import net.datenstrudel.bulbs.core.domain.model.messaging.DomainEventPublisher;
-import net.datenstrudel.bulbs.core.infrastructure.Runnable_EventPublishingAware;
 import net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.BulbBridgeHardwareAdapter;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbBridgeAddress;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbBridgeHwException;
@@ -19,6 +18,7 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -68,20 +68,14 @@ public class BulbsHwServiceImpl implements BulbsHwService{
             final BulbBridgeAddress address, 
             final BulbsPrincipal principal, 
             final BulbsPlatform platform) throws BulbBridgeHwException {
-        hwAdapterForPlatform(platform).discoverNewBulbs(
+        CompletableFuture<InvocationResponse> res = hwAdapterForPlatform(platform).discoverNewBulbs(
                 address, principal, platform);
-        //FIXME: Put waiting into vendor specific implementation
-        asyncExecutor.execute(new Runnable_EventPublishingAware() {
-            @Override
-            public void execute() {
-                // We wait, as underlying hardware processes the search.
-                try{
-                    Thread.sleep(60000l);
-                }catch(InterruptedException iex){}
-                DomainEventPublisher.instance().publish(
-                        new BulbSearchFinished(bulbBridgeId.getUuId(), principal));
-            }
-        } );
+
+        res.handle((a, b) -> {
+            DomainEventPublisher.instance().publish(
+                    new BulbSearchFinished(bulbBridgeId.getUuId(), principal));
+            return null;
+        });
     }
     @Override
     public HwResponse modifyBridgeAttributes(

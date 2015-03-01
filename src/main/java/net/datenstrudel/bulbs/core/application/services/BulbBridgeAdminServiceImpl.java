@@ -73,6 +73,7 @@ public class BulbBridgeAdminServiceImpl
 
     @Override
     public void syncAllBridges(String userApiKey) throws BulbBridgeHwException {
+        log.info("Triggering Synchronization from Hardware to core model.. ");
         BulbsContextUser user = userRepository.findByApiKey(userApiKey);
         if(user == null) throw new AuthenticationException("No user for apiKey["+userApiKey+"]");
         Set<BulbBridge> bridges = bridgeRepository.findByOwner(user.getBulbsContextUserlId());
