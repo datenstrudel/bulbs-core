@@ -31,7 +31,7 @@
         <start-class>net.datenstrudel.bulbs.core.main.Main</start-class>
         <skipIT>false</skipIT>
         <maven.javadoc.skip>true</maven.javadoc.skip>
-        <bulbs-shared.version>1.2-SNAPSHOT</bulbs-shared.version>
+        <bulbs-shared.version>1.2</bulbs-shared.version>
         <httpclient.version>4.3</httpclient.version>
     </properties>
 
