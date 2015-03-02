@@ -10,7 +10,11 @@ It provides a RESTful API, abstracting from illuminant vendor specific controlle
     
 _Illuminant_ in this context means (potentially) any kind of (RGB/HSL) light bulb or light source that is capable of processing commands over a local area network, 
 like [LIFX](http://lifx.co/) or [Phlips Hue](http://meethue.com).
-Currently there is just an adapter implementation for _Philips Hue_. The _LIFX_ implementation will follow.
+Currently there are adapter implementations for both of these vendors.
+
+For usage of Lifx bulbs it is necessary to firstly provide access to local WIFI to one of the bulbs by using the native app. Having done this once, control
+over Lifx bulbs works from this app autonomously. Many thanks to [magicmonkey](https://github.com/magicmonkey) who has provided great work by documenting the basic
+LIFX protocol [here](https://github.com/magicmonkey/lifxjs/blob/master/Protocol.md).
 
 This module is supposed to be deployable on __single-board computers__, capable of running a JVM like the [Raspberry Pi](http://www.raspberrypi.org/) or [Banana Pi](bananapi.org) in order 
     to provide a stateful, always-available, local control system with low energy consumption.
@@ -66,10 +70,6 @@ Besides the swagger documentation that is available (with Maven Profile `debug` 
 a brief API description will be given here.. 
 
 ---
-
----
-## General Architectual Overview
-// TODO
 
 ## Development
 ### Build and start the application
