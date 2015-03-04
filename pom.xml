@@ -43,15 +43,19 @@
         <snapshots><enabled>false</enabled></snapshots>
     </repository>
     <repository>
-        <id>java-net</id>
-        <url>https://maven.java.net/content/repositories/releases</url>
+        <id>maven.springframework.org</id>
+        <name>SpringSource releases</name>
+        <url>http://maven.springframework.org/milestone</url>
+        <releases><enabled>true</enabled></releases>
     </repository>
-    
-    <!--<repository>-->
-      <!--<id>sonatype-snapshots</id>-->
-      <!--<name>Sonatype</name>-->
-      <!--<url>https://oss.sonatype.org/content/repositories/snapshots/</url>-->
-    <!--</repository>-->
+
+    <repository>
+        <!-- ToDo: Replace by central repository when aspectj version is available -->
+        <id>maven.alfresco.com</id>
+        <name>Alfresco</name>
+        <url>https://maven.alfresco.com/nexus/content/groups/public/</url>
+        <releases><enabled>true</enabled></releases>
+    </repository>
 
   </repositories>
   <pluginRepositories>
@@ -67,7 +71,8 @@
         <url>http://maven.springframework.org/milestone</url>
         <releases><enabled>true</enabled></releases>
     </pluginRepository>
-    
+
+
   </pluginRepositories>
 
     <dependencies>
