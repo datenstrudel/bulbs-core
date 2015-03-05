@@ -704,34 +704,63 @@ function GroupCtrl($scope, $rootScope, GlobalOptionsService, GroupService,
 }
 
 //~ PRESETs ////////////////////////////////////////////////////////////////////
-function PresetCtrl($scope, $rootScope, $routeParams, PresetService, GlobalOptionsService, ColorConverter){
-
-    $scope.presets = [];
-    $scope.globalOptions = GlobalOptionsService.allOptions();
-    $scope.presetsOptions = {
-        orderByExp : 'name',
+function PresetCtrl($scope, $rootScope, $routeParams, PresetService, GlobalOptionsService, ColorConverter, $timeout){
+    var model = $scope;
+    model.presets = [];
+    model.globalOptions = GlobalOptionsService.allOptions();
+    model.inEdit = null;
+    model.inEditSortValue = null;
+    model.presetsOptions = {
+        orderByExp : function(el){
+            if(model.inEdit != null && model.inEdit == el){
+                if(model.inEditSortValue == null){
+                    // Set to fixed sorting value
+                    model.inEditSortValue = model.orderFunction(el);
+                }
+                return model.inEditSortValue;
+            }else{
+                return model.orderFunction(el);
+            }
+        },
         orderReverse : false
     };
-	$scope.toolsOptions = {
+
+    model.orderFunction = function(preset){
+        return preset.name.substr(0, preset.name.length);;
+    };
+	model.toolsOptions = {
 		applyStatesOnMod : false,
 		continuousTrigger : true
 	};
+
+    model.presetEditModeChanged = function(preset, mode){
+        //~ Prevent sorting in edit mode
+        if(mode) {
+            model.inEdit = preset;
+        }else{
+            model.inEdit = null;
+            model.inEditSortValue = null;
+        }
+    };
+    //$timeout(function(){
+    //}, 0);
     
-    $scope.newPreset = function(){
-		$scope.presets.push(PresetService.newPreset());
+    model.newPreset = function(){
+        model.presetsOptions.orderByExp = null;
+		model.presets.push(PresetService.newPreset());
 	};
 
-    $scope.init = function(){
+    model.init = function(){
         PresetService.presetsByUser().then(
             function(presets){
-                $scope.presets = presets;
+                model.presets = presets;
             },
             function(error){
                 console.warn("Error loading presets: " + error);
             }
         );
     };
-    $scope.init();
+    model.init();
 }
 
 //~ IDENTITY ///////////////////////////////////////////////////////////////////

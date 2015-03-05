@@ -616,7 +616,18 @@ angular.module('entityServices', ['ngResource', 'identityAuthServices'])
 				var idx = presets.indexOf(presetCurrent);
 				presets.remove(presetCurrent);
 				presets.splice(idx, 0, presetBackup);
-			}
+			},
+            presetsInEditMode : function(){
+                var res = false;
+                angular.forEach(presets, function (p) {
+                    if(p.isUnsaved){
+                        res = true;
+                        return;
+                    }
+                });
+                return res;
+            }
+
 			
         };
     })

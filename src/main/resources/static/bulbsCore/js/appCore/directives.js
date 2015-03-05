@@ -184,7 +184,8 @@ angular.module('bulbs_core_directives', [])
 			scope : {
 				preset: '=',
 				applyStateImmediately : '=',
-				continuousTrigger : '='
+				continuousTrigger : '=',
+                editModeChanged : '&'
 			},
 			link : function link($scope, tElement, iAttrs){
 				
@@ -221,7 +222,6 @@ angular.module('bulbs_core_directives', [])
 
                 $scope.lastStateChangeSrc = "";
 
-				
 				// Head
 				$scope.switchEditName = function(b_state){
 					if(typeof(b_state) !== 'undefined'){
@@ -229,9 +229,7 @@ angular.module('bulbs_core_directives', [])
 					}else{
 						$scope.editName = !$scope.editName;
 					}
-					if(!$scope.editName && $scope.preset.isUnsaved){
-						PresetService.removePreset($scope.preset);
-					}
+                    $scope.editModeChanged({preset: $scope.preset, mode: $scope.editName});
 				};
 				$scope.save = function(presetMember){
 					if($scope.preset.isUnsaved){
@@ -285,7 +283,7 @@ angular.module('bulbs_core_directives', [])
 				// Entities
 				$scope.setEditMode = function(b_mode){
 					var prevEditMode = $scope.editMode;
-					if( $scope.editMode === b_mode)return ;
+					if( $scope.editMode === b_mode)return;
 					$scope.editMode = b_mode;
 					if(!b_mode){
 						$scope.entitySelected = null;
@@ -301,6 +299,14 @@ angular.module('bulbs_core_directives', [])
 				$scope.cancelEdit = function(){
 					$scope.setEditMode(false);
 					$scope.preset = PresetService.replacePreset($scope.preset, $scope.presetBackup);
+				};
+				$scope.cancelEditName = function(){
+					    $scope.switchEditName(false);
+                    if(!$scope.editName && $scope.preset.isUnsaved){
+                        PresetService.removePreset($scope.preset);
+                    }else{
+					    $scope.preset = PresetService.replacePreset($scope.preset, $scope.presetBackup);
+                    }
 				};
 				$scope.selectEntity = function(entity){
                     $scope.entitySelectionHash = Math.round(Math.random() * 1000);
