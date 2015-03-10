@@ -63,7 +63,7 @@ public class CmdHwExecutor extends Runnable_EventPublishingAware {
     //~ Method(s) //////////////////////////////////////////////////////////////
     @Override
     public void execute() {
-        BulbId bulbId = command.getBulbId();
+        BulbId bulbId = command.getTargetId();
         BulbState prevUserState = null;
         BulbState prevState = this.previousState;
         List<BulbState> preProcessedStates;
@@ -92,7 +92,7 @@ public class CmdHwExecutor extends Runnable_EventPublishingAware {
                         prevState = state2Apply;
                         instance().publishDeferred(
                                 new BulbStateChanged(
-                                        command.getBulbId().serialize(),
+                                        command.getTargetId().serialize(),
                                         state2Apply));
                     } catch (BulbBridgeHwException ex) {
                         log.warn("Error applying bulb state: ", ex);

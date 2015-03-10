@@ -29,7 +29,7 @@ public class ConverterGroupActuatorCmd
         out.setStates(src.getStates());
         out.setGroupId(
                 (String) DtoConverterRegistry.instance().converterForDomain(BulbGroupId.class)
-                        .convert(src.getGroupId()));
+                        .convert(src.getTargetId()));
         return out;
     }
     @Override

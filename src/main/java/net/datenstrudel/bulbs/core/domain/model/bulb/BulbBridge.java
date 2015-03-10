@@ -307,8 +307,8 @@ public class BulbBridge extends Entity<BulbBridge, BulbBridgeId> {
 	public void execBulbActuation(
             BulbActuatorCommand command, 
             BulbsPrincipal principal) throws BulbBridgeHwException{
-        if(command.getBulbId() == null) throw new IllegalArgumentException("bulbId must not be null!");
-        BulbId bulbId = command.getBulbId();
+        if(command.getTargetId() == null) throw new IllegalArgumentException("BulbActuatorCommand.targetId must not be null!");
+        BulbId bulbId = command.getTargetId();
         Bulb b = bulbById(bulbId);
         if(b == null) throw new IllegalArgumentException("Bulb["+bulbId+"] doesn't exist!");
         

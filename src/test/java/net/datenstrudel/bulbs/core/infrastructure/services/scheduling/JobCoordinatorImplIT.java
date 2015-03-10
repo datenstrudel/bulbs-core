@@ -1,13 +1,15 @@
 package net.datenstrudel.bulbs.core.infrastructure.services.scheduling;
 
-import net.datenstrudel.bulbs.core.IntegrationTest;
+import net.datenstrudel.bulbs.core.TestConfig;
+import net.datenstrudel.bulbs.core.config.BulbsCoreConfig;
 import net.datenstrudel.bulbs.core.infrastructure.services.InfrastructureServicesConfig;
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;import org.junit.Before;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.quartz.CronExpression;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -25,18 +27,18 @@ import static org.junit.Assert.*;
 @ContextConfiguration(
 //initializers = TestConfig.class,
 classes = {
-//    TestConfig.class,
+    TestConfig.class,
+    BulbsCoreConfig.class,
     InfrastructureServicesConfig.class
 })
 @RunWith(SpringJUnit4ClassRunner.class)
-@Category(IntegrationTest.class)
-public class JobCoordinatorImplTest {
+public class JobCoordinatorImplIT {
     
-    private static final Logger log = LoggerFactory.getLogger(JobCoordinatorImplTest.class);
+    private static final Logger log = LoggerFactory.getLogger(JobCoordinatorImplIT.class);
     @Autowired
     private JobCoordinatorImpl instance;
             
-    public JobCoordinatorImplTest() {
+    public JobCoordinatorImplIT() {
     }
     
     @BeforeClass

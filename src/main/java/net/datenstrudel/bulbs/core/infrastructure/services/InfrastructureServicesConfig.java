@@ -3,6 +3,7 @@ package net.datenstrudel.bulbs.core.infrastructure.services;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 
 /**
@@ -14,6 +15,7 @@ import org.springframework.scheduling.quartz.SchedulerFactoryBean;
         "net.datenstrudel.bulbs.core.infrastructure.services.scheduling",
         "net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter"
 }, excludeFilters = @ComponentScan.Filter(Configuration.class) )
+@PropertySource("classpath:/bulbs-core-config.properties")
 public class InfrastructureServicesConfig {
 
     //~ Member(s) //////////////////////////////////////////////////////////////

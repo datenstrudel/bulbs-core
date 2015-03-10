@@ -10,9 +10,10 @@ import net.datenstrudel.bulbs.shared.domain.model.identity.AppId;
  * Triggers a preset to be executed.
  */
 public class PresetActuatorCommand
-        extends AbstractActuatorCmd<PresetActuatorCommand> {
+        extends AbstractActuatorCmd<PresetActuatorCommand, PresetId> {
 
     //~ Member(s) //////////////////////////////////////////////////////////////
+    @Deprecated
     private PresetId presetId;
     
     
@@ -25,21 +26,18 @@ public class PresetActuatorCommand
             CommandPriority priority, 
             PresetId presetId,
             boolean loop) {
-        super(appId, userApiKey, priority, loop);
+        super(presetId, appId, userApiKey, priority, loop);
         this.presetId = presetId;
     }
     
     //~ Method(s) //////////////////////////////////////////////////////////////
-    public PresetId getPresetId() {
-        return presetId;
-    }
-    
+
     //~ ////////////////////////////////////////////////////////////////////////
     @Override
     public int deferredExecutionHash() {
         int hash = userApiKey.hashCode();
-        hash = 17 * hash + (presetId.hashCode());
-        hash = 17 * hash + (appId.hashCode());
+        hash = 17 * hash + (getTargetId().hashCode());
+        hash = 17 * hash + (getAppId().hashCode());
         return hash;
     }
     @Override
@@ -52,13 +50,11 @@ public class PresetActuatorCommand
         if(other == null)return false;
         if(this == other) return true;
         if( !super.sameValueAs(other) ) return false;
-        if( !presetId.equals(other.presetId) )return false;
         return true;
     }
     @Override
     public int hashCode() {
         int hash = super.hashCode();
-        hash = 97 * hash + (this.presetId != null ? this.presetId.hashCode() : 0);
         return hash;
     }
     @Override
@@ -74,9 +70,5 @@ public class PresetActuatorCommand
     }
 
     //~ Private Artifact(s) ////////////////////////////////////////////////////
-    private void setPresetId(PresetId presetId) {
-        this.presetId = presetId;
-    }
-    
 
 }

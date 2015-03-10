@@ -18,10 +18,11 @@ import java.util.List;
  *
  * @author Thomas Wendzinski
  */
-public class GroupActuatorCommand  extends AbstractActuatorCmd<GroupActuatorCommand>
+public class GroupActuatorCommand  extends AbstractActuatorCmd<GroupActuatorCommand, BulbGroupId>
         implements Serializable{
 
     //~ Member(s) //////////////////////////////////////////////////////////////
+    @Deprecated
     private BulbGroupId groupId;
     //~ Construction ///////////////////////////////////////////////////////////
     private GroupActuatorCommand(){}
@@ -32,7 +33,7 @@ public class GroupActuatorCommand  extends AbstractActuatorCmd<GroupActuatorComm
             CommandPriority priority,
             List<BulbState> states
             ) {
-        super(appId, userApiKey, priority, states);
+        super(groupId, appId, userApiKey, priority, states);
         this.groupId = groupId;
     }
     public GroupActuatorCommand(
@@ -42,54 +43,32 @@ public class GroupActuatorCommand  extends AbstractActuatorCmd<GroupActuatorComm
             CommandPriority priority,
             List<BulbState> states, 
             boolean loop) {
-        super(appId, userApiKey, priority, states, loop);
+        super(groupId, appId, userApiKey, priority, states, loop);
         this.groupId = groupId;
-    }
-    /**
-     * Retrieve a new actuation command with state transition. The number of states
-     * is determined by the <code>transitionDelay</code>
-     * @param appId 
-     * @param userApiKey 
-     * @param groupId
-     * @param transitionStart
-     * @param transitionEnd
-     * @param transitionDelay in <code>ms</code>
-     * @param wholeTransitionTime in <code>ms</code>
-     * @return 
-     */
-    public static GroupActuatorCommand withStateTransition(
-            BulbGroupId groupId, 
-            AppId appId,
-            String userApiKey,
-            BulbState transitionStart, BulbState transitionEnd,
-            int transitionDelay, int wholeTransitionTime
-            ){
-        throw new UnsupportedOperationException("Implement me!");
     }
 
     //~ Method(s) //////////////////////////////////////////////////////////////
     @Override
     public int deferredExecutionHash() {
         int hash = userApiKey.hashCode();
-        hash = 17 * hash + (groupId.hashCode());
-        hash = 17 * hash + (appId.hashCode());
+        hash = 17 * hash + (getTargetId().hashCode());
+        hash = 17 * hash + (getAppId().hashCode());
         return hash;
     }
     @Override
     public void execute(ActuatorDomainService actuatorService) throws BulbBridgeHwException {
         actuatorService.execute(this);
     }
-    
-    
-    public BulbGroupId getGroupId() {
-        return groupId;
-    }
+
+    /**
+     * @return
+     * @deprecated this overriden method is to be deleted when any persisted ActuatorCommand has been resaved.
+     */
     @Override
-    public boolean sameValueAs(GroupActuatorCommand other) {
-        if(other == null)return false;
-        if( !super.sameValueAs(other) ) return false;
-        if( !groupId.equals( other.getGroupId() ) ) return false;
-        return true;
+    public BulbGroupId getTargetId() {
+        BulbGroupId id = super.getTargetId();
+        if(id != null) return id;
+        return groupId;
     }
     
     public List<BulbActuatorCommand> toBSingleBulbCommands(BulbGroup group){
@@ -106,9 +85,14 @@ public class GroupActuatorCommand  extends AbstractActuatorCmd<GroupActuatorComm
     
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     @Override
+    public boolean sameValueAs(GroupActuatorCommand other) {
+        if(other == null)return false;
+        if( !super.sameValueAs(other) ) return false;
+        return true;
+    }
+    @Override
     public int hashCode() {
         int hash = super.hashCode();
-        hash = 97 * hash + (this.groupId != null ? this.groupId.hashCode() : 0);
         return hash;
     }
     @Override
@@ -127,7 +111,7 @@ public class GroupActuatorCommand  extends AbstractActuatorCmd<GroupActuatorComm
     public String toString() {
         return "GroupActuatorCmd{" 
                 + "appId=" + appId 
-                + ", groupId=" + groupId 
+                + ", targetId=" + targetId
                 + ", priority=" + priority 
                 + ", states=" + states 
             + '}';
@@ -135,8 +119,5 @@ public class GroupActuatorCommand  extends AbstractActuatorCmd<GroupActuatorComm
     
 
     //~ Private Artifact(s) ////////////////////////////////////////////////////
-    private void setGroupId(BulbGroupId groupId) {
-        this.groupId = groupId;
-    }
 
 }

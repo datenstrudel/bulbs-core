@@ -21,7 +21,7 @@ public class ConverterBulbActuatorCmd
     @Override
     public DtoBulbActuatorCmd convert(BulbActuatorCommand src) {
         DtoBulbActuatorCmd out = new DtoBulbActuatorCmd();
-        out.setBulbId(src.getBulbId().serialize());
+        out.setBulbId(src.getTargetId().serialize());
         out.setAppId(src.getAppId().getUniqueAppName());
         out.setPriority(src.getPriority());
         out.setStates(src.getStates());

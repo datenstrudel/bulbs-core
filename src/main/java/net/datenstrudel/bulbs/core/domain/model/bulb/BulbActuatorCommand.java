@@ -16,10 +16,11 @@ import java.util.List;
  * @created 08-Jun-2013 23:02:11
  */
  public class BulbActuatorCommand 
-        extends AbstractActuatorCmd<BulbActuatorCommand>
+        extends AbstractActuatorCmd<BulbActuatorCommand, BulbId>
         implements Serializable{
 
     //~ Member(s) //////////////////////////////////////////////////////////////
+    @Deprecated
 	private BulbId bulbId;
 	
     //~ Construction ///////////////////////////////////////////////////////////
@@ -34,8 +35,7 @@ import java.util.List;
             CommandPriority priority,
             List<BulbState> states
             ) {
-        super(appId, userApiKey, priority, states);
-        this.bulbId = bulbId;
+        super(bulbId, appId, userApiKey, priority, states);
     }
     public BulbActuatorCommand(
             BulbId bulbId, 
@@ -44,8 +44,7 @@ import java.util.List;
             CommandPriority priority,
             List<BulbState> states, 
             boolean loop) {
-        super(appId, userApiKey, priority, states, loop);
-        this.bulbId = bulbId;
+        super(bulbId, appId, userApiKey, priority, states, loop);
     }
     /**
      * Retrieve a new actuation command with state transition. The number of states
@@ -73,7 +72,7 @@ import java.util.List;
     @Override
     public int deferredExecutionHash() {
         int hash = userApiKey.hashCode();
-        hash = 17 * hash + (getBulbId().hashCode());
+        hash = 17 * hash + (getTargetId().hashCode());
         hash = 17 * hash + (getAppId().hashCode());
         return hash;
     }
@@ -81,9 +80,15 @@ import java.util.List;
     public void execute(ActuatorDomainService actuatorService) throws BulbBridgeHwException{
         actuatorService.execute(this);
     }
-    
-    
-    public BulbId getBulbId() {
+
+    /**
+     * @return
+     * @deprecated this overriden method is to be deleted when any persisted ActuatorCommand has been resaved.
+     */
+    @Override
+    public BulbId getTargetId() {
+        BulbId id = super.getTargetId();
+        if(id != null) return id;
         return bulbId;
     }
 
@@ -91,7 +96,6 @@ import java.util.List;
     public boolean sameValueAs(BulbActuatorCommand other) {
         if(other == null)return false;
         if( !super.sameValueAs(other) ) return false;
-        if(!bulbId.equals(other.bulbId))return false;
         return true;
     }
     @Override
@@ -116,15 +120,11 @@ import java.util.List;
     public String toString() {
         return "BulbActuatorCommand{" 
                 + "appId=" + appId 
-                + ", bulbId=" + bulbId 
-                + ", priority=" + priority 
+                + ", priority=" + priority
                 + ", states=" + states 
             + '}';
     }
     
     //~ Private Artifact(s) ////////////////////////////////////////////////////
-    private void setBulbId(BulbId bulbId) {
-        this.bulbId = bulbId;
-    }
-    
+
 }
