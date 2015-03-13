@@ -30,6 +30,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.*;
 
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
@@ -100,11 +101,12 @@ public class ScheduledActuationRepositoryImplIT {
         System.out.println("findByName");
         BulbsContextUserId creator = new BulbsContextUserId("testLoadById__userId");
         ScheduledActuationId id = instance.nextIdentity(creator);
-        ScheduledActuation expResult = newTestInstance(id, false, false);
+        ScheduledActuation expResult = newTestInstance(id, true, false);
         
         instance.save(expResult);
         ScheduledActuation result = instance.findByNameAndId_Creator(expResult.getName(), creator);
         assertEquals(expResult, result);
+        assertThat(result.getTrigger(), is(expResult.getTrigger()));
     }
     @Test
     public void findByScheduleId_Owner(){
@@ -112,7 +114,7 @@ public class ScheduledActuationRepositoryImplIT {
         BulbsContextUserId userXp = new BulbsContextUserId("test_UserUuid_exp");
         BulbsContextUserId userUXp = new BulbsContextUserId("test_UserUuid_unExp");
         ScheduledActuation xp1 = newTestInstance(instance.nextIdentity(userXp), false, false);
-        ScheduledActuation xp2 = newTestInstance(instance.nextIdentity(userXp), false, false);
+        ScheduledActuation xp2 = newTestInstance(instance.nextIdentity(userXp), true, false);
         ScheduledActuation uxp1 = newTestInstance(instance.nextIdentity(userUXp), false, false);
         Set<ScheduledActuation> expResult = new HashSet<>();
         expResult.add(xp1);
@@ -169,15 +171,16 @@ public class ScheduledActuationRepositoryImplIT {
     private ScheduledActuation newTestInstance(ScheduledActuationId id, boolean withTrigger, boolean withStates){
         final ScheduledActuation res;
         if(withTrigger){
+            PointInTimeTrigger trigger = new PointInTimeTrigger(new Date(), "UTC");
+            trigger.toCronExpression(); // create cron exp internally
             res = new ScheduledActuation(
                     id, 
-                    "testLoadById_actName", 
-                    new PointInTimeTrigger(new Date(), "UTC"), true);
+                    "testLoadById_actName",
+                    trigger, true);
         }else{
             res = new ScheduledActuation(id, "test_name", false);
         }
-            
-        
+
         if(withStates){
             final List<AbstractActuatorCmd> states = new ArrayList<>();
             final BulbBridgeId bridgeId = new BulbBridgeId("testSchedActRep_bridgeId_0");

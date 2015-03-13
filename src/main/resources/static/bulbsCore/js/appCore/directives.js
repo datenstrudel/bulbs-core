@@ -595,6 +595,12 @@ angular.module('bulbs_core_directives', [])
 						$location.hash(old); // Prevent page reload!
 					}, 0);
 				};
+
+                //~ Schedules
+                $scope.showScheduler = false;
+                $scope.switchShowScheduler = function(){
+                    $scope.showScheduler = !$scope.showScheduler;
+                };
 				
 				//
 				$scope.initAll = function(){
@@ -1017,6 +1023,7 @@ angular.module('bulbs_core_directives', [])
         };
     })
 
+    //DEPRECATED (?)
     .directive('bulbsCoreNavbarAffix', function(){
         return {
             replace : false,
@@ -1035,5 +1042,54 @@ angular.module('bulbs_core_directives', [])
             }
         };
     })
+
+    .directive('pointInTimeScheduler', ['ScheduledActuationService', function(ScheduledActuationService){
+        return {
+            replace : true,
+            restrict : 'EA',
+            templateUrl : 'bulbsCore/partials/directives/pointInTimeScheduler.html',
+            scope : {
+                visible : '=',
+                preset : '='
+            },
+            link : function link($scope, tElement, attrs){
+                var model = $scope;
+                model.schedViewModel = {};
+                model.scheduler = {};
+
+                model.save = function(){
+                    console.log("Save btn pressed.");
+                    ScheduledActuationService.createSchedule(model.scheduler);
+                };
+
+                model.inputTimeChanged = function(){
+                    console.debug("Model hcanged");
+                    if(model.schedViewModel.hourOfDay >= 0 && model.schedViewModel.minOfHour >= 0 ){
+                        var triggerTime = new Date();
+                        triggerTime.setHours(model.schedViewModel.hourOfDay);
+                        triggerTime.setMinutes(model.schedViewModel.minOfHour);
+                        if(triggerTime.getTime() < new Date().getTime()){
+                            triggerTime.setHours(triggerTime.getHours() + 24);
+                        }
+                        model.scheduler.trigger.startAt = triggerTime.getTime();
+                        console.debug("New Trigger time set: " + triggerTime);
+                    }
+                };
+
+                model.init = function(){
+                    console.debug("Init PIT Scheduler.");
+                    var scheduler = ScheduledActuationService.newSchedulerForPreset(model.preset);
+                    model.scheduler = scheduler;
+                };
+
+                model.$watch('visible', function(){
+                    if(model.visible){
+                        model.init();
+                    }
+                });
+            }
+        };
+    }])
+
 
 ;

@@ -1,0 +1,18 @@
+<div id="pointInTimeScheduler" ng-show="visible" class="animate-show animate-data">
+
+    <span class="timePartInput">
+        <input type="number" max="24" maxlength="2" name="hourOfDay"
+               ng-model="schedViewModel.hourOfDay" ng-change="inputTimeChanged()"
+               class="form-control ng-pristine ng-valid-number ng-valid ng-valid-min" /> :
+        <input type="number" max="59" maxlength="2" name="minOfHour"
+               ng-model="schedViewModel.minOfHour" ng-change="inputTimeChanged()"
+               class="form-control ng-pristine ng-valid-number ng-valid ng-valid-min" />
+    </span>
+    <span>
+        <button ng-click="save()" type="button" class="btn btn-xs btn-success " title="Save scheduler">
+            Save
+        </button>
+    </span>
+
+
+</div>

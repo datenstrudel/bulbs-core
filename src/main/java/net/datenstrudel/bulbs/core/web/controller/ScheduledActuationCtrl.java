@@ -7,7 +7,6 @@ import net.datenstrudel.bulbs.core.application.services.ScheduledActuationServic
 import net.datenstrudel.bulbs.core.domain.model.bulb.AbstractActuatorCmd;
 import net.datenstrudel.bulbs.core.domain.model.identity.BulbsContextUser;
 import net.datenstrudel.bulbs.core.domain.model.scheduling.ScheduledActuationId;
-import net.datenstrudel.bulbs.shared.domain.model.client.preset.DtoPreset;
 import net.datenstrudel.bulbs.shared.domain.model.client.scheduling.DtoScheduledActuation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -40,8 +39,8 @@ public class ScheduledActuationCtrl {
     @RequestMapping(method = RequestMethod.GET, value="/{scheduledActuationId}", 
             produces = "application/json")
     public DtoScheduledActuation loadById(
-        @PathVariable("scheduledActuationId") String _scheduledActuationId,
-        Authentication authentication){
+            @PathVariable("scheduledActuationId") String _scheduledActuationId,
+            Authentication authentication){
             
         BulbsContextUser principal = ((BulbsContextUser)authentication.getPrincipal());
         ScheduledActuationId schedId = ScheduledActuationId.fromSerialized(_scheduledActuationId);
@@ -55,8 +54,8 @@ public class ScheduledActuationCtrl {
     @RequestMapping(method = RequestMethod.DELETE, value="/{scheduledActuationId}", 
             produces = "application/json")
     public void deleteById(
-        @PathVariable("scheduledActuationId") String _scheduledActuationId,
-        Authentication authentication){
+            @PathVariable("scheduledActuationId") String _scheduledActuationId,
+            Authentication authentication ){
             
         BulbsContextUser principal = ((BulbsContextUser)authentication.getPrincipal());
         ScheduledActuationId schedId = ScheduledActuationId.fromSerialized(_scheduledActuationId);
@@ -67,7 +66,7 @@ public class ScheduledActuationCtrl {
     @ResponseBody
     @RequestMapping(method = RequestMethod.GET, value="/", 
             produces = "application/json")
-    public List<DtoPreset> scheduledActuationsByUser(
+    public List<DtoScheduledActuation> scheduledActuationsByUser(
             Authentication authentication){
             
         BulbsContextUser principal = ((BulbsContextUser)authentication.getPrincipal());
@@ -78,7 +77,7 @@ public class ScheduledActuationCtrl {
     }
     
     @ResponseBody
-    @RequestMapping(method = RequestMethod.POST, value="/",
+    @RequestMapping(method = RequestMethod.POST,
             consumes = "application/json")
     public DtoScheduledActuation createAndActivate(
             final @RequestBody @Valid DtoScheduledActuation dtoNewSchedule,
@@ -93,9 +92,9 @@ public class ScheduledActuationCtrl {
                 dtoNewSchedule.getName(), 
                 dtoNewSchedule.getTrigger(), 
                 dtoNewSchedule.isDeleteAfterExecution(), 
-                (Collection<AbstractActuatorCmd> ) converterFactory
+                converterFactory
                         .converterForDomain(AbstractActuatorCmd.class)
-                        .reverseConvert(dtoNewSchedule.getStates()) );  
+                        .reverseConvertCollection((Collection) dtoNewSchedule.getStates()) );
         DtoScheduledActuation res = modelPort.outputAs(DtoScheduledActuation.class);
         return res;
     }

@@ -50,8 +50,7 @@
         <div class="animate-show text-center container">
             <!--panel-body -->
 
-            <div class="" id="pn_entitySelection"
-                 >
+            <div class="" id="pn_entitySelection" >
                  <!--ng-class="{ 'col-lg-6' : editMode, 'col-lg-12' : !editMode }"-->
 
                 <div id="pn_presetControl" class="text-center animate-show animate-data" ng-if="!editMode">
@@ -83,6 +82,13 @@
                             </button>
                         </div>
                         <div class="pull-right">
+                            <button
+                                type="button"
+                                class="btn btn-sm"
+                                ng-click="switchShowScheduler()"
+                                title="Configure a Scheduler">
+                                <span class="glyphicon glyphicon-bullhorn"></span>
+                            </button>
                             <button
                                 type="button"
                                 class="btn btn-sm"
@@ -257,4 +263,9 @@
             
         </div>
     </div>
+
+    <point-in-time-scheduler
+            visible="showScheduler"
+            preset="preset" />
+
 </div>

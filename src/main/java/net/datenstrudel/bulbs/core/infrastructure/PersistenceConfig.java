@@ -31,7 +31,8 @@ import java.util.List;
 })
 @PropertySource("classpath:/bulbs-core-config.properties")
 @ComponentScan(basePackages = {
-        "net.datenstrudel.bulbs.core.infrastructure.persistence.repository"
+        "net.datenstrudel.bulbs.core.infrastructure.persistence.repository",
+        "net.datenstrudel.bulbs.core.infrastructure.persistence.converters"
 }, excludeFilters = @ComponentScan.Filter(Configuration.class))
 @EnableMongoRepositories(
         basePackages = {
