@@ -55,7 +55,9 @@ var module__bulbs_core = angular
 		IdentityService.checkSignedIn().then(
 			function(user){
 				console.log("Found user already Logged in: " + user);
-				$location.path('/core/bulbs');
+                if($location.path() === "/login"){
+				    $location.path('/core/bulbs');
+                }
 			}, function(error){
 				$location.path('/login');
 			});

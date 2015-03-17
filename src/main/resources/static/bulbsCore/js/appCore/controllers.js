@@ -704,7 +704,7 @@ function GroupCtrl($scope, $rootScope, GlobalOptionsService, GroupService,
 }
 
 //~ PRESETs ////////////////////////////////////////////////////////////////////
-function PresetCtrl($scope, $rootScope, $routeParams, PresetService, GlobalOptionsService, ColorConverter, $timeout){
+function PresetCtrl($scope, PresetService, GlobalOptionsService, ScheduledActuationService){
     var model = $scope;
     model.presets = [];
     model.globalOptions = GlobalOptionsService.allOptions();
@@ -760,6 +760,8 @@ function PresetCtrl($scope, $rootScope, $routeParams, PresetService, GlobalOptio
             }
         );
     };
+
+
     model.init();
 }
 

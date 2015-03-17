@@ -84,7 +84,8 @@
                         <div class="pull-right">
                             <button
                                 type="button"
-                                class="btn btn-sm"
+                                class="btn btn-sm btn-"
+                                ng-class="{'btn-danger' : scheduler.activated, 'btn-success' : (scheduler && !scheduler.isUnsaved && !scheduler.activated), 'active': showScheduler}"
                                 ng-click="switchShowScheduler()"
                                 title="Configure a Scheduler">
                                 <span class="glyphicon glyphicon-bullhorn"></span>

@@ -1,18 +1,65 @@
-<div id="pointInTimeScheduler" ng-show="visible" class="animate-show animate-data">
+<div id="pointInTimeScheduler" ng-show="visible"
+     class="panel panel-info panel-info-entity animate-show animate-data " >
 
-    <span class="timePartInput">
-        <input type="number" max="24" maxlength="2" name="hourOfDay"
-               ng-model="schedViewModel.hourOfDay" ng-change="inputTimeChanged()"
-               class="form-control ng-pristine ng-valid-number ng-valid ng-valid-min" /> :
-        <input type="number" max="59" maxlength="2" name="minOfHour"
-               ng-model="schedViewModel.minOfHour" ng-change="inputTimeChanged()"
-               class="form-control ng-pristine ng-valid-number ng-valid ng-valid-min" />
-    </span>
-    <span>
-        <button ng-click="save()" type="button" class="btn btn-xs btn-success " title="Save scheduler">
-            Save
-        </button>
-    </span>
+    <div class="panel-heading-slim container">
+        <h6 class="pull-left">Timer</h6>
+        <span class="pull-right">
+            <button ng-click="switchActivation()" type="button" class="btn btn-xs btn-success " title="Save scheduler"
+                    ng-class="{ 'active' : scheduler.activated, 'inactive' : !scheduler.activated }">
+                {{ scheduler.activated ? ' Deactivate ' : ' Activate '}}
+            </button>
+            <!--<button type="button" ng-click="modifyEntityState_Enabled(entitySelected, !entitySelectedEnabled)" ng-class="{ 'active' : entitySelectedEnabled,-->
+                                                <!--'inactive' : !entitySelectedEnabled }" class="btn-power btn btn-sm active" title="Power">-->
+                <!--<span class="glyphicon glyphicon-off"></span>-->
+            <!--</button>-->
+        </span>
+    </div>
 
+    <fieldset>
+        <div class="container">
+            <div class="row col-md-12 col-xs-12 col-lg-12">
+                <!--<span class="col-lg-2 col-xs-2 align-right">-->
+                    <label for="timeSet" class=""><strong>Start at: </strong> </label>
+                <!--</span>-->
+            </div>
+            <div class="row col-md-12 col-xs-12 col-lg-12">
+                <div id="timeSet" class="timePartInput ">
+                    <span class="">{{formatDate()}}&nbsp-&nbsp</span>
+                    <input type="number" min="0" max="24" maxlength="2" name="hourOfDay"
+                           ng-model="schedViewModel.hourOfDay" ng-change="inputTimeChanged()"
+                           class="form-control ng-pristine ng-valid-number ng-valid ng-valid-min" /> <strong>:</strong>
+                    <input type="number" min="0" max="59" maxlength="2" name="minOfHour"
+                           ng-model="schedViewModel.minOfHour" ng-change="inputTimeChanged()"
+                           class="form-control ng-pristine ng-valid-number ng-valid ng-valid-min" />
+                </div>
+            </div>
+            <!--<div class="row">-->
+                <!--<div class="col-lg-5 col-xs-5"></div>-->
+                <!--<div class="col-lg-7 col-xs-7">{{formatDate()}}</div>-->
+            <!--</div>-->
 
+        </div>
+    </fieldset>
+    <div class="panel-footer container ontainer-fluid min-height2  "
+            >
+         <!--ng-hide="!editMode || isUnsaved"-->
+
+        <div class="row ">
+            <div class="col-md-3 col-xs-3 col-lg-3 input-group-btn ">
+                <button ng-click="deleteScheduler()"
+                        type="button"
+                        ng-class="{ 'disabled' : scheduler.isUnsaved}"
+                        class="btn btn-xs btn-danger animate-show"
+                        title="Delete this scheduler">
+                    <span class="glyphicon glyphicon-trash"></span>
+                </button>
+            <!--ng-show="editMode && !isUnsaved"-->
+            </div>
+            <div class="col-md-9 col-xs-9 col-lg-9 align-right pull-right"
+                    ng-show="scheduler.activated">
+                Triggers in: {{triggersIn()}}
+            </div>
+        </div>
+
+    </div>
 </div>

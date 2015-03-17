@@ -17,7 +17,9 @@ import net.datenstrudel.bulbs.core.domain.model.scheduling.ScheduledActuationId;
 import net.datenstrudel.bulbs.core.domain.model.scheduling.ScheduledActuationRepository;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbBridgeHwException;
 import net.datenstrudel.bulbs.shared.domain.model.scheduling.Trigger;
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -29,7 +31,8 @@ import java.util.Set;
  * @author Thomas Wendzinski
  */
 @Service
-public class ScheduledActuationServiceImpl implements ScheduledActuationService{
+public class ScheduledActuationServiceImpl implements ScheduledActuationService,
+        ScheduledActuationServiceInternal {
 
     //~ Member(s) //////////////////////////////////////////////////////////////
     private static final Logger log = LoggerFactory.getLogger(ScheduledActuationServiceImpl.class);
@@ -112,6 +115,7 @@ public class ScheduledActuationServiceImpl implements ScheduledActuationService{
     
     @Override
     public void remove(BulbsContextUserId userId, ScheduledActuationId actId) {
+        log.info("Going to remove ScheduledActuation by ID {}", actId);
         ScheduledActuation entity2Del = schedRepo.findOne(actId);
         if(entity2Del == null){
             throw new IllegalArgumentException("error.scheduledActuation.notFound");
@@ -121,6 +125,7 @@ public class ScheduledActuationServiceImpl implements ScheduledActuationService{
     }
     @Override
     public void activate(BulbsContextUserId userId, ScheduledActuationId actId) {
+        log.info("Going to activate scheduledActuation {}", actId);
         ScheduledActuation entity = schedRepo.findOne(actId);
         if(entity == null){
             throw new IllegalArgumentException("error.scheduledActuation.notFound");
@@ -130,6 +135,7 @@ public class ScheduledActuationServiceImpl implements ScheduledActuationService{
     }
     @Override
     public void deactivate(BulbsContextUserId userId, ScheduledActuationId actId) {
+        log.info("Going to deactivate scheduledActuation {}", actId);
         ScheduledActuation entity = schedRepo.findOne(actId);
         if(entity == null){
             throw new IllegalArgumentException("error.scheduledActuation.notFound");
@@ -147,7 +153,16 @@ public class ScheduledActuationServiceImpl implements ScheduledActuationService{
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    
+    @Override
+    public void modifyTrigger(BulbsContextUserId userId, ScheduledActuationId actId, Trigger newTrigger) {
+        ScheduledActuation entity = schedRepo.findOne(actId);
+        if(entity == null){
+            throw new IllegalArgumentException("error.scheduledActuation.notFound");
+        }
+        entity.defineTrigger(newTrigger, jobCoordinator);
+        schedRepo.save(entity);
+    }
+
     @Override
     public void execute(BulbsContextUserId userId, ScheduledActuationId actId) {
         ScheduledActuation schedAct = schedRepo.findOne(actId);
@@ -166,6 +181,21 @@ public class ScheduledActuationServiceImpl implements ScheduledActuationService{
             log.error("Error on execution of ScheduledActuation.", ex);
         }
     }
+
+    @Override
+    public void deleteAfterExecutionIfConfigured(ScheduledActuationId id) {
+        ScheduledActuation entity = schedRepo.findOne(id);
+        if(entity == null){
+            throw new IllegalArgumentException("error.scheduledActuation.notFound");
+        }
+        log.info("Handling after execution of {} ..", entity);
+        if (!entity.isDeleteAfterExecution()) return;
+        log.info("Going to remove scheduledActuation due to it has been executed; {}", entity);
+
+        schedRepo.delete(entity);
+    }
+
+
     //~ Private Artifact(s) ////////////////////////////////////////////////////
 
     
