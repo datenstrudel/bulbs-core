@@ -210,7 +210,7 @@ angular.module('hardwareResources', ['ngResource', 'identityAuthServices'])
     })
 ;
 angular.module('entityServices', ['ngResource', 'identityAuthServices'])
-    .factory('BridgeService', function($resource, $q, $rootScope, BridgeResourceService, StompClientHolder, ActuatorServiceBulbs){
+    .factory('BridgeService', function($resource, $q, $rootScope, BridgeResourceService){
 		var allBridges = [];
         var emptyBridge = {
             bridgeId : "",

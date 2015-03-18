@@ -10,6 +10,7 @@ import net.datenstrudel.bulbs.core.domain.model.scheduling.ScheduledActuationId;
 import net.datenstrudel.bulbs.shared.domain.model.client.scheduling.DtoScheduledActuation;
 import net.datenstrudel.bulbs.shared.domain.model.scheduling.Trigger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,7 +20,8 @@ import java.util.List;
 import java.util.Set;
 
 @RestController
-@RequestMapping(value = "core/schedules")
+@RequestMapping(value = "core/schedules",
+        produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(value = "schedules", description = "Schedule bulb-, preset- or group states ", position = 50)
 public class ScheduledActuationCtrl {
 

@@ -155,6 +155,7 @@ public class ScheduledActuationServiceImpl implements ScheduledActuationService,
 
     @Override
     public void modifyTrigger(BulbsContextUserId userId, ScheduledActuationId actId, Trigger newTrigger) {
+        log.info("Going to set new {} for ScheduledActuation {}", newTrigger, actId);
         ScheduledActuation entity = schedRepo.findOne(actId);
         if(entity == null){
             throw new IllegalArgumentException("error.scheduledActuation.notFound");

@@ -13,7 +13,9 @@ import org.springframework.context.annotation.Configuration;
  * @author Thomas Wendzinski
  */
 @Configuration
-@ComponentScan(basePackages = {"net.datenstrudel.bulbs.core.domain.model.infrastructure"})
+@ComponentScan(
+        basePackages = {"net.datenstrudel.bulbs.core.domain.model.infrastructure"},
+        excludeFilters = @ComponentScan.Filter(Configuration.class))
 //@Import(value = {SchedulerInfrastructureConfig.class})
 public class ScheduledActuationIntegrationTestConfig {
 

@@ -1,7 +1,9 @@
 package net.datenstrudel.bulbs.core.application.messaging.notification;
 
 import net.datenstrudel.bulbs.core.application.messaging.notification.infrastructure.NotificationServiceRabbitMq;
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ChannelListener;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,7 +22,9 @@ import java.util.List;
  */
 @Configuration
 @EnableScheduling
-@ComponentScan(value = "net.datenstrudel.bulbs.core.application.messaging.notification.infrastructure")
+@ComponentScan(
+        value = "net.datenstrudel.bulbs.core.application.messaging.notification.infrastructure",
+        excludeFilters = @ComponentScan.Filter(Configuration.class))
 public class NotificationConfig {
 
     //~ Member(s) //////////////////////////////////////////////////////////////

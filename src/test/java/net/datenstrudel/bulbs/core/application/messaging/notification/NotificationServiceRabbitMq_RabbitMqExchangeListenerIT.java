@@ -14,17 +14,21 @@ import net.datenstrudel.bulbs.core.domain.model.messaging.DomainEvent;
 import net.datenstrudel.bulbs.core.domain.model.messaging.DomainEventPublisher;
 import net.datenstrudel.bulbs.core.domain.model.messaging.DomainEventSubscriber;
 import net.datenstrudel.bulbs.core.security.config.SecurityConfig;
+import net.datenstrudel.bulbs.core.testConfigs.WebTestConfig;
 import net.datenstrudel.bulbs.core.websocket.WebSocketConfig;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbState;
 import net.datenstrudel.bulbs.shared.domain.model.identity.AppId;
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;import org.junit.Before;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.util.Date;
 import java.util.Objects;
@@ -40,12 +44,14 @@ import static org.junit.Assert.assertTrue;
     initializers = TestConfig.class,
     classes = {
         TestConfig.class,
+        WebTestConfig.class,
         BulbsCoreConfig.class,
         ApplicationLayerConfig.class,
         SecurityConfig.class,
         WebSocketConfig.class
 })
 @RunWith(SpringJUnit4ClassRunner.class)
+@WebAppConfiguration
 @Category(IntegrationTest.class)
 public class NotificationServiceRabbitMq_RabbitMqExchangeListenerIT
         extends RabbitMqExchangeListener{
