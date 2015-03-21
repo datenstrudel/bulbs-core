@@ -21,6 +21,7 @@
         <!--<appender-ref ref="STDOUT" />-->
     <!--</root>-->
     <logger name="org.springframework" level="INFO"/>
+    <logger name="net.datenstrudel.bulbs.core" level="DEBUG" />
     <logger name="net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.lifx" level="DEBUG" />
     <include resource="org/springframework/boot/logging/logback/base.xml"/>
 

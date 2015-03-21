@@ -1,9 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package net.datenstrudel.bulbs.core.application.services;
 
 import net.datenstrudel.bulbs.core.application.facade.ModelFacadeOutPort;
@@ -26,10 +20,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-/**
- *
- * @author Thomas Wendzinski
- */
 @Service
 public class ScheduledActuationServiceImpl implements ScheduledActuationService,
         ScheduledActuationServiceInternal {
@@ -57,8 +47,7 @@ public class ScheduledActuationServiceImpl implements ScheduledActuationService,
         this.actuatorService = actuatorService;
         this.userRepository = userRepository;
     }
-    
-    
+
     //~ Method(s) //////////////////////////////////////////////////////////////
     @Override
     public Set<ScheduledActuation> loadAllByUser(BulbsContextUserId userId) {
@@ -146,7 +135,7 @@ public class ScheduledActuationServiceImpl implements ScheduledActuationService,
     
     @Override
     public void modifyName(BulbsContextUserId userId, ScheduledActuationId actId, String newName) {
-        
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     @Override
     public void modifyStates(BulbsContextUserId userId, ScheduledActuationId actId, Collection<AbstractActuatorCmd> newStates) {
@@ -187,7 +176,7 @@ public class ScheduledActuationServiceImpl implements ScheduledActuationService,
     public void deleteAfterExecutionIfConfigured(ScheduledActuationId id) {
         ScheduledActuation entity = schedRepo.findOne(id);
         if(entity == null){
-            throw new IllegalArgumentException("error.scheduledActuation.notFound");
+            throw new IllegalArgumentExceptionNotRepeatable("error.scheduledActuation.notFound");
         }
         log.info("Handling after execution of {} ..", entity);
         if (!entity.isDeleteAfterExecution()) return;

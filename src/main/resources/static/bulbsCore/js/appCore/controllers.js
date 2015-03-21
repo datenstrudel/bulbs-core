@@ -162,19 +162,9 @@ function BulbsCtrl($scope, $rootScope, $http, $routeParams, $timeout,
         }, bulb);
     };
     $scope.modifyBulbState = function(newState, bulb){
-        var cmd = {
-            appId : 'APP_TYPE__BULBS_CORE',
-            priority : { priority : 0},
-            bulbId : bulb.bulbId,
-            transitionDelay : 0,
-            states : [
-                newState
-            ]
-        };
-        // Stomp WS request
-        ActuatorServiceBulbs.execute(
-            cmd // Request Body
-        ); 
+        var cmd = BulbService.newActCmd(bulb);
+        cmd.states.push(newState);
+        ActuatorServiceBulbs.execute(cmd);
     };
     
     //~ Options
@@ -539,19 +529,9 @@ function GroupCtrl($scope, $rootScope, GlobalOptionsService, GroupService,
         }, group);
     };
     $scope.modifyGroupState = function(newState, group){
-        var cmd = {
-            appId : 'APP_TYPE__BULBS_CORE',
-            priority : { priority : 0},
-            groupId : group.groupId,
-            transitionDelay : 0,
-            states : [
-                newState
-            ]
-        };
-        // Stomp WS request
-        ActuatorServiceGroups.execute(
-            cmd // Request Body
-        ); 
+        var cmd = GroupService.newActCmd(group);
+        cmd.states.push(newState);
+        ActuatorServiceGroups.execute(cmd);
     };
 
     $scope.initColorFor = function(group){
@@ -560,8 +540,7 @@ function GroupCtrl($scope, $rootScope, GlobalOptionsService, GroupService,
         if(typeof(group.bulbs[0].state) === 'undefined' || group.bulbs[0] == null )return null;
         return group.bulbs[0].state.color;
     };
-    
-    
+
     $scope.calcGroupsAvailableBulbs = function(group){
         if(typeof($scope.groupsAvailableBulbs[group.groupId]) === 'undefined'){
             $scope.groupsAvailableBulbs[group.groupId] = [];
