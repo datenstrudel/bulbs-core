@@ -81,7 +81,7 @@ public class BulbBridgeAdminServiceImpl
             try{
                 el.syncToHardwareState(user.principalFrom(el.getId()));
             }catch(BulbBridgeHwException bbhwex){
-                log.info("Couldn't sync due to: " + bbhwex.getMessage());
+                log.info("Couldn't sync bridge  " + el + " due to: " + bbhwex.getMessage());
                 el.markRecursivelyOffline(user.principalFrom(el.getId()));
             }
             bridgeRepository.save(el);

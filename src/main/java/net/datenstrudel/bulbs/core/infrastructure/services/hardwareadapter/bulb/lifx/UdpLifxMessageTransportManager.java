@@ -240,7 +240,7 @@ public class UdpLifxMessageTransportManager {
                         LifxMessage[] suspMsg = suspendedMessages.remove(packetType);
                         if (suspMsg != null && System.currentTimeMillis() - suspensionTime.get(packetType) < SUSPENSION_TIMEOUT_MS) {
                             clientsWaiting.remove(packetType).complete(suspMsg);
-                            log.debug("Message resolved: {}", suspMsg);
+                            log.debug("Message resolved: " + suspMsg );
                         }else{
                             clientsWaiting.remove(packetType).completeExceptionally(
                                     new BulbBridgeHwException("No answer received within time frame"));
@@ -256,7 +256,7 @@ public class UdpLifxMessageTransportManager {
                         LifxMessage[] suspMsg = suspendedMessages.remove(packetType);
                         if (suspMsg != null) {
                             result.complete(suspMsg);
-                            log.debug("Message resolved: {}", suspMsg);
+                            log.debug("Message resolved: " + suspMsg);
                         } else {
 //                            log.debug("Hit message awaiting timeout {}", packetType);
                             result.completeExceptionally(new BulbBridgeHwException("No answer received within time frame"));

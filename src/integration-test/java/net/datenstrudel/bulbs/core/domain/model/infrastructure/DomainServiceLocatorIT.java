@@ -1,19 +1,15 @@
 package net.datenstrudel.bulbs.core.domain.model.infrastructure;
 
-import net.datenstrudel.bulbs.core.IntegrationTest;
 import net.datenstrudel.bulbs.core.TestConfig;
 import net.datenstrudel.bulbs.core.config.BulbsCoreConfig;
 import net.datenstrudel.bulbs.core.domain.model.bulb.BulbsHwService;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
-import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
 
 /**
  *
@@ -26,10 +22,9 @@ import static org.junit.Assert.fail;
         BulbsCoreConfig.class
 })
 @RunWith(SpringJUnit4ClassRunner.class)
-@Category(value = IntegrationTest.class)
-public class DomainServiceLocatorTest {
+public class DomainServiceLocatorIT {
     
-    public DomainServiceLocatorTest() {
+    public DomainServiceLocatorIT() {
     }
     
     @Before

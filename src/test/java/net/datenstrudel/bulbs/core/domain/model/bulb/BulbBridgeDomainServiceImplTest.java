@@ -1,6 +1,7 @@
 package net.datenstrudel.bulbs.core.domain.model.bulb;
 
 import net.datenstrudel.bulbs.core.domain.model.identity.*;
+import net.datenstrudel.bulbs.core.domain.model.messaging.DomainEventPublisher;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbBridgeAddress;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbsPlatform;
 import org.junit.Test;
@@ -28,7 +29,7 @@ public class BulbBridgeDomainServiceImplTest {
         BulbsPrincipal principal2 = new BulbsPrincipal("test_userName2", AppIdCore.instance(), "test_bbId1", BulbsPrincipalState.REGISTERED);
         BulbsPrincipal principal3 = new BulbsPrincipal("test_userName3", AppIdCore.instance(), "test_bbId1", BulbsPrincipalState.REGISTERED);
         BulbsContextUser user = new BulbsContextUser(new BulbsContextUserId("test_useruuid"), "test_email", "", "test_nick", "test_ApiKey");
-
+        DomainEventPublisher.instance().reset();
         instance.removeBulbsPrincipalsAfterDeletion(
                 principal1,
                 new BulbsPrincipal[]{principal1, principal2, principal3},

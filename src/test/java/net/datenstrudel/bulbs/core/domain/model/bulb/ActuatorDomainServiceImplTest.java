@@ -10,11 +10,10 @@ import net.datenstrudel.bulbs.core.domain.model.preset.PresetActuatorCommand;
 import net.datenstrudel.bulbs.core.domain.model.preset.PresetRepository;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.CommandPriority;
 import net.datenstrudel.bulbs.shared.domain.model.identity.AppId;
-import org.easymock.Capture;
-import org.easymock.CaptureType;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Collection;
@@ -22,8 +21,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.*;
 
 /**
  *
@@ -46,9 +46,9 @@ public class ActuatorDomainServiceImplTest {
     
     @Before
     public void setUp() {
-        mk_bridgeRepository = createNiceMock(BulbBridgeRepository.class);
+        mk_bridgeRepository = mock(BulbBridgeRepository.class);
         ReflectionTestUtils.setField(instance, "bridgeRepository", mk_bridgeRepository);
-        mk_userService = createMock(BulbsContextUserDomainService.class);
+        mk_userService = mock(BulbsContextUserDomainService.class);
         ReflectionTestUtils.setField(instance, "userService", mk_userService);
         
     }
@@ -110,35 +110,32 @@ public class ActuatorDomainServiceImplTest {
     
     @Test
     public void testExecute_ActuationCancelCommand() throws Exception {
-        System.out.println("execute");
-        BulbBridgeId[] bridges = {new BulbBridgeId("testCancel_brUuid_1"), new BulbBridgeId("testCancel_brUuid_2")};
+        BulbBridgeId[] bridges = {
+                new BulbBridgeId("testCancel_brUuid_1"),
+                new BulbBridgeId("testCancel_brUuid_2"),
+                new BulbBridgeId("testCancel_brUuid_3")};
         ActuationCancelCommand cancelCommand = newCancelCmd(bridges);
 
-        expect(mk_userService.loadPrincipalByUserApiKey(
-                isA(String.class), isA(AppId.class), isA(BulbBridgeId.class)) )
-                .andReturn(new BulbsPrincipal("testUsername", AppIdCore.instance(), "testBulbBridge", BulbsPrincipalState.REGISTERED))
-                .anyTimes();
+        when(mk_userService.loadPrincipalByUserApiKey(any(String.class), any(AppId.class), any(BulbBridgeId.class)))
+                .thenReturn(new BulbsPrincipal("testUsername", AppIdCore.instance(), "testBulbBridge", BulbsPrincipalState.REGISTERED));
         
-        Capture<ActuationCancelCommand> captCmd = new Capture<>(CaptureType.ALL);
-        BulbBridge mk_br1, mk_br2;
-        mk_br1 = createMock( BulbBridge.class); 
-        mk_br2 = createMock( BulbBridge.class);
-        
-        expect(mk_bridgeRepository.findOne(bridges[0])).andReturn(mk_br1).once();
-        mk_br1.cancelActuation(capture(captCmd), isA(BulbsPrincipal.class));
-        expectLastCall().once();
-        
-        expect(mk_bridgeRepository.findOne(bridges[1])).andReturn(mk_br2).once();
-        mk_br2.cancelActuation(capture(captCmd), isA(BulbsPrincipal.class));
-        expectLastCall().once();
-        
-        
-        replay(mk_userService, mk_bridgeRepository, mk_br1, mk_br2);
+        ArgumentCaptor<ActuationCancelCommand> captCmd = ArgumentCaptor.forClass(ActuationCancelCommand.class);
+        BulbBridge mk_br1, mk_br2, mk_br3;
+        mk_br1 = mock(BulbBridge.class);
+        mk_br2 = mock(BulbBridge.class);
+        mk_br3 = mock(BulbBridge.class);
+
+        when(mk_bridgeRepository.findOne(bridges[0])).thenReturn(mk_br1);
+        when(mk_bridgeRepository.findOne(bridges[1])).thenReturn(mk_br2);
+        when(mk_bridgeRepository.findOne(bridges[2])).thenReturn(null);
 
         instance.execute(cancelCommand);
-        
-        verify(mk_userService, mk_bridgeRepository, mk_br1, mk_br2);
-        List<ActuationCancelCommand> captCmds = captCmd.getValues();
+
+        verify(mk_br1, times(1)).cancelActuation(captCmd.capture(), any(BulbsPrincipal.class));
+        verify(mk_br2, times(1)).cancelActuation(captCmd.capture(), any(BulbsPrincipal.class));
+        verify(mk_br3, times(0)).cancelActuation(captCmd.capture(), any(BulbsPrincipal.class));
+
+        List<ActuationCancelCommand> captCmds = captCmd.getAllValues();
         assertEquals(2, captCmds.size());
         assertEquals(2, captCmds.get(0).getEntityIds().size() );
         assertEquals(2, captCmds.get(1).getEntityIds().size() );

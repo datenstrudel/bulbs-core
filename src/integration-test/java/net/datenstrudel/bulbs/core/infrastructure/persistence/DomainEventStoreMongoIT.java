@@ -1,7 +1,6 @@
 package net.datenstrudel.bulbs.core.infrastructure.persistence;
 
 import jdk.nashorn.internal.ir.annotations.Ignore;
-import net.datenstrudel.bulbs.core.IntegrationTest;
 import net.datenstrudel.bulbs.core.TestConfig;
 import net.datenstrudel.bulbs.core.application.messaging.eventStore.DomainEventStore;
 import net.datenstrudel.bulbs.core.application.messaging.eventStore.StoredEvent;
@@ -9,10 +8,11 @@ import net.datenstrudel.bulbs.core.domain.model.messaging.DomainEvent;
 import net.datenstrudel.bulbs.core.infrastructure.PersistenceConfig;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbState;
 import net.datenstrudel.bulbs.shared.domain.model.color.ColorRGB;
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;import org.junit.After;
+import org.junit.After;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ContextConfiguration;

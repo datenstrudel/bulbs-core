@@ -3,7 +3,6 @@ package net.datenstrudel.bulbs.core.infrastructure.persistence.repository;
 import net.datenstrudel.bulbs.core.TestConfig;
 import net.datenstrudel.bulbs.core.application.messaging.eventStore.PublishedMessageTracker;
 import net.datenstrudel.bulbs.core.application.messaging.eventStore.PublishedMessageTrackerStore;
-import net.datenstrudel.bulbs.core.domain.model.preset.Preset;
 import net.datenstrudel.bulbs.core.infrastructure.PersistenceConfig;
 import org.junit.Before;
 import org.junit.Test;
