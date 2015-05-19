@@ -37,9 +37,9 @@ public class ScheduledActuationId implements ValueObject<ScheduledActuationId>, 
         return uuid + creator.getUuid();
     }
     public static ScheduledActuationId fromSerialized(String in){
-        if(in.length() < 37) throw new ValidationException("Id was too short");
-        String uuid = in.substring(0, 36);
-        String userId = in.substring(36);
+        if(in.length() < 46) throw new ValidationException("Id was too short");
+        String uuid = in.substring(0, 46);
+        String userId = in.substring(46);
         return new ScheduledActuationId(uuid, new BulbsContextUserId(userId));
     }
 

@@ -7,22 +7,21 @@ import net.datenstrudel.bulbs.core.application.services.ScheduledActuationServic
 import net.datenstrudel.bulbs.core.domain.model.bulb.AbstractActuatorCmd;
 import net.datenstrudel.bulbs.core.domain.model.identity.BulbsContextUser;
 import net.datenstrudel.bulbs.core.domain.model.scheduling.ScheduledActuationId;
-import net.datenstrudel.bulbs.shared.domain.model.client.preset.DtoPreset;
 import net.datenstrudel.bulbs.shared.domain.model.client.scheduling.DtoScheduledActuation;
+import net.datenstrudel.bulbs.shared.domain.model.scheduling.Trigger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
-/**
- *
- * @author Thomas Wendzinski
- */
 @RestController
-@RequestMapping(value = "core/schedules")
+@RequestMapping(value = "core/schedules",
+        produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(value = "schedules", description = "Schedule bulb-, preset- or group states ", position = 50)
 public class ScheduledActuationCtrl {
 
@@ -40,8 +39,8 @@ public class ScheduledActuationCtrl {
     @RequestMapping(method = RequestMethod.GET, value="/{scheduledActuationId}", 
             produces = "application/json")
     public DtoScheduledActuation loadById(
-        @PathVariable("scheduledActuationId") String _scheduledActuationId,
-        Authentication authentication){
+            @PathVariable("scheduledActuationId") String _scheduledActuationId,
+            Authentication authentication){
             
         BulbsContextUser principal = ((BulbsContextUser)authentication.getPrincipal());
         ScheduledActuationId schedId = ScheduledActuationId.fromSerialized(_scheduledActuationId);
@@ -55,8 +54,8 @@ public class ScheduledActuationCtrl {
     @RequestMapping(method = RequestMethod.DELETE, value="/{scheduledActuationId}", 
             produces = "application/json")
     public void deleteById(
-        @PathVariable("scheduledActuationId") String _scheduledActuationId,
-        Authentication authentication){
+            @PathVariable("scheduledActuationId") String _scheduledActuationId,
+            Authentication authentication ){
             
         BulbsContextUser principal = ((BulbsContextUser)authentication.getPrincipal());
         ScheduledActuationId schedId = ScheduledActuationId.fromSerialized(_scheduledActuationId);
@@ -65,20 +64,20 @@ public class ScheduledActuationCtrl {
     }
     
     @ResponseBody
-    @RequestMapping(method = RequestMethod.GET, value="/", 
+    @RequestMapping(method = RequestMethod.GET,
             produces = "application/json")
-    public List<DtoPreset> scheduledActuationsByUser(
+    public Set<DtoScheduledActuation> scheduledActuationsByUser(
             Authentication authentication){
             
         BulbsContextUser principal = ((BulbsContextUser)authentication.getPrincipal());
         
         modelPort.registerConverterFor(DtoScheduledActuation.class);
         scheduledActuationService.loadAllByUser(principal.getBulbsContextUserlId());
-        return modelPort.outputAs(List.class);
+        return modelPort.outputAsSet(DtoScheduledActuation.class);
     }
     
     @ResponseBody
-    @RequestMapping(method = RequestMethod.POST, value="/",
+    @RequestMapping(method = RequestMethod.POST,
             consumes = "application/json")
     public DtoScheduledActuation createAndActivate(
             final @RequestBody @Valid DtoScheduledActuation dtoNewSchedule,
@@ -93,9 +92,9 @@ public class ScheduledActuationCtrl {
                 dtoNewSchedule.getName(), 
                 dtoNewSchedule.getTrigger(), 
                 dtoNewSchedule.isDeleteAfterExecution(), 
-                (Collection<AbstractActuatorCmd> ) converterFactory
+                converterFactory
                         .converterForDomain(AbstractActuatorCmd.class)
-                        .reverseConvert(dtoNewSchedule.getStates()) );  
+                        .reverseConvertCollection((Collection) dtoNewSchedule.getStates()) );
         DtoScheduledActuation res = modelPort.outputAs(DtoScheduledActuation.class);
         return res;
     }
@@ -116,6 +115,19 @@ public class ScheduledActuationCtrl {
             scheduledActuationService.deactivate(principal.getBulbsContextUserlId(), schedId);
         }
         
+    }
+
+    @ResponseBody
+    @RequestMapping(method = RequestMethod.PUT, value="/{scheduledActuationId}/trigger")
+    public void setNewTrigger(
+            @PathVariable("scheduledActuationId") String _scheduledActuationId,
+            @RequestBody @Valid Trigger trigger,
+            Authentication authentication
+    ){
+        BulbsContextUser principal = ((BulbsContextUser)authentication.getPrincipal());
+        ScheduledActuationId schedId = ScheduledActuationId.fromSerialized(_scheduledActuationId);
+
+        scheduledActuationService.modifyTrigger(principal.getBulbsContextUserlId(), schedId, trigger);
     }
     
     @ResponseBody

@@ -16,7 +16,11 @@ public class IdentityUtil {
     BulbsContextUserService userService;
 
     public BulbsContextUser createNewTestUser(String credentials){
-        BulbsContextUser res = userService.signUp("test_email" + (Math.random() * 1000l) + "@test.datenstrudel.net", credentials, "test_nick", new ValidatorBulbsContextUser.NotificationHandlerBulbsContextUser() {
+        BulbsContextUser res = userService.signUp(
+                "test_email" + (Math.random() * 1000l) + "@test.datenstrudel.net",
+                credentials,
+                "test_nick",
+                new ValidatorBulbsContextUser.NotificationHandlerBulbsContextUser() {
             @Override
             public void handleDuplicateEmail(String mailAddressConcerned) {
             }

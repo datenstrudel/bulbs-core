@@ -167,10 +167,10 @@ public class BulbsHwServiceImpl implements BulbsHwService{
                 hwAdapterForPlatform(platform), 
                 platform);
         CmdHwExecutor runningExec;
-        if( ( runningExec = this.runningExecutions.get( command.getBulbId()) ) != null ){
+        if( ( runningExec = this.runningExecutions.get( command.getTargetId()) ) != null ){
             runningExec.cancelExecution();
         }
-        this.runningExecutions.put(command.getBulbId(), exec);
+        this.runningExecutions.put(command.getTargetId(), exec);
         
         asyncExecutor.execute(exec, 50l);
         

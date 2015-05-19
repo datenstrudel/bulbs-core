@@ -1,7 +1,9 @@
 package net.datenstrudel.bulbs.core.web.controller.util;
 
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbBridgeHwException;
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;import org.springframework.http.HttpStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.FieldError;
@@ -73,9 +75,8 @@ public class ControllerExceptionHandler {
             HttpServletRequest req, 
             HttpServletResponse resp, 
             HttpSession session){
-        if(log.isDebugEnabled()){
-            log.debug("Handling Invalid Request Exception of type["+ex.getClass().getSimpleName()+"]: " + ex.getMessage());
-        }
+
+        log.info("Handling Invalid Request Exception of type[" + ex.getClass().getSimpleName() + "]: " + ex.getMessage());
         if(ex instanceof MethodArgumentNotValidException){
             MethodArgumentNotValidException manvex = (MethodArgumentNotValidException) ex;
             StringBuilder rejFields = new StringBuilder("Fields rejected or missing: ");
@@ -87,20 +88,7 @@ public class ControllerExceptionHandler {
         }
         return ex.getMessage();
     }
-//    @ExceptionHandler({
-//    })
-//    @ResponseStatus(HttpStatus.BAD_REQUEST)
-//    @ResponseBody
-//    public String handleInvalidRequest(
-//            Exception ex, 
-//            HttpServletRequest req, 
-//            HttpServletResponse resp, 
-//            HttpSession session){
-//        
-//        return ex.getMessage();
-//    }
-    
-    
+
     @ExceptionHandler(BulbBridgeHwException.class)
     @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
     @ResponseBody

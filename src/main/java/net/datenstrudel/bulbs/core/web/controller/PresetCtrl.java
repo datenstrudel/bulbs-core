@@ -27,7 +27,8 @@ import java.util.Set;
  * @author Thomas Wendzinski
  */
 @RestController
-@RequestMapping(value = "/core/", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/core/",
+        produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(value = "presets", description = "contain bulbs' and/or groups' states, ~transitions", position = 40)
 public class PresetCtrl {
 

@@ -7,7 +7,9 @@ import net.datenstrudel.bulbs.core.application.messaging.notification.infrastruc
 import net.datenstrudel.bulbs.core.application.services.IBulbBridgeAdminServiceInternal;
 import net.datenstrudel.bulbs.core.domain.model.bulb.BulbBridgeId;
 import net.datenstrudel.bulbs.core.domain.model.bulb.events.BulbSearchFinished;
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -37,8 +39,6 @@ public class BulbSearchFinishedHandler extends RabbitMqExchangeListener{
     protected void filteredDispatch(String type, String message) {
         Notification nf = gson.fromJson(message, Notification.class);
         if(log.isDebugEnabled()){
-            log.debug("|-- [ X ] Going to handle retrieved message containing payload type["+type+"]");
-            log.debug(" -- [ X ] Going to handle retrieved Notification with id["+nf.getNotificationId()+"]");
             log.debug(" -- [ X ] Going to sync internal bridge state.");
         }
         BulbSearchFinished evt = gson.fromJson(nf.getEventBody(), BulbSearchFinished.class);

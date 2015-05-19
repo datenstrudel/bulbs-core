@@ -159,27 +159,27 @@ angular.module('hardwareResources', ['ngResource', 'identityAuthServices'])
         );
     })
     .factory('PresetResourceService', function($resource, IdentityService){
-        return $resource('core/presets', 
-                {}, 
+        return $resource('core/presets',
+                {},
                 {
                     presetById: {url: 'core/presets/:presetId', method:'GET', params:{}, isArray:false,
                             headers : {'Auth' : window.escape(IdentityService.apiKey())} },
-                    presetsByUser: {method:'GET', params:{}, isArray:true, 
+                    presetsByUser: {method:'GET', params:{}, isArray:true,
                             headers : {'Auth' : window.escape(IdentityService.apiKey())} },
-                    createPreset: {method:'POST', params:{}, isArray:false, 
-                            headers : {'Auth' : window.escape(IdentityService.apiKey())} }, 
+                    createPreset: {method:'POST', params:{}, isArray:false,
+                            headers : {'Auth' : window.escape(IdentityService.apiKey())} },
                     deletePreset: {url: 'core/presets/:presetId', method:'DELETE',
-                            params:{}, isArray:false, 
-                            headers : {'Auth' : window.escape(IdentityService.apiKey())} 
+                            params:{}, isArray:false,
+                            headers : {'Auth' : window.escape(IdentityService.apiKey())}
                     },
                     modifyName: {url: 'core/presets/:presetId/name', method:'PUT',
-                            params:{}, isArray:false, 
+                            params:{}, isArray:false,
                             headers : {
 								'Auth' : window.escape(IdentityService.apiKey())
-							} 
+							}
                     },
                     modifyPresetStates: {url: 'core/presets/:presetId/states', method:'PUT',
-                            params:{}, isArray : true, 
+                            params:{}, isArray : true,
                             headers : {'Auth' : window.escape(IdentityService.apiKey())},
 							transformResponse : function(data){
 								var res = angular.fromJson(data);
@@ -189,9 +189,28 @@ angular.module('hardwareResources', ['ngResource', 'identityAuthServices'])
                 }
         );
     })
+    .factory('ScheduledActuationResourceService', function($resource, IdentityService){
+        return $resource('core/schedules',
+            {},
+            {
+                loadById : { url : 'core/schedules/:scheduledActuationId', method: 'GET', params : {}, isArray: false,
+                        headers : {'Auth' : window.escape(IdentityService.apiKey())} },
+                toggleActivation : { url : 'core/schedules/:scheduledActuationId/active/:active', method: 'PUT', params : {}, isArray: false,
+                        headers : {'Auth' : window.escape(IdentityService.apiKey())} },
+                loadByUser : {method: 'GET', params : {}, isArray: true,
+                        headers : {'Auth' : window.escape(IdentityService.apiKey())} },
+                createAndActivate : { method: 'POST', params : {}, isArray: false,
+                    headers : {'Auth' : window.escape(IdentityService.apiKey())} },
+                setNewTrigger : {url : 'core/schedules/:scheduledActuationId/trigger',  method: 'PUT', params : {}, isArray: false,
+                    headers : {'Auth' : window.escape(IdentityService.apiKey())} },
+                remove : { url : 'core/schedules/:scheduledActuationId', method: 'DELETE', params : {}, isArray: false,
+                    headers : {'Auth' : window.escape(IdentityService.apiKey())} }
+            }
+        );
+    })
 ;
 angular.module('entityServices', ['ngResource', 'identityAuthServices'])
-    .factory('BridgeService', function($resource, $q, $rootScope, BridgeResourceService, StompClientHolder, ActuatorServiceBulbs){
+    .factory('BridgeService', function($resource, $q, $rootScope, BridgeResourceService){
 		var allBridges = [];
         var emptyBridge = {
             bridgeId : "",
@@ -477,7 +496,7 @@ angular.module('entityServices', ['ngResource', 'identityAuthServices'])
             priority : { priority : 1},
             transitionDelay : 0
         };
-        
+
         var presetById = function(presetId){
             return angular.forEach(presets, function(preset){
                 if(preset.presetId === presetId){
@@ -616,8 +635,179 @@ angular.module('entityServices', ['ngResource', 'identityAuthServices'])
 				var idx = presets.indexOf(presetCurrent);
 				presets.remove(presetCurrent);
 				presets.splice(idx, 0, presetBackup);
-			}
-			
+			},
+            presetsInEditMode : function(){
+                var res = false;
+                angular.forEach(presets, function (p) {
+                    if(p.isUnsaved){
+                        res = true;
+                        return;
+                    }
+                });
+                return res;
+            }
+
+        };
+    })
+    .factory('ScheduledActuationService', function($resource, $q, $rootScope, ScheduledActuationResourceService, EntityUtils, PresetService){
+        var allSchedules = {};
+        var initialized = false;
+        var scheduledActuation = {
+            isUnsaved : true,
+            deleteAfterExecution : true,
+            scheduledActuationId : {},
+            //nextTriggerTime : '', // read only
+            name: '<anonymousTrigger>',
+            activated : false,
+            trigger : {
+                type : "PointInTimeTrigger", // | DaysOfWeekTrigger | InervalTrigger
+                startAt : new Date().getTime() + 28800000, // plus 8 hours
+                timezoneId : 'CET',
+                expired: false // read only
+            },
+            "states": []
+        };
+        var schedulesByPreset = {};
+        var schedulesInitialized = false;
+
+        var schedulesByUser = function(forceUpdate){
+            forceUpdate = typeof(forceUpdate) !== 'undefined' ? forceUpdate : false;
+            var deferredRes = $q.defer();
+            if(initialized && !forceUpdate){
+                deferredRes.resolve(allSchedules);
+                return deferredRes.promise;
+            }
+            ScheduledActuationResourceService.loadByUser(
+                {},
+                {},
+                function(resp){
+                    console.info("Schedules loaded.");
+                    allSchedules = resp;
+                    deferredRes.resolve(allSchedules);
+                    initialized = true;
+                },
+                function(resp){
+                    deferredRes.reject(resp);
+                }
+            );
+            return deferredRes.promise;
+        };
+        var initSchedulesByPreset = function(){
+            var deferredRes = $q.defer();
+            schedulesByUser(false).then(
+                function (schedules){
+                    schedulesByPreset = {};
+                    angular.forEach(schedules, function(s){
+                        if(s.states &&  s.states[0] && "PRESET" === s.states[0].type){
+                            var skey = s.states[0].presetId;
+                            schedulesByPreset[skey] = s;
+                        }
+                    });
+                    schedulesInitialized = true;
+                    deferredRes.resolve(schedulesByPreset);
+                }, function (error){
+                    console.error(error);
+                    deferredRes.reject(error);
+                }
+            );
+            return deferredRes.promise;
+        };
+        var schedulerForPreset = function(preset){
+            var res = $q.defer();
+            initSchedulesByPreset(false).then(
+                function (schedules) {
+                    if( typeof(schedules[preset.presetId]) === 'undefined' ){
+                        res.resolve(null);
+                    }else{
+                        res.resolve(schedulesByPreset[preset.presetId]);
+                    }
+                }, function(error){
+                    console.info(error);
+                    res.reject(error);
+                }
+            );
+            return res.promise;
+        };
+
+        return {
+            schedulesByUser : schedulesByUser,
+            deleteScheduler : function(scheduler){
+                var deferredRes = $q.defer();
+                ScheduledActuationResourceService.remove(
+                    {scheduledActuationId : scheduler.scheduledActuationId},
+                    {},
+                    function(res){
+                        allSchedules.remove(scheduler);
+                        deferredRes.resolve(res);
+                        $rootScope.$broadcast("Evt_SchedulerHasChanged", scheduler);
+                    }, function(error) {
+                        console.error(error);
+                        deferredRes.reject(error);
+                    }
+                );
+                return deferredRes.promise;
+            },
+            toggleActivation : function(scheduler, isActive){
+                var deferredRes = $q.defer();
+                scheduler.activated = isActive;
+                ScheduledActuationResourceService.toggleActivation(
+                    {scheduledActuationId : scheduler.scheduledActuationId,
+                        active : isActive},
+                    {},
+                    function(res){
+                        deferredRes.resolve(res);
+                        $rootScope.$broadcast("Evt_SchedulerHasChanged", scheduler);
+                    }, function(error) {
+                        scheduler.activated = !isActive;
+                        console.error(error);
+                        deferredRes.reject(error);
+                        $rootScope.$broadcast("Evt_SchedulerHasChanged", scheduler);
+                    }
+                );
+                return deferredRes.promise;
+            },
+            setNewTrigger : function(scheduler, newTrigger){
+                var deferredRes = $q.defer();
+                ScheduledActuationResourceService.setNewTrigger(
+                    {scheduledActuationId : scheduler.scheduledActuationId },
+                    newTrigger,
+                    function(res){
+                        deferredRes.resolve(res);
+                        $rootScope.$broadcast("Evt_SchedulerHasChanged", scheduler);
+                    }, function(error) {
+                        console.error(error);
+                        deferredRes.reject(error);
+                        $rootScope.$broadcast("Evt_SchedulerHasChanged", scheduler);
+                    }
+                );
+                return deferredRes.promise;
+            },
+            newSchedulerForPreset : function(preset){
+                var res = angular.copy(scheduledActuation);
+                res.scheduledActuationId = EntityUtils.newUUID();
+                res.states.push(PresetService.newPresetCommand(preset));
+                allSchedules.push(res);
+                return res;
+            },
+            createSchedule : function(unsavedSchedule){
+                var promiseNewSchedule = $q.defer();
+                ScheduledActuationResourceService.createAndActivate(
+                    {}, unsavedSchedule,
+                    function(resp){
+                        allSchedules.remove(unsavedSchedule);
+                        allSchedules.push(resp);
+                        promiseNewSchedule.resolve(resp);
+                        console.log("Schedule successfully created: " + resp.name);
+                        $rootScope.$broadcast("Evt_SchedulerHasChanged", resp);
+                    },
+                    function(error){
+                        unsavedSchedule.activated = false;
+                        promiseNewSchedule.reject(error);
+                    }
+                );
+                return promiseNewSchedule.promise;
+            },
+            schedulerForPreset : schedulerForPreset
         };
     })
     .factory('EntityUtils', function(){
@@ -802,7 +992,7 @@ angular.module('webSocketServices', ['ngResource', 'identityAuthServices'])
             res.connect();
         }
         return $rootScope._StompClientHolder;
-    });
+    })
 ;
 
 angular.module('colorServices', [])

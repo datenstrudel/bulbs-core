@@ -21,7 +21,7 @@ import java.util.List;
  */
 @Configuration
 @EnableSwagger
-@Profile("development")
+@Profile("swagger")
 public class SwaggerConfig {
 
     @Autowired

@@ -175,8 +175,8 @@ angular.module('bulbs_core_directives', [])
 		return directiveDefObj;
 	}])
 
-	.directive('bulbPreset', ['PresetService','BulbService', 'GroupService', 'ColorConverter', '$timeout', '$location', '$anchorScroll',
-			function(PresetService, BulbService, GroupService, ColorConverter, $timeout, $location, $anchorScroll) {
+	.directive('bulbPreset', ['PresetService','BulbService', 'GroupService', 'ColorConverter', '$timeout', '$q', '$location', '$anchorScroll', 'ScheduledActuationService',
+			function(PresetService, BulbService, GroupService, ColorConverter, $timeout, $q, $location, $anchorScroll, ScheduledActuationService ) {
 		return {
 			replace : true,
 			restrict : 'EA',
@@ -184,7 +184,8 @@ angular.module('bulbs_core_directives', [])
 			scope : {
 				preset: '=',
 				applyStateImmediately : '=',
-				continuousTrigger : '='
+				continuousTrigger : '=',
+                editModeChanged : '&'
 			},
 			link : function link($scope, tElement, iAttrs){
 				
@@ -221,7 +222,6 @@ angular.module('bulbs_core_directives', [])
 
                 $scope.lastStateChangeSrc = "";
 
-				
 				// Head
 				$scope.switchEditName = function(b_state){
 					if(typeof(b_state) !== 'undefined'){
@@ -229,9 +229,7 @@ angular.module('bulbs_core_directives', [])
 					}else{
 						$scope.editName = !$scope.editName;
 					}
-					if(!$scope.editName && $scope.preset.isUnsaved){
-						PresetService.removePreset($scope.preset);
-					}
+                    $scope.editModeChanged({preset: $scope.preset, mode: $scope.editName});
 				};
 				$scope.save = function(presetMember){
 					if($scope.preset.isUnsaved){
@@ -285,7 +283,7 @@ angular.module('bulbs_core_directives', [])
 				// Entities
 				$scope.setEditMode = function(b_mode){
 					var prevEditMode = $scope.editMode;
-					if( $scope.editMode === b_mode)return ;
+					if( $scope.editMode === b_mode)return;
 					$scope.editMode = b_mode;
 					if(!b_mode){
 						$scope.entitySelected = null;
@@ -301,6 +299,14 @@ angular.module('bulbs_core_directives', [])
 				$scope.cancelEdit = function(){
 					$scope.setEditMode(false);
 					$scope.preset = PresetService.replacePreset($scope.preset, $scope.presetBackup);
+				};
+				$scope.cancelEditName = function(){
+					    $scope.switchEditName(false);
+                    if(!$scope.editName && $scope.preset.isUnsaved){
+                        PresetService.removePreset($scope.preset);
+                    }else{
+					    $scope.preset = PresetService.replacePreset($scope.preset, $scope.presetBackup);
+                    }
 				};
 				$scope.selectEntity = function(entity){
                     $scope.entitySelectionHash = Math.round(Math.random() * 1000);
@@ -589,6 +595,23 @@ angular.module('bulbs_core_directives', [])
 						$location.hash(old); // Prevent page reload!
 					}, 0);
 				};
+
+                //~ Schedules
+                $scope.showScheduler = false;
+                $scope.scheduler = null;
+                $scope.switchShowScheduler = function(){
+                    $scope.showScheduler = !$scope.showScheduler;
+                };
+                $scope.loadSchedulerForPreset = function(){
+                    ScheduledActuationService.schedulerForPreset($scope.preset).then(
+                        function(scheduler){
+                            $scope.scheduler = scheduler;
+                        }
+                    );
+                };
+                $scope.$on('Evt_SchedulerHasChanged', function(scheduler){
+                    $scope.loadSchedulerForPreset();
+                });
 				
 				//
 				$scope.initAll = function(){
@@ -605,11 +628,11 @@ angular.module('bulbs_core_directives', [])
 									$scope.calcActualAvailableEntities();
 								}, function(error){
 									console.log("TODO: Handle following error globally!");
-									console.log(error);
+									console.error(error);
 							});
 						}, function(error){
 							console.log("TODO: Handle following error globally!");
-							console.log(error);
+							console.error(error);
 					});
 				};
 				$scope.init = function(){
@@ -641,7 +664,9 @@ angular.module('bulbs_core_directives', [])
 							} 
 						);
 					}, 0 );
-					if($scope.editMode) $scope.scrollToThis();
+					if($scope.editMode) $scope.scrollToThis(); // ???
+                    $scope.loadSchedulerForPreset();
+
 				};
 				$scope.initAll();
 					
@@ -1011,6 +1036,7 @@ angular.module('bulbs_core_directives', [])
         };
     })
 
+    //DEPRECATED (?)
     .directive('bulbsCoreNavbarAffix', function(){
         return {
             replace : false,
@@ -1029,5 +1055,122 @@ angular.module('bulbs_core_directives', [])
             }
         };
     })
+
+    .directive('pointInTimeScheduler', ['ScheduledActuationService', function(ScheduledActuationService){
+        return {
+            replace : true,
+            restrict : 'EA',
+            templateUrl : 'bulbsCore/partials/directives/pointInTimeScheduler.html',
+            scope : {
+                visible : '=',
+                preset : '='
+            },
+            link : function link($scope, tElement, attrs){
+                var model = $scope;
+                model.schedViewModel = {};
+                model.scheduler = {};
+
+                model.switchActivation = function(){
+                    model.scheduler.activated = !model.scheduler.activated;
+                    if(model.scheduler.isUnsaved){
+                        console.log("Saving unsaved.");
+                        //~ Create new
+                        console.debug("Going to save new scheduler");
+                        ScheduledActuationService.createSchedule(model.scheduler).then(
+                            function(res){
+                                model.scheduler = res;
+                            }
+                        );
+                        model.init(true);
+                    }else{
+                        console.log("Saving .");
+                        ScheduledActuationService.setNewTrigger(model.scheduler, model.scheduler.trigger).then(
+                            function(res){
+                                ScheduledActuationService.toggleActivation(model.scheduler, model.scheduler.activated );
+                            }, function(error){
+                                alert("Internal error couldn't set trigger!");
+                                model.scheduler.activated = !model.scheduler.activated;
+                            }
+                        );
+                    }
+                    //ScheduledActuationService.createSchedule(model.scheduler);
+                };
+                model.deleteScheduler = function(){
+                    ScheduledActuationService.deleteScheduler(model.scheduler).then(
+                        function(res){
+                            model.scheduler.activated = false;
+                            model.scheduler = null;
+                            model.visible = false;
+                        }
+                    );
+                };
+
+                model.inputTimeChanged = function(){
+                    console.debug("Model changed");
+                    if(!model.scheduler.isUnsaved && model.scheduler.activated){
+                        // Deactivate active scheduler on trigger change
+                        ScheduledActuationService.toggleActivation(model.scheduler, false);
+                    }
+                    if(model.schedViewModel.hourOfDay >= 0 && model.schedViewModel.minOfHour >= 0 ){
+                        var triggerTime = new Date();
+                        triggerTime.setHours(model.schedViewModel.hourOfDay);
+                        triggerTime.setMinutes(model.schedViewModel.minOfHour);
+                        triggerTime.setSeconds(0);
+                        if(triggerTime.getTime() < new Date().getTime()){
+                            triggerTime.setHours(triggerTime.getHours() + 24);
+                        }
+                        model.scheduler.trigger.startAt = triggerTime.getTime();
+                        console.debug("New Trigger time set: " + triggerTime);
+                    }
+                };
+                model.triggersIn = function(){
+                    if( !model.scheduler )return;
+                    if( !model.scheduler.activated) return "";
+                    var date = new Date(model.scheduler.trigger.startAt - new Date().getTime());
+                    date.setMinutes(date.getMinutes() + new Date().getTimezoneOffset());
+                    return date.getHours() + "h and " + date.getMinutes() + "min"
+                };
+
+                model.init = function(isEditMode){
+                    console.debug("Init PIT Scheduler.");
+                    model.schedulerForPreset(isEditMode);
+                };
+
+                model.schedulerForPreset = function(serveNewIfNotExisting){
+                    console.debug("Init Scheduler directive model..");
+                    ScheduledActuationService.schedulerForPreset($scope.preset).then(
+                        function (scheduler){
+                            if(scheduler == null){
+                                if(serveNewIfNotExisting){
+                                    model.scheduler = ScheduledActuationService.newSchedulerForPreset(model.preset);
+                                } else model.scheduler = null;
+                            } else{
+                                model.scheduler = scheduler;
+                            }
+                            if(model.scheduler != null){
+                                var triggerTime = new Date(model.scheduler.trigger.startAt);
+                                model.schedViewModel.hourOfDay = triggerTime.getHours();
+                                model.schedViewModel.minOfHour = triggerTime.getMinutes();
+                            }
+                        }
+                    );
+                };
+
+                model.$watch('visible', function(){
+                    if(model.visible){
+                        model.init(true);
+                    }
+                });
+
+                model.formatDate = function(){
+                    if(model.scheduler == null || typeof( model.scheduler) === 'undefined' || typeof(model.scheduler.trigger) === 'undefined'){
+                        return "";
+                    }
+                    return new Date(model.scheduler.trigger.startAt).toLocaleDateString();
+                };
+                model.init(false);
+            }
+        };
+    }])
 
 ;

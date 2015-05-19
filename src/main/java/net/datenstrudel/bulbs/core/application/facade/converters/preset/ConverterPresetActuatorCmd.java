@@ -24,7 +24,7 @@ public class  ConverterPresetActuatorCmd
         DtoPresetActuatorCmd res = new DtoPresetActuatorCmd();
         res.setAppId(src.getAppId().getUniqueAppName());
         res.setPresetId((String) DtoConverterRegistry.instance().converterForDomain(
-                PresetId.class).convert(src.getPresetId()));
+                PresetId.class).convert(src.getTargetId()));
         res.setPriority(src.getPriority());
         res.setStates(src.getStates());
         res.setLoop(src.isLoop());

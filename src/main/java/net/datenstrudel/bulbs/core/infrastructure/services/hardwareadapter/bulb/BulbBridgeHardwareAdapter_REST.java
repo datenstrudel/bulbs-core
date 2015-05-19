@@ -41,8 +41,8 @@ public class BulbBridgeHardwareAdapter_REST implements BulbBridgeHardwareAdapter
 
     //~ Member(s) //////////////////////////////////////////////////////////////
     private static final Logger log = LoggerFactory.getLogger(BulbBridgeHardwareAdapter_REST.class);
-    @Value("${hardwareAdapter.philipsHue.bulbDiscoveryWaitTimeMillis}")
-    private long bulbDiscoveryWaitTimeMs = 60000l;
+    @Value("${hardwareAdapter.philipsHue.bulbDiscoveryWaitTimeMillis:60000L}")
+    private long bulbDiscoveryWaitTimeMs = 60000L;
 
     private RestTemplate restClient;
     @Autowired
@@ -50,7 +50,7 @@ public class BulbBridgeHardwareAdapter_REST implements BulbBridgeHardwareAdapter
     private AsyncTaskExecutor asyncExecutor;
     
     //~ Connection Params ~~~~~~~~~~~
-    @Value("${hardwareAdapter.philipsHue.maxTcpConnections}")
+    @Value("${hardwareAdapter.philipsHue.maxTcpConnections:10}")
     int connectionsMax;
     int CONNECTIONS__ROUTE_MAX = 100;
     int CONNECTION_TIMEOUT_MS = 1000;

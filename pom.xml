@@ -31,7 +31,7 @@
         <start-class>net.datenstrudel.bulbs.core.main.Main</start-class>
         <skipIT>false</skipIT>
         <maven.javadoc.skip>true</maven.javadoc.skip>
-        <bulbs-shared.version>1.2</bulbs-shared.version>
+        <bulbs-shared.version>1.3-SNAPSHOT</bulbs-shared.version>
         <httpclient.version>4.3</httpclient.version>
     </properties>
 
@@ -329,6 +329,11 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <jvmArguments>
+                        -Duser.timezone="UTC"
+                    </jvmArguments>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

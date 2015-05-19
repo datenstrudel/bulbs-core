@@ -1,5 +1,6 @@
 package net.datenstrudel.bulbs.core.websocket;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.metrics.CounterService;
 import org.springframework.context.annotation.Bean;
@@ -7,11 +8,15 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.converter.MessageConverter;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.messaging.support.ChannelInterceptor;
-import org.springframework.web.socket.config.annotation.*;
+import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
+import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
+import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
+import org.springframework.web.socket.config.annotation.WebSocketTransportRegistration;
 import org.springframework.web.socket.server.standard.TomcatRequestUpgradeStrategy;
 import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
 
@@ -28,6 +33,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Autowired
     CounterService counterService;
+
+    @Autowired
+    ObjectMapper jacksonObjectMapper;
 
     @Override
 	public void registerStompEndpoints(StompEndpointRegistry registry) {
@@ -79,14 +87,12 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         reg.taskExecutor().maxPoolSize(2);
         reg.taskExecutor().queueCapacity(180);
     }
-
     @Override
     public void configureClientOutboundChannel(ChannelRegistration reg) {
         reg.taskExecutor().corePoolSize(1);
         reg.taskExecutor().maxPoolSize(2);
         reg.taskExecutor().queueCapacity(180);
     }
-
     @Override
     public void configureWebSocketTransport(WebSocketTransportRegistration registry) {
         registry.setSendTimeLimit(2500);
@@ -101,8 +107,15 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public boolean configureMessageConverters(List<MessageConverter> messageConverters) {
-        messageConverters.add(new DtoWsMessageJsonAdapter());
+        messageConverters.add(mappingJackson2MessageConverter());
         return false;
+    }
+
+    @Bean
+    public MappingJackson2MessageConverter mappingJackson2MessageConverter() {
+        MappingJackson2MessageConverter messageConverter = new MappingJackson2MessageConverter();
+        messageConverter.setObjectMapper(jacksonObjectMapper);
+        return messageConverter;
     }
 
 }

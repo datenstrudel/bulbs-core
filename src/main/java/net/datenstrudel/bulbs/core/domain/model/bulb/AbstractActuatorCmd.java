@@ -7,18 +7,19 @@ import net.datenstrudel.bulbs.shared.domain.model.bulb.CommandPriority;
 import net.datenstrudel.bulbs.shared.domain.model.identity.AppId;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 /**
  *
  * @author Thomas Wendzinski
  * @param <T>
  */
-public abstract class AbstractActuatorCmd<T extends AbstractActuatorCmd>
+public abstract class AbstractActuatorCmd<T extends AbstractActuatorCmd, ID>
         implements ValueObject<T>{
 
     //~ Member(s) //////////////////////////////////////////////////////////////
+    protected ID targetId;
     protected AppId appId;
     protected String userApiKey;
     protected CommandPriority priority = CommandPriority.standard();
@@ -33,6 +34,9 @@ public abstract class AbstractActuatorCmd<T extends AbstractActuatorCmd>
     
     //~ Construction ///////////////////////////////////////////////////////////
     protected AbstractActuatorCmd(){}
+    protected AbstractActuatorCmd(ID targetId){
+        this.targetId = targetId;
+    }
     /**
      * At a minimum required for sub classes.
      * @param appId
@@ -41,32 +45,38 @@ public abstract class AbstractActuatorCmd<T extends AbstractActuatorCmd>
      * @param loop 
      */
     protected AbstractActuatorCmd(
+            ID targetId,
             AppId appId,
             String userApiKey,
             CommandPriority priority,
             boolean loop){
+        this.targetId = targetId;
         this.appId = appId;
         this.userApiKey = userApiKey;
         this.priority = priority;
         this.loop = loop;
     }
     public AbstractActuatorCmd(
+            ID targetId,
             AppId appId,
             String userApiKey,
             CommandPriority priority,
             List<BulbState> states
             ) {
+        this.targetId = targetId;
         this.appId = appId;
         this.userApiKey = userApiKey;
         this.priority = priority;
         this.states = states;
     }
     public AbstractActuatorCmd(
+            ID targetId,
             AppId appId,
             String userApiKey,
             CommandPriority priority,
             List<BulbState> states, 
             boolean loop) {
+        this.targetId = targetId;
         this.appId = appId;
         this.userApiKey = userApiKey;
         this.priority = priority;
@@ -113,20 +123,25 @@ public abstract class AbstractActuatorCmd<T extends AbstractActuatorCmd>
     public boolean isLoop() {
         return loop;
     }
-    
+    public ID getTargetId() {
+        return targetId;
+    }
+
     @Override
     public boolean sameValueAs(T other) {
         if(other == null)return false;
+        if(!Objects.equals(targetId, other.targetId))return false;
         if(!appId.equals(other.appId))return false;
         if(!userApiKey.equals(other.userApiKey))return false;
         if(!priority.equals(other.priority))return false;
-        if(!states.equals(other.states))return false;
+        if(!Objects.equals(this.states, other.states))return false;
 
         return true;
     }
     @Override
     public int hashCode() {
         int hash = 5;
+        hash = 97 * hash + (this.targetId != null ? this.targetId.hashCode() : 0);
         hash = 97 * hash + (this.appId != null ? this.appId.hashCode() : 0);
         hash = 97 * hash + (this.userApiKey != null ? this.userApiKey.hashCode() : 0);
         hash = 97 * hash + (this.priority != null ? this.priority.hashCode() : 0);
@@ -161,5 +176,7 @@ public abstract class AbstractActuatorCmd<T extends AbstractActuatorCmd>
     protected void setLoop(boolean loop) {
         this.loop = loop;
     }
-    
+    protected void setTargetId(ID targetId) {
+        this.targetId = targetId;
+    }
 }

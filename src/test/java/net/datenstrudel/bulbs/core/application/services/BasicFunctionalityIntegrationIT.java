@@ -9,16 +9,20 @@ import net.datenstrudel.bulbs.core.domain.model.identity.BulbsContextUser;
 import net.datenstrudel.bulbs.core.domain.model.identity.BulbsContextUserRepository;
 import net.datenstrudel.bulbs.core.domain.model.identity.ValidatorBulbsContextUser;
 import net.datenstrudel.bulbs.core.security.config.SecurityConfig;
+import net.datenstrudel.bulbs.core.testConfigs.WebTestConfig;
 import net.datenstrudel.bulbs.core.websocket.WebSocketConfig;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.*;
 import net.datenstrudel.bulbs.shared.domain.model.color.ColorRGB;
 import org.junit.Before;
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;import org.junit.Test;
+import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.util.LinkedList;
 
@@ -34,9 +38,11 @@ import static org.junit.Assert.*;
         BulbsCoreConfig.class,
         ApplicationLayerConfig.class,
         SecurityConfig.class,
+        WebTestConfig.class,
         WebSocketConfig.class,
         TestConfig.class
 })
+@WebAppConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
 public class BasicFunctionalityIntegrationIT {
     

@@ -9,7 +9,9 @@ import net.datenstrudel.bulbs.core.domain.model.preset.Preset;
 import net.datenstrudel.bulbs.core.domain.model.preset.PresetActuatorCommand;
 import net.datenstrudel.bulbs.core.domain.model.preset.PresetRepository;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbBridgeHwException;
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.metrics.CounterService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -65,7 +67,7 @@ public class ActuatorDomainServiceImpl implements ActuatorDomainService{
     @Override
     public void execute(BulbActuatorCommand bulbCommand) throws BulbBridgeHwException {
         Assert.notNull(bulbCommand.getUserApiKey());
-        BulbBridgeId bridgeId = bulbCommand.getBulbId().getBridgeId();
+        BulbBridgeId bridgeId = bulbCommand.getTargetId().getBridgeId();
         BulbsPrincipal principal = userService.loadPrincipalByUserApiKey(
                 bulbCommand.getUserApiKey(), bulbCommand.getAppId(), bridgeId);
         
@@ -79,9 +81,9 @@ public class ActuatorDomainServiceImpl implements ActuatorDomainService{
     }
     @Override
     public void execute(GroupActuatorCommand groupCmd) throws BulbBridgeHwException{
-        BulbGroup group = groupRepository.findOne(groupCmd.getGroupId());
+        BulbGroup group = groupRepository.findOne(groupCmd.getTargetId());
         if(group == null){
-            throw new IllegalArgumentException("Group["+groupCmd.getGroupId()+"] addressed doesn't exist!");
+            throw new IllegalArgumentException("Group["+groupCmd.getTargetId()+"] addressed doesn't exist!");
         }
         List<BulbActuatorCommand> bulbCommands = new ArrayList<>(group.getBulbs().size());
         for (BulbId bulbId : group.getBulbs()) {
@@ -99,9 +101,9 @@ public class ActuatorDomainServiceImpl implements ActuatorDomainService{
     }
     @Override
     public void execute(PresetActuatorCommand presetCommand)throws BulbBridgeHwException{
-        Preset preset = presetRepository.findOne(presetCommand.getPresetId());
+        Preset preset = presetRepository.findOne(presetCommand.getTargetId());
         if(preset == null){
-            throw new IllegalArgumentException("Preset["+presetCommand.getPresetId()+"] addressed doesn't exist!");
+            throw new IllegalArgumentException("Preset["+presetCommand.getTargetId()+"] addressed doesn't exist!");
         }
         for (AbstractActuatorCmd el : preset.getStates() ) {
             el.setAppId(presetCommand.getAppId()); 

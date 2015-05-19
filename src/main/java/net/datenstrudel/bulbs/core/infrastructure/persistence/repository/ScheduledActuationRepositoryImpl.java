@@ -1,6 +1,8 @@
 package net.datenstrudel.bulbs.core.infrastructure.persistence.repository;
 
+import com.google.common.collect.Sets;
 import net.datenstrudel.bulbs.core.domain.model.identity.BulbsContextUserId;
+import net.datenstrudel.bulbs.core.domain.model.preset.PresetId;
 import net.datenstrudel.bulbs.core.domain.model.scheduling.ScheduledActuation;
 import net.datenstrudel.bulbs.core.domain.model.scheduling.ScheduledActuationId;
 import net.datenstrudel.bulbs.core.domain.model.scheduling.ScheduledActuationRepositoryExt;
@@ -11,9 +13,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.IndexOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.index.Index;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -51,7 +56,18 @@ public class ScheduledActuationRepositoryImpl implements ScheduledActuationRepos
                 "SCHED_ACT-" + UUID.randomUUID().toString().toUpperCase(), creator);
     }
 
-//    @Override
+    @Override
+    public Set<ScheduledActuation> findByStatesContainsTargetId(PresetId presetId) {
+//        return null;
+        return Sets.newHashSet(mongo.find(
+                Query.query( Criteria
+                        .where("states.targetId")
+                        .is(presetId)
+                )
+                , ScheduledActuation.class ));
+//                .and("userId").is(id.getCreator().getUuid()))
+    }
+    //    @Override
 //    public ScheduledActuation findOne(ScheduledActuationId id) {
 //        return mongo.findOne(Query.query(Criteria
 //                .where("schedulerUuid")

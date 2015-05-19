@@ -5,6 +5,7 @@ import net.datenstrudel.bulbs.core.application.ApplicationLayerConfig;
 import net.datenstrudel.bulbs.core.application.messaging.notification.NotificationService;
 import net.datenstrudel.bulbs.core.config.BulbsCoreConfig;
 import net.datenstrudel.bulbs.core.security.config.SecurityConfig;
+import net.datenstrudel.bulbs.core.testConfigs.WebTestConfig;
 import net.datenstrudel.bulbs.core.websocket.WebSocketConfig;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,6 +31,7 @@ import static org.easymock.EasyMock.*;
     classes = {
             SecurityConfig.class,
             TestConfig.class,
+            WebTestConfig.class,
             BulbsCoreConfig.class,
             ApplicationLayerConfig.class,
             WebSocketConfig.class

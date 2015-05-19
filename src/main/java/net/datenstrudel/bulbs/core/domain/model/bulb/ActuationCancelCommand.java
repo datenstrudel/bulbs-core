@@ -11,7 +11,7 @@ import java.util.Set;
  * Cancels any multi state actuation of the given entities by id.
  * @author Thomas Wendzinski
  */
-public class ActuationCancelCommand extends AbstractActuatorCmd<ActuationCancelCommand>
+public class ActuationCancelCommand extends AbstractActuatorCmd<ActuationCancelCommand, Set<BulbId>>
         implements Serializable{
 
     //~ Member(s) //////////////////////////////////////////////////////////////
@@ -25,7 +25,7 @@ public class ActuationCancelCommand extends AbstractActuatorCmd<ActuationCancelC
             AppId appId, 
             String userApiKey, 
             CommandPriority priority) {
-        super(appId, userApiKey, priority, false);
+        super(entityIds, appId, userApiKey, priority, false);
         this.entityIds = entityIds;
     }
     
@@ -35,7 +35,7 @@ public class ActuationCancelCommand extends AbstractActuatorCmd<ActuationCancelC
 
     @Override
     public int deferredExecutionHash() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported.");
     }
     @Override
     public void execute(ActuatorDomainService actuatorService) throws BulbBridgeHwException {

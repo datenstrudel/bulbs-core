@@ -1,6 +1,11 @@
 package net.datenstrudel.bulbs.core.web.config;
 
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;import org.springframework.beans.factory.annotation.Autowired;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +19,8 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import java.util.List;
+import java.util.TimeZone;
+
 /**
  *
  * @author Thomas Wendzinski
@@ -22,17 +29,13 @@ import java.util.List;
 @EnableWebMvc
 @ComponentScan(basePackages = {
         "net.datenstrudel.bulbs.core.web"
-        
-})
+}, excludeFilters = @ComponentScan.Filter(Configuration.class))
 @PropertySource("classpath:/bulbs-core-config.properties")
 public class WebConfig extends WebMvcConfigurerAdapter{
     
     //~ Member(s) //////////////////////////////////////////////////////////////
     private static final Logger log = LoggerFactory.getLogger(WebConfig.class);
 
-
-    @Autowired
-    JsonHttpMessageConverter gsonHttpMessageConverter;
     //~ Construction ///////////////////////////////////////////////////////////
     //~ Method(s) //////////////////////////////////////////////////////////////
     @Override
@@ -57,16 +60,34 @@ public class WebConfig extends WebMvcConfigurerAdapter{
                 .addResourceLocations("classpath:/static/swagger/**")
                 .setCachePeriod(36000000);
     }
+
+    @Bean
+    public ObjectMapper jacksonObjectMapper() {
+        ObjectMapper res = new ObjectMapper();
+        res.configure(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE, false);
+        res.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        res.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
+//        res.configure(SerializationFeature.DAT.FAIL_ON_IGNORED_PROPERTIES, false);
+        res.setTimeZone(TimeZone.getTimeZone("UTC"));
+        res.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
+        res.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+        return res;
+    }
+    @Bean
+    public MappingJackson2HttpMessageConverter getMappingJackson2HttpMessageConverter() {
+        MappingJackson2HttpMessageConverter jacksonConverter = new MappingJackson2HttpMessageConverter();
+        jacksonConverter.setObjectMapper(jacksonObjectMapper());
+        return jacksonConverter;
+    }
+
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
         log.info("Configure message converters..");
+        converters.add(getMappingJackson2HttpMessageConverter());
         for (HttpMessageConverter<?> el : converters) {
-            log.info("MSG CONVERTER FOUND: " + el.getClass().getSimpleName());
+            log.info("MSG CONVERTER registered: " + el.getClass().getSimpleName());
         }
-        converters.add(gsonHttpMessageConverter);
-        MappingJackson2HttpMessageConverter jacksonConverter = new MappingJackson2HttpMessageConverter();
-        converters.add(jacksonConverter);
-        super.configureMessageConverters(converters); 
+        super.configureMessageConverters(converters);
     }
     /**
      * Enable JSR-303 Bean validation

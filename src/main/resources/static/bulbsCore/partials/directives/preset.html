@@ -12,10 +12,10 @@
             </h2>
             <div class="input-group pull-right" ng-show="editMode">
                 <button class="btn btn-xs btn-warning"
-                                ng-click="applyPreset(preset, false)"
-                                ng-disabled="!presetEntities.length"
-                                title="Apply Preset now!">
-                            <span class="glyphicon glyphicon-play"></span>
+                        ng-click="applyPreset(preset, false)"
+                        ng-disabled="!presetEntities.length"
+                        title="Apply Preset now!">
+                    <span class="glyphicon glyphicon-play"></span>
                 </button>&nbsp;
                 <button class="btn btn-xs btn-warning"
                         ng-click="applyPreset(preset, true)"
@@ -42,7 +42,7 @@
                                 type="button" class="btn btn-success">
                             Save
                         </button>
-                        <a href="" class="btn" ng-click="switchEditName()" >Cancel</a>  
+                        <a href="" class="btn" ng-click="cancelEditName()" >Cancel</a>
                     </span>
                 </div>
             </form>
@@ -50,8 +50,7 @@
         <div class="animate-show text-center container">
             <!--panel-body -->
 
-            <div class="" id="pn_entitySelection"
-                 >
+            <div class="" id="pn_entitySelection" >
                  <!--ng-class="{ 'col-lg-6' : editMode, 'col-lg-12' : !editMode }"-->
 
                 <div id="pn_presetControl" class="text-center animate-show animate-data" ng-if="!editMode">
@@ -83,6 +82,14 @@
                             </button>
                         </div>
                         <div class="pull-right">
+                            <button
+                                type="button"
+                                class="btn btn-sm btn-"
+                                ng-class="{'btn-danger' : scheduler.activated, 'btn-success' : (scheduler && !scheduler.isUnsaved && !scheduler.activated), 'active': showScheduler}"
+                                ng-click="switchShowScheduler()"
+                                title="Configure a Scheduler">
+                                <span class="glyphicon glyphicon-bullhorn"></span>
+                            </button>
                             <button
                                 type="button"
                                 class="btn btn-sm"
@@ -257,4 +264,9 @@
             
         </div>
     </div>
+
+    <point-in-time-scheduler
+            visible="showScheduler"
+            preset="preset" />
+
 </div>

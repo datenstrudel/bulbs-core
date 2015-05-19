@@ -7,6 +7,8 @@ import net.datenstrudel.bulbs.core.domain.model.bulb.BulbBridgeId;
 import net.datenstrudel.bulbs.core.domain.model.bulb.BulbId;
 import net.datenstrudel.bulbs.core.domain.model.identity.AppIdCore;
 import net.datenstrudel.bulbs.core.domain.model.identity.BulbsContextUserId;
+import net.datenstrudel.bulbs.core.domain.model.preset.PresetActuatorCommand;
+import net.datenstrudel.bulbs.core.domain.model.preset.PresetId;
 import net.datenstrudel.bulbs.core.domain.model.scheduling.JobCoordinator;
 import net.datenstrudel.bulbs.core.domain.model.scheduling.ScheduledActuation;
 import net.datenstrudel.bulbs.core.domain.model.scheduling.ScheduledActuationId;
@@ -16,7 +18,6 @@ import net.datenstrudel.bulbs.core.infrastructure.services.InfrastructureService
 import net.datenstrudel.bulbs.core.testConfigs.InfrastructureServicesTestConfig;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.CommandPriority;
 import net.datenstrudel.bulbs.shared.domain.model.scheduling.PointInTimeTrigger;
-import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -29,7 +30,9 @@ import org.springframework.util.StringUtils;
 
 import java.util.*;
 
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
 
 /**
  *
@@ -62,7 +65,7 @@ public class ScheduledActuationRepositoryImplIT {
     @Before
     public void setUp() {
         mongo.dropCollection(ScheduledActuation.class);
-        mk_jobCoordinator = EasyMock.createNiceMock(JobCoordinator.class);
+        mk_jobCoordinator = mock(JobCoordinator.class);
     }
 
     @Test
@@ -98,11 +101,12 @@ public class ScheduledActuationRepositoryImplIT {
         System.out.println("findByName");
         BulbsContextUserId creator = new BulbsContextUserId("testLoadById__userId");
         ScheduledActuationId id = instance.nextIdentity(creator);
-        ScheduledActuation expResult = newTestInstance(id, false, false);
+        ScheduledActuation expResult = newTestInstance(id, true, false);
         
         instance.save(expResult);
         ScheduledActuation result = instance.findByNameAndId_Creator(expResult.getName(), creator);
         assertEquals(expResult, result);
+        assertThat(result.getTrigger(), is(expResult.getTrigger()));
     }
     @Test
     public void findByScheduleId_Owner(){
@@ -110,7 +114,7 @@ public class ScheduledActuationRepositoryImplIT {
         BulbsContextUserId userXp = new BulbsContextUserId("test_UserUuid_exp");
         BulbsContextUserId userUXp = new BulbsContextUserId("test_UserUuid_unExp");
         ScheduledActuation xp1 = newTestInstance(instance.nextIdentity(userXp), false, false);
-        ScheduledActuation xp2 = newTestInstance(instance.nextIdentity(userXp), false, false);
+        ScheduledActuation xp2 = newTestInstance(instance.nextIdentity(userXp), true, false);
         ScheduledActuation uxp1 = newTestInstance(instance.nextIdentity(userUXp), false, false);
         Set<ScheduledActuation> expResult = new HashSet<>();
         expResult.add(xp1);
@@ -118,6 +122,30 @@ public class ScheduledActuationRepositoryImplIT {
 
         instance.save(Arrays.asList(uxp1, xp1, xp2));
         Set<ScheduledActuation> result = instance.findById_Creator(userXp);
+        assertEquals(expResult, result);
+    }
+    @Test
+    public void findByStates_PresetId(){
+        System.out.println("findByStates_PresetId");
+        BulbsContextUserId userXp = new BulbsContextUserId("test_UserUuid_exp");
+        BulbsContextUserId userUXp = new BulbsContextUserId("test_UserUuid_unExp");
+        ScheduledActuation xp1 = newTestInstance(instance.nextIdentity(userXp), false, false);
+        ScheduledActuation uxp1 = newTestInstance(instance.nextIdentity(userUXp), false, true);
+        ScheduledActuation uxp2 = newTestInstance(instance.nextIdentity(userXp), false, true);
+        Set<ScheduledActuation> expResult = new HashSet<>();
+        expResult.add(xp1);
+        PresetId presetId = new PresetId("testPresetUuid-1", xp1.getId().getCreator());
+        PresetId presetId2 = new PresetId("testPresetUuid-2", xp1.getId().getCreator());
+        xp1.setNewStates(Arrays.asList(
+                new PresetActuatorCommand(AppIdCore.instance(), "testUserApiKey", new CommandPriority(0),
+                        presetId, false),
+                new PresetActuatorCommand(AppIdCore.instance(), "testUserApiKey", new CommandPriority(0),
+                        presetId2, false)
+        ), mk_jobCoordinator);
+
+
+        instance.save(Arrays.asList(uxp1, uxp2, xp1));
+        Set<ScheduledActuation> result = instance.findByStatesContainsTargetId(presetId);
         assertEquals(expResult, result);
     }
 
@@ -143,15 +171,16 @@ public class ScheduledActuationRepositoryImplIT {
     private ScheduledActuation newTestInstance(ScheduledActuationId id, boolean withTrigger, boolean withStates){
         final ScheduledActuation res;
         if(withTrigger){
+            PointInTimeTrigger trigger = new PointInTimeTrigger(new Date(), "UTC");
+            trigger.toCronExpression(); // create cron exp internally
             res = new ScheduledActuation(
                     id, 
-                    "testLoadById_actName", 
-                    new PointInTimeTrigger(new Date(), "UTC"), true);
+                    "testLoadById_actName",
+                    trigger, true);
         }else{
             res = new ScheduledActuation(id, "test_name", false);
         }
-            
-        
+
         if(withStates){
             final List<AbstractActuatorCmd> states = new ArrayList<>();
             final BulbBridgeId bridgeId = new BulbBridgeId("testSchedActRep_bridgeId_0");
@@ -161,6 +190,8 @@ public class ScheduledActuationRepositoryImplIT {
                     new CommandPriority(0), new LinkedList<>()));
             states.add(new BulbActuatorCommand(new BulbId(bridgeId, "3"), AppIdCore.instance(), "testUserApiKey",
                     new CommandPriority(0), new LinkedList<>()));
+            states.add(new PresetActuatorCommand(AppIdCore.instance(), "testUserApiKe", new CommandPriority(0),
+                    new PresetId("testPresetUuid-generic", id.getCreator()), false) );
             res.setNewStates(states, mk_jobCoordinator);
         }
         

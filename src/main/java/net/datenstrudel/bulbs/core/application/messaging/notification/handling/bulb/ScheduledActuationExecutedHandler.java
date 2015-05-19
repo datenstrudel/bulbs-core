@@ -4,9 +4,8 @@ import com.google.gson.Gson;
 import net.datenstrudel.bulbs.core.application.messaging.notification.Exchanges;
 import net.datenstrudel.bulbs.core.application.messaging.notification.handling.RabbitMqExchangeListener;
 import net.datenstrudel.bulbs.core.application.messaging.notification.infrastructure.Notification;
-import net.datenstrudel.bulbs.core.application.services.IBulbBridgeAdminServiceInternal;
-import net.datenstrudel.bulbs.core.domain.model.bulb.BulbId;
-import net.datenstrudel.bulbs.core.domain.model.bulb.events.BulbStateChanged;
+import net.datenstrudel.bulbs.core.application.services.ScheduledActuationServiceInternal;
+import net.datenstrudel.bulbs.core.domain.model.scheduling.ScheduledActuationExecuted;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,20 +16,20 @@ import org.springframework.stereotype.Component;
  * @author Thomas Wendzinski
  */
 @Component
-public class BulbStateChangedHandler extends RabbitMqExchangeListener{
+public class ScheduledActuationExecutedHandler extends RabbitMqExchangeListener{
 
     //~ Member(s) //////////////////////////////////////////////////////////////
-    private static final Logger log = LoggerFactory.getLogger(BulbStateChangedHandler.class);
+    private static final Logger log = LoggerFactory.getLogger(ScheduledActuationExecutedHandler.class);
     private static final String[] subscribedTo = new String[]{
-        BulbStateChanged.class.getName()
+        ScheduledActuationExecuted.class.getName()
     };
-    @Autowired 
+    @Autowired
     private Gson gson;
     @Autowired
-    IBulbBridgeAdminServiceInternal bridgeAdminServiceInternal;
-    
+    ScheduledActuationServiceInternal scheduledActuationService;
+
     //~ Construction ///////////////////////////////////////////////////////////
-    public BulbStateChangedHandler() {
+    public ScheduledActuationExecutedHandler() {
         super();
     }
     
@@ -39,10 +38,8 @@ public class BulbStateChangedHandler extends RabbitMqExchangeListener{
     protected void filteredDispatch(String type, String message) {
         Notification nf = gson.fromJson(message, Notification.class);
 
-        BulbStateChanged evt = gson.fromJson(nf.getEventBody(), BulbStateChanged.class);
-        bridgeAdminServiceInternal.updateBulbStateInternal(
-                BulbId.fromSerialized(evt.getBulbId()),
-                evt.getState());
+        ScheduledActuationExecuted evt = gson.fromJson(nf.getEventBody(), ScheduledActuationExecuted.class);
+        scheduledActuationService.deleteAfterExecutionIfConfigured(evt.getEntityId());
     }
     @Override
     protected String topicName() {

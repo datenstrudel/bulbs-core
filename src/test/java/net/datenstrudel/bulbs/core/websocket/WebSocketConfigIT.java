@@ -1,12 +1,12 @@
 package net.datenstrudel.bulbs.core.websocket;
 
-import net.datenstrudel.bulbs.core.main.Main;
-import net.datenstrudel.bulbs.core.util.IdentityUtil;
 import net.datenstrudel.bulbs.core.TestConfig;
 import net.datenstrudel.bulbs.core.application.ApplicationLayerConfig;
 import net.datenstrudel.bulbs.core.config.BulbsCoreConfig;
 import net.datenstrudel.bulbs.core.domain.model.identity.BulbsContextUser;
+import net.datenstrudel.bulbs.core.main.Main;
 import net.datenstrudel.bulbs.core.security.config.SecurityConfig;
+import net.datenstrudel.bulbs.core.util.IdentityUtil;
 import net.datenstrudel.bulbs.core.util.IdentityUtlConfig;
 import net.datenstrudel.bulbs.core.web.config.WebConfig;
 import org.junit.Test;
@@ -14,12 +14,14 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.IntegrationTest;
 import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.http.*;
+import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.web.socket.*;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
-import org.springframework.web.socket.sockjs.client.*;
+import org.springframework.web.socket.sockjs.client.SockJsClient;
+import org.springframework.web.socket.sockjs.client.Transport;
+import org.springframework.web.socket.sockjs.client.WebSocketTransport;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -55,8 +57,7 @@ public class WebSocketConfigIT {
 
     @Test
     public void coreWebsocketsRequestUpdatePossible() throws InterruptedException, URISyntaxException {
-        BulbsContextUser testUser = identityUtil.createNewTestUserAndSignIn("test_credentials");
-//        TestRestTemplate client = new TestRestTemplate();
+        BulbsContextUser testUser = identityUtil.createNewTestUser("test_credentials");
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add("Auth", testUser.getApiKey());
         WebSocketHttpHeaders headers = new WebSocketHttpHeaders(httpHeaders );

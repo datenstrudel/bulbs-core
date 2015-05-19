@@ -1,7 +1,9 @@
 package net.datenstrudel.bulbs.core.domain.model.scheduling;
 
-import net.datenstrudel.bulbs.core.IntegrationTest;
+import junit.framework.Assert;
+import net.datenstrudel.bulbs.core.TestConfig;
 import net.datenstrudel.bulbs.core.application.services.ScheduledActuationService;
+import net.datenstrudel.bulbs.core.config.BulbsCoreConfig;
 import net.datenstrudel.bulbs.core.domain.model.bulb.AbstractActuatorCmd;
 import net.datenstrudel.bulbs.core.domain.model.identity.BulbsContextUserId;
 import net.datenstrudel.bulbs.core.domain.model.preset.PresetActuatorCommand;
@@ -9,11 +11,9 @@ import net.datenstrudel.bulbs.core.infrastructure.services.InfrastructureService
 import net.datenstrudel.bulbs.core.testConfigs.ScheduledActuationIntegrationTestConfig;
 import net.datenstrudel.bulbs.shared.domain.model.scheduling.PointInTimeTrigger;
 import net.datenstrudel.bulbs.shared.domain.model.scheduling.Trigger;
-import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -33,20 +33,21 @@ import static org.easymock.EasyMock.*;
  */
 @ContextConfiguration(
 classes = {
+        TestConfig.class,
+        BulbsCoreConfig.class,
         InfrastructureServicesConfig.class,
         ScheduledActuationIntegrationTestConfig.class
       }
 )
 @RunWith(SpringJUnit4ClassRunner.class)
-@Category(IntegrationTest.class)
-public class ScheduledActuationIntegrationTest {
+public class ScheduledActuationIT {
 
     @Autowired
     ScheduledActuationService mk_actService;
     @Autowired 
     JobCoordinator jobCoordinator;
     
-    public ScheduledActuationIntegrationTest() {
+    public ScheduledActuationIT() {
     }
     
     @BeforeClass
@@ -106,11 +107,14 @@ public class ScheduledActuationIntegrationTest {
         
         expectLastCall().andStubDelegateTo(new ScheduledActuationService() {
             @Override
+            public void modifyTrigger(BulbsContextUserId userId, ScheduledActuationId actId, Trigger newTrigger) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
             public void execute(BulbsContextUserId userId, ScheduledActuationId actId) {
                 testDeActivate_failed[0] = true;
             }
-
-            
             @Override
             public Set<ScheduledActuation> loadAllByUser(BulbsContextUserId userId) {
                 throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.

@@ -11,7 +11,7 @@
         <div class="col-xs-4">
             <div class="btn-toolbar pull-right">
                 <div class="btn-group">
-                    <button ng-click="newPreset()" type="button" class="btn btn-default btn-block" title="Refresh Bulbs">
+                    <button ng-click="newPreset()" type="button" class="btn btn-default btn-block" title="Create new Preset">
                         <b><span class="glyphicon glyphicon-plus"></span></b> New Preset
                     </button>
                 </div>
@@ -99,6 +99,7 @@
             <bulb-preset preset="p"
                          apply-state-immediately="toolsOptions.applyStatesOnMod"
                          continuous-trigger="toolsOptions.continuousTrigger"
+                         edit-mode-changed="presetEditModeChanged(preset, mode)"
             />
         </div>
     </div>

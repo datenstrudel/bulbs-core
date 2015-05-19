@@ -36,7 +36,8 @@ public interface ScheduledActuationService {
     public void modifyName(BulbsContextUserId userId, ScheduledActuationId actId, 
             String newName); //TODO: Validator
     public void modifyStates(BulbsContextUserId userId, ScheduledActuationId actId, 
-            Collection<AbstractActuatorCmd> newStates); 
+            Collection<AbstractActuatorCmd> newStates);
+    public void modifyTrigger(BulbsContextUserId userId, ScheduledActuationId actId, Trigger newTrigger);
     
     /**
      * For internal use only. This method actually applies the actuation commands
