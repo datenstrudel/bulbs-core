@@ -134,8 +134,8 @@ public class ActuatorDomainServiceImpl implements ActuatorDomainService{
 
             BulbBridge bridge = bridgeRepository.findOne(bridgeId);
             if(bridge == null){
-                log.error("BulbBridge["+bridgeId+"] doesnt' exist! Command not executable.");
-                throw new IllegalArgumentException("BulbBridge["+bridgeId+"] doesnt' exist! Command not executable.");
+                log.warn("BulbBridge["+bridgeId+"] doesnt' exist! Command not executable.");
+                return;
             }
             bridge.cancelActuation(
                 new ActuationCancelCommand(

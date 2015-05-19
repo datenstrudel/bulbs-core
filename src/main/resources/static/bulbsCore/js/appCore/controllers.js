@@ -60,6 +60,7 @@ function BulbsCtrl($scope, $rootScope, $http, $routeParams, $timeout,
             },
             function(error){
                 // ~ Failure
+                console.error("Error loading bulbs: " +error);
                 $scope.serverError = "Error(" + error.status +")" + error.data;
             }
         );

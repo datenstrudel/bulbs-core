@@ -30,8 +30,8 @@ import org.springframework.util.StringUtils;
 
 import java.util.*;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -73,8 +73,8 @@ public class ScheduledActuationRepositoryImplIT {
         System.out.println("nextIdentity");
         BulbsContextUserId creator = new BulbsContextUserId("testNextId__userId");
         ScheduledActuationId result = instance.nextIdentity(creator);
-        assertEquals(creator, result.getCreator() );
-        assertTrue(!StringUtils.isEmpty(result.getUuid()));
+        assertThat(result.getCreator(), is(creator)  );
+        assertThat("Identity uuid exists", !StringUtils.isEmpty(result.getUuid()));
     }
 
     @Test
@@ -87,12 +87,12 @@ public class ScheduledActuationRepositoryImplIT {
         instance.save(expResult);
         ScheduledActuation result = instance.findOne(id);
         
-        assertEquals(expResult, result);
-        assertEquals(expResult.getTrigger(), result.getTrigger());
-        assertEquals(expResult.getStates(), result.getStates());
-        assertEquals(expResult.getName(), result.getName());
-        assertEquals(expResult.getCreated(), result.getCreated());
-        assertEquals(expResult.isDeleteAfterExecution(), result.isDeleteAfterExecution() );
+        assertThat(result, is(expResult) );
+        assertThat(result.getTrigger(), is(expResult.getTrigger()) );
+        assertThat(result.getStates(), is(expResult.getStates()));
+        assertThat(result.getName(), is(expResult.getName()));
+        assertThat(result.getCreated(), is(expResult.getCreated()));
+        assertThat(result.isDeleteAfterExecution(), is(expResult.isDeleteAfterExecution())  );
         
     }
 
@@ -105,7 +105,7 @@ public class ScheduledActuationRepositoryImplIT {
         
         instance.save(expResult);
         ScheduledActuation result = instance.findByNameAndId_Creator(expResult.getName(), creator);
-        assertEquals(expResult, result);
+        assertThat(result, is(expResult));
         assertThat(result.getTrigger(), is(expResult.getTrigger()));
     }
     @Test
@@ -122,7 +122,7 @@ public class ScheduledActuationRepositoryImplIT {
 
         instance.save(Arrays.asList(uxp1, xp1, xp2));
         Set<ScheduledActuation> result = instance.findById_Creator(userXp);
-        assertEquals(expResult, result);
+        assertThat(result, is(expResult));
     }
     @Test
     public void findByStates_PresetId(){
@@ -146,7 +146,7 @@ public class ScheduledActuationRepositoryImplIT {
 
         instance.save(Arrays.asList(uxp1, uxp2, xp1));
         Set<ScheduledActuation> result = instance.findByStatesContainsTargetId(presetId);
-        assertEquals(expResult, result);
+        assertThat(result, is(expResult));
     }
 
     public void testStore() {
@@ -162,10 +162,10 @@ public class ScheduledActuationRepositoryImplIT {
         
         instance.save(expResult);
         ScheduledActuation res = instance.findOne(id);
-        assertNotNull(res);
+        assertThat(res, is(notNullValue()));
         instance.delete(id);
         res = instance.findOne(id);
-        assertNull(res);
+        assertThat(res, is(nullValue()));
     }
     
     private ScheduledActuation newTestInstance(ScheduledActuationId id, boolean withTrigger, boolean withStates){

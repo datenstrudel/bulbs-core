@@ -11,8 +11,8 @@ import java.io.Serializable;
  */
 public class BulbId implements ValueObject<BulbId>, Serializable{
 
-	private String localId;
     private BulbBridgeId bridgeId;
+	private String localId;
 
 	private BulbId(){}
     /**

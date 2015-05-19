@@ -10,4 +10,4 @@ services:
   - rabbitmq
 
 install: true
-script: mvn clean install -Dspring.profiles.active=travisci
+script: gradle clean build -Dspring.profiles.active=travisci

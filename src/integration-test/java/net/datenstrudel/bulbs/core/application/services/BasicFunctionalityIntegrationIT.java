@@ -26,7 +26,9 @@ import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.util.LinkedList;
 
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 
 /**
  *
@@ -85,19 +87,19 @@ public class BasicFunctionalityIntegrationIT {
                 }
         );
 
-        assertNotNull(user);
+        assertThat(user, is(notNullValue()));
         BulbBridge bridge = bridgeAdminService.findAndCreateBulbBridge(
                 BulbsPlatform._EMULATED, 
                 new BulbBridgeAddress("intTestHost__"+System.currentTimeMillis(), 1234),
                 user.getApiKey()); 
-        assertNotNull(bridge);
+        assertThat(bridge, is(notNullValue()));
         log.info("Bridge created: " + bridge);
         try{
-            Thread.sleep(1000);
+            Thread.sleep(3000);
         }catch (InterruptedException iex){}
 
         BulbsContextUser assertUser = userRepository.findByEmail(user.getEmail());
-        assertTrue(!assertUser.getBulbsPrincipals().isEmpty());
+        assertThat("The user has got principals", !assertUser.getBulbsPrincipals().isEmpty());
         
         BulbId bulbAddressed = bridge.getBulbs().iterator().next().getId();
         final BulbState state2Apply = new BulbState(new ColorRGB(255, 255, 255), true);
@@ -118,8 +120,7 @@ public class BasicFunctionalityIntegrationIT {
         }
         bridge = bridgeAdminService.bridgesByContextUser(user.getApiKey()).iterator().next();
         Bulb assertBulb = bridge.bulbById(bulbAddressed);
-        assertEquals(state2Apply, assertBulb.getState());
-        
+        assertThat(assertBulb.getState(), is(state2Apply) );
         
         log.info("////////////////////////////////////////////////////////////////////////");
         log.info("/~ Integration test 'testSignupAndBridgeCreation' successfully finished.");

@@ -28,7 +28,7 @@ import static org.junit.Assert.assertTrue;
         }
 )
 @Category(value = IntegrationTest.class)
-public class Runnable_EventPublishingAwareTest {
+public class Runnable_EventPublishingAwareIT {
 
     @Autowired
     @Qualifier("taskExecutor")

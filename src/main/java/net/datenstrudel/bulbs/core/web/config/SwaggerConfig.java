@@ -1,16 +1,36 @@
 package net.datenstrudel.bulbs.core.web.config;
 
+//import com.mangofactory.swagger.authorization.AuthorizationContext;
+//import com.mangofactory.swagger.configuration.SpringSwaggerConfig;
+//import com.mangofactory.swagger.models.dto.AuthorizationType;
+//import com.mangofactory.swagger.plugin.EnableSwagger;
+//import com.mangofactory.swagger.plugin.SwaggerSpringMvcPlugin;
+//import com.wordnik.swagger.model.ApiInfo;
+//import com.wordnik.swagger.model.ApiKey;
+//import com.wordnik.swagger.model.Authorization;
+//import com.wordnik.swagger.model.AuthorizationScope;
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.context.annotation.Bean;
+//import org.springframework.context.annotation.Configuration;
+//import org.springframework.context.annotation.Profile;
+//import org.springframework.security.core.Authentication;
+//import org.springframework.stereotype.Controller;
+//
+//import java.security.Principal;
+//import java.util.ArrayList;
+//import java.util.List;
+
 import com.mangofactory.swagger.authorization.AuthorizationContext;
 import com.mangofactory.swagger.configuration.SpringSwaggerConfig;
+import com.mangofactory.swagger.models.dto.*;
 import com.mangofactory.swagger.plugin.EnableSwagger;
 import com.mangofactory.swagger.plugin.SwaggerSpringMvcPlugin;
-import com.wordnik.swagger.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.servlet.mvc.Controller;
 
 import java.security.Principal;
 import java.util.ArrayList;
@@ -26,19 +46,20 @@ public class SwaggerConfig {
 
     @Autowired
     private SpringSwaggerConfig springSwaggerConfig;
-
+//
     @Bean
     public SwaggerSpringMvcPlugin customImplementation(){
-        return new SwaggerSpringMvcPlugin(this.springSwaggerConfig)
+        SwaggerSpringMvcPlugin mvcPlugin = new SwaggerSpringMvcPlugin(this.springSwaggerConfig);
+        mvcPlugin
                 .apiInfo(apiInfo())
                 .ignoredParameterTypes(Authentication.class, Principal.class)
-                .excludeAnnotations(Controller.class)
+                .excludeAnnotations(new Class[]{Controller.class})
                 .authorizationTypes(authTypes())
-                .authorizationContext(authContext())
-        ;
+                .authorizationContext(authContext()) ;
+        return mvcPlugin;
     }
     private ApiInfo apiInfo() {
-        ApiInfo apiInfo = new ApiInfo(
+        return new ApiInfo(
                 "Bulbs_Core Light control API",
                 "Bulbs_Core enables you to abstract control of light bulbs from (potentially) different hardware vendors by giving you a unified API.",
                 "",
@@ -46,7 +67,6 @@ public class SwaggerConfig {
                 "No license yet",
                 "No license yet"
         );
-        return apiInfo;
     }
 
     private List<AuthorizationType> authTypes(){
@@ -65,9 +85,7 @@ public class SwaggerConfig {
         AuthorizationScope[] authorizationScopes = new AuthorizationScope[]{authorizationScope};
         auths.add(new Authorization("Auth", authorizationScopes));
 
-        AuthorizationContext authorizationContext =
-                new AuthorizationContext.AuthorizationContextBuilder(auths).build();
-        return authorizationContext;
+        return new AuthorizationContext.AuthorizationContextBuilder(auths).build();
 
     }
 }

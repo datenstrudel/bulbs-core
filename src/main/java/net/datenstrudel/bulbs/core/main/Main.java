@@ -7,6 +7,7 @@ import net.datenstrudel.bulbs.core.web.config.SwaggerConfig;
 import net.datenstrudel.bulbs.core.web.config.WebConfig;
 import net.datenstrudel.bulbs.core.websocket.WebSocketConfig;
 import org.apache.catalina.connector.Connector;
+import org.apache.coyote.http11.AbstractHttp11Protocol;
 import org.apache.coyote.http11.Http11NioProtocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,14 +102,28 @@ public class Main extends SpringBootServletInitializer {
     private void applyStageIndependendContainerConfig(TomcatEmbeddedServletContainerFactory factory){
         factory.setContextPath("");
         factory.addErrorPages(new ErrorPage(HttpStatus.NOT_FOUND, "/errorpages/404.html"));
+
+        //~ Enable compression
+        factory.addConnectorCustomizers(connector -> {
+            AbstractHttp11Protocol ph = (AbstractHttp11Protocol) connector.getProtocolHandler();
+            ph.setCompression("on");
+            ph.setCompressionMinSize(2048);
+            String mimeTypes = ph.getCompressableMimeTypes();
+            mimeTypes += "," + "application/javascript";
+            mimeTypes += "," + "text/css";
+            ph.setCompressableMimeTypes(mimeTypes);
+            log.info("Compressable MimeTypes applied: {} ", mimeTypes);
+        });
     }
 
     private Connector createSslConnector() {
         Connector connector = new Connector("org.apache.coyote.http11.Http11NioProtocol");
         Http11NioProtocol protocol = (Http11NioProtocol) connector.getProtocolHandler();
+        File keystore = null;
+        File truststore = null;
         try {
-            File keystore = new DefaultResourceLoader().getResource(this.pathToKeystore).getFile(); //new ClassPathResource(pathToKeystore).getFile();
-            File truststore = new DefaultResourceLoader().getResource(pathToKeystore).getFile();
+            keystore = new DefaultResourceLoader().getResource(this.pathToKeystore).getFile(); //new ClassPathResource(pathToKeystore).getFile();
+            truststore = new DefaultResourceLoader().getResource(pathToKeystore).getFile();
             connector.setScheme("https");
             connector.setSecure(true);
             connector.setPort(443);
@@ -120,8 +135,8 @@ public class Main extends SpringBootServletInitializer {
             protocol.setKeyAlias(this.sslKeyAlias);
             return connector;
         }catch (IOException ex) {
-            throw new IllegalStateException("can't access keystore: [" + "keystore"
-                    + "] or truststore: [" + "keystore" + "]", ex);
+            throw new IllegalStateException("can't access keystore: [" + keystore
+                    + "] or truststore: [" + truststore + "]", ex);
         }
     }
 
