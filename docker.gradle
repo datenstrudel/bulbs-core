@@ -1,0 +1,55 @@
+/*
+ Docker assembly
+ */
+buildscript{
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+    dependencies{
+        classpath 'com.bmuschko:gradle-docker-plugin:2.4'
+    }
+}
+apply plugin: com.bmuschko.gradle.docker.DockerRemoteApiPlugin
+
+import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
+import com.bmuschko.gradle.docker.tasks.image.Dockerfile
+
+ext{
+    jdkBinFile = project.hasProperty('jdkBinFile') ? project.getProperty('jdkBinFile') : 'jdk-8u33-linux-arm-vfp-hflt.gz'
+}
+
+task createDockerfile(type: Dockerfile) {
+    destFile = project.file('build/docker/Dockerfile')
+    if(buildPlatform.equals("x86")){
+        from('java:8')
+    }else if (buildPlatform.equals("arm")){
+        from('sdhibit/rpi-raspbian')
+        copy{
+            from "/go-lib/${project.jdkBinFile}"
+            into "build/docker"
+        }
+        addFile("${project.jdkBinFile}", "/opt/")
+        runCommand("update-alternatives --install /usr/bin/javac javac /opt/jdk1.8.0_33/bin/javac 1")
+        runCommand("update-alternatives --install /usr/bin/java java /opt/jdk1.8.0_33/bin/javac 1")
+        runCommand("update-alternatives --config javac")
+        runCommand("update-alternatives --config java")
+    }else{
+        throw new IllegalArgumentException("No or unsupported 'buildPlatform' parameter supplied: ${buildPlatform}")
+    }
+    maintainer('Datenstrudel')
+    exposePort(8080, 80, 443)
+    copyFile("bulbs-core-${version}.jar", "/opt/bulbs-core/bulbs-core.jar")
+    entryPoint("java", "-jar", "/opt/bulbs-core/bulbs-core.jar")
+}
+
+task provideFatJar4Docker(type: Copy){
+    from 'build/libs'
+    into 'build/docker'
+}
+task buildImage(type: DockerBuildImage){
+    dependsOn createDockerfile
+    dependsOn provideFatJar4Docker
+    inputDir = createDockerfile.destFile.parentFile
+    tag = "datenstrudel/bulbs-core-${project.buildPlatform}:${project.buildNumber}"
+}

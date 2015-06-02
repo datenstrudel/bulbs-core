@@ -1,13 +1,13 @@
 buildscript{
     repositories {
         mavenCentral()
+        jcenter()
     }
     dependencies{
         classpath("org.springframework.boot:spring-boot-gradle-plugin:1.2.3.RELEASE")
         classpath 'org.ajoberstar:gradle-git:1.1.0'
     }
 }
-
 
 import org.ajoberstar.grgit.*
 import org.apache.tools.ant.filters.ReplaceTokens
@@ -37,10 +37,14 @@ ext{
     springVersion = '4.1.0.RELEASE'
     springBootVersion = '1.1.9.RELEASE'
     revision = getBranchName()
+    buildNumber = project.hasProperty('buildNumber') ? project.getProperty('buildNumber') : '[build unknown]'
+    buildPlatform = project.hasProperty('buildPlatform') ? project.getProperty('buildPlatform') : 'x86'
 
     jsSrcDir = "src/main/resources/static/bulbsCore/js"
     cssSrcDir = "src/main/resources/static/bulbsCore/css"
 }
+
+apply from: 'docker.gradle'
 
 sourceSets {
     integTest {
@@ -142,10 +146,6 @@ configurations.all {
     }
 }
 
-processResources {
-    exclude '**/*.properties'
-}
-
 task('filterCopy', type: Copy) {
     from "src/main/resources"
     into "${buildDir}/resources/main"
@@ -155,12 +155,12 @@ task('filterCopy', type: Copy) {
             "project.archivesBaseName": project.property("archivesBaseName"),
             "project.description": project.property("description"),
             "project.version"    : project.property("version"),
-            "project.revision"   : project.property("revision")
+            "project.revision"   : project.property("revision"),
+            "project.buildNumber"   : project.property("buildNumber")
     ]
 }
-processResources.dependsOn filterCopy
 
-//~ Javascript resource processing
+//~ Javascript resource processing /////////////////////////////////////////////////
 combineJs {
     source = [
             "${jsSrcDir}/lib/angular.js",
@@ -196,7 +196,6 @@ minifyJs {
         compilerOptions.languageIn = "ECMASCRIPT5"
     }
 }
-processResources.dependsOn minifyJs
 assemble.dependsOn minifyJs
 
 //~ CSS resource processing
@@ -217,7 +216,11 @@ minifyCss {
         lineBreakPos = -1
     }
 }
-
-processResources.dependsOn minifyCss
 assemble.dependsOn minifyCss
 
+processResources {
+    exclude '**/*.properties'
+    dependsOn filterCopy
+    dependsOn minifyJs
+    dependsOn minifyCss
+}
