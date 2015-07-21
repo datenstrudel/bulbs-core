@@ -40,7 +40,7 @@ task createDockerfile(type: Dockerfile) {
     maintainer('Datenstrudel')
     exposePort(8080, 80, 443)
     copyFile("bulbs-core-${version}.jar", "/opt/bulbs-core/bulbs-core.jar")
-    entryPoint("java", "-jar", "/opt/bulbs-core/bulbs-core.jar")
+    entryPoint("java", "-jar", "/opt/bulbs-core/bulbs-core.jar", "-Dspring.profiles.active=docker")
 }
 
 task provideFatJar4Docker(type: Copy){
