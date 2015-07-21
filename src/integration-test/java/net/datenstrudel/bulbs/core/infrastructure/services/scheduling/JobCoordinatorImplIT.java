@@ -25,7 +25,7 @@ import static org.junit.Assert.*;
  * @author Thomas Wendzinski
  */
 @ContextConfiguration(
-//initializers = TestConfig.class,
+initializers = TestConfig.class,
 classes = {
     TestConfig.class,
     BulbsCoreConfig.class,

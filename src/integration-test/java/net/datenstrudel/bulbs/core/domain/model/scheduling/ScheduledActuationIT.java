@@ -32,6 +32,7 @@ import static org.easymock.EasyMock.*;
  * @author Thomas Wendzinski
  */
 @ContextConfiguration(
+initializers = TestConfig.class,
 classes = {
         TestConfig.class,
         BulbsCoreConfig.class,

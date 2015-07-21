@@ -8,6 +8,7 @@ import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePropertySource;
@@ -27,7 +28,7 @@ public class TestConfig
     //~ Member(s) //////////////////////////////////////////////////////////////
     private static final Logger log = LoggerFactory.getLogger(TestConfig.class);
     private static final String TEST_PROPERTIES_PATH = 
-            "classpath:/bulbs-core-config-test.properties";
+            "classpath:/application-test.properties";
     
     //~ Construction ///////////////////////////////////////////////////////////
     
@@ -42,6 +43,11 @@ public class TestConfig
     public CounterService counterService_mk() {
         CounterService res = mock(CounterService.class);
         return res;
+    }
+
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer propertyPlaceholderConfigurer() {
+        return new PropertySourcesPlaceholderConfigurer();
     }
 
     @Override
