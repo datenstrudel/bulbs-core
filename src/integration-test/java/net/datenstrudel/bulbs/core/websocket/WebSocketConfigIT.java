@@ -89,7 +89,7 @@ public class WebSocketConfigIT {
             }
         }, headers, new URI("http://localhost:9092/core/websockets"));
 
-        Thread.sleep(1500l);
+        Thread.sleep(3000l);
         assertThat(connectionSucessful, is(Boolean.TRUE));
     }
 
