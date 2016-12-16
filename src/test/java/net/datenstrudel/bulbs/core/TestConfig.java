@@ -22,8 +22,7 @@ import static org.mockito.Mockito.mock;
  * @author Thomas Wendzinski
  */
 @Configuration
-public class TestConfig
-        implements ApplicationContextInitializer<ConfigurableApplicationContext>{
+public class TestConfig implements ApplicationContextInitializer<ConfigurableApplicationContext>{
 
     //~ Member(s) //////////////////////////////////////////////////////////////
     private static final Logger log = LoggerFactory.getLogger(TestConfig.class);
@@ -33,12 +32,12 @@ public class TestConfig
     //~ Construction ///////////////////////////////////////////////////////////
     
     //~ Method(s) //////////////////////////////////////////////////////////////
-    @Bean(name = "bulbsHwService")
-    public BulbsHwService bulbsHwService_mk(){
-//        BulbsHwService res = EasyMock.createStrictMock(BulbsHwService.class);
-//        return res;
-        return mock(BulbsHwService.class);
-    }
+//    @Bean(name = "bulbsHwService")
+//    public BulbsHwService bulbsHwService_mk(){
+////        BulbsHwService res = EasyMock.createStrictMock(BulbsHwService.class);
+////        return res;
+//        return mock(BulbsHwService.class);
+//    }
     @Bean
     public CounterService counterService_mk() {
         CounterService res = mock(CounterService.class);

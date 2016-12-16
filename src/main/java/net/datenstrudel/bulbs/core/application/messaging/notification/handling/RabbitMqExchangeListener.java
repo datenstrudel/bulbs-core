@@ -61,7 +61,6 @@ public abstract class RabbitMqExchangeListener {
                 }
             }while(!cancelOk);
             setCancelOk(false); // reset
-            this.channel.close();
             this.channel.abort();
             
         }

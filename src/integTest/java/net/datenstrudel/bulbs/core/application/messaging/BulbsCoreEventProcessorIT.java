@@ -41,6 +41,7 @@ import static org.mockito.Mockito.mock;
             BulbsCoreConfig.class,
             ApplicationLayerConfig.class,
             BulbsCoreEventProcessorIT.Cfg.class
+
 })
 @RunWith(SpringJUnit4ClassRunner.class)
 public class BulbsCoreEventProcessorIT {

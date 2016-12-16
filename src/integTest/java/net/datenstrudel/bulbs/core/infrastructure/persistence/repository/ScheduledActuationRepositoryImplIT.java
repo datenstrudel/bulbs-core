@@ -1,6 +1,38 @@
 package net.datenstrudel.bulbs.core.infrastructure.persistence.repository;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNull.notNullValue;
+import static org.mockito.Mockito.mock;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
 import net.datenstrudel.bulbs.core.TestConfig;
+import net.datenstrudel.bulbs.core.application.ApplicationLayerConfig;
+import net.datenstrudel.bulbs.core.config.BulbsCoreConfig;
+import net.datenstrudel.bulbs.core.security.config.SecurityConfig;
+import net.datenstrudel.bulbs.core.testConfigs.ScheduledActuationIntegrationTestConfig;
+import net.datenstrudel.bulbs.core.web.config.SwaggerConfig;
+import net.datenstrudel.bulbs.core.web.config.WebConfig;
+import net.datenstrudel.bulbs.core.websocket.WebSocketConfig;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.util.StringUtils;
+
 import net.datenstrudel.bulbs.core.domain.model.bulb.AbstractActuatorCmd;
 import net.datenstrudel.bulbs.core.domain.model.bulb.BulbActuatorCommand;
 import net.datenstrudel.bulbs.core.domain.model.bulb.BulbBridgeId;
@@ -18,35 +50,22 @@ import net.datenstrudel.bulbs.core.infrastructure.services.InfrastructureService
 import net.datenstrudel.bulbs.core.testConfigs.InfrastructureServicesTestConfig;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.CommandPriority;
 import net.datenstrudel.bulbs.shared.domain.model.scheduling.PointInTimeTrigger;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.util.StringUtils;
-
-import java.util.*;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.mockito.Mockito.mock;
 
 /**
  *
  * @author Thomas Wendzinski
  */
-@RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(
     initializers = TestConfig.class,
     classes = {
-            TestConfig.class,
-            PersistenceConfig.class,
-            InfrastructureServicesConfig.class,
-            InfrastructureServicesTestConfig.class
-    })
+        TestConfig.class,
+        PersistenceConfig.class,
+        BulbsCoreConfig.class,
+        InfrastructureServicesConfig.class,
+        ScheduledActuationIntegrationTestConfig.class
+    }
+)
+@RunWith(SpringRunner.class)
 public class ScheduledActuationRepositoryImplIT {
     
     @Autowired

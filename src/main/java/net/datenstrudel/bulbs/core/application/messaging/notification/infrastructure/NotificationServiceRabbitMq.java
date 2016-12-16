@@ -84,7 +84,7 @@ public class NotificationServiceRabbitMq implements NotificationService {
                 notification.getType(),
                 props, 
                 objectSerializer.toJson(notification).getBytes());
-        channel.close();
+//        channel.close();
     }
     private Stream<Notification> listUnpublishedNotifications(Long mostRecentStoredEventId){
         List<StoredEvent> events = eventStore.loadAllStoredEventsSince(mostRecentStoredEventId);

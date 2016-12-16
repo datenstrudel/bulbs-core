@@ -86,7 +86,7 @@ public class PersistenceConfig extends AbstractMongoConfiguration{
         mongeez.setFile(new ClassPathResource("/mongodb-changesets/mongeez.xml"));
         mongeez.setMongo(mongo());
         mongeez.setDbName(this.dbName);
-        mongeez.process();
+//        mongeez.process();
     }
 
     @Override
@@ -97,7 +97,7 @@ public class PersistenceConfig extends AbstractMongoConfiguration{
                 .threadsAllowedToBlockForConnectionMultiplier(threadsAllowedToBlockForConnectionMultiplier)
                 .connectTimeout(connectTimeout)
                 .maxWaitTime(maxWaitTime)
-                .autoConnectRetry(autoConnectRetry)
+//                .autoConnectRetry(autoConnectRetry)
                 .socketKeepAlive(true)
                 .socketTimeout(socketTimeout)
 //                .writeConcern(WriteConcern.ACKNOWLEDGED).build();

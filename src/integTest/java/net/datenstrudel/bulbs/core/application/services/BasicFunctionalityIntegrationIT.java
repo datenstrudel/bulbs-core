@@ -20,8 +20,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.util.LinkedList;
@@ -29,13 +31,14 @@ import java.util.LinkedList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.NONE;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 /**
  *
  * @author Thomas Wendzinski
  */
-@SpringApplicationConfiguration(
-    initializers = TestConfig.class,
+@SpringBootTest(
     classes = {
         BulbsCoreConfig.class,
         ApplicationLayerConfig.class,
@@ -44,8 +47,7 @@ import static org.hamcrest.Matchers.notNullValue;
         WebSocketConfig.class,
         TestConfig.class
 })
-@WebAppConfiguration
-@RunWith(SpringJUnit4ClassRunner.class)
+@RunWith(SpringRunner.class)
 public class BasicFunctionalityIntegrationIT {
     
     //~ Member(s) //////////////////////////////////////////////////////////////
@@ -116,8 +118,7 @@ public class BasicFunctionalityIntegrationIT {
         
         try{
             Thread.sleep(2000);
-        }catch (InterruptedException iex){
-        }
+        }catch (InterruptedException iex){ }
         bridge = bridgeAdminService.bridgesByContextUser(user.getApiKey()).iterator().next();
         Bulb assertBulb = bridge.bulbById(bulbAddressed);
         assertThat(assertBulb.getState(), is(state2Apply) );

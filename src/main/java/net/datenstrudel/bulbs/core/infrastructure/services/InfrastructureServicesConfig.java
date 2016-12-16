@@ -16,15 +16,11 @@ import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 }, excludeFilters = @ComponentScan.Filter(Configuration.class) )
 public class InfrastructureServicesConfig {
 
-    //~ Member(s) //////////////////////////////////////////////////////////////
-    //~ Construction ///////////////////////////////////////////////////////////
-    //~ Method(s) //////////////////////////////////////////////////////////////
-    @Bean 
+    @Bean
     public SchedulerFactoryBean schedulerFactory(){
         SchedulerFactoryBean res = new SchedulerFactoryBean();
         res.setWaitForJobsToCompleteOnShutdown(false);
-        return res; 
+        return res;
     }
-    //~ Private Artifact(s) ////////////////////////////////////////////////////
 
 }

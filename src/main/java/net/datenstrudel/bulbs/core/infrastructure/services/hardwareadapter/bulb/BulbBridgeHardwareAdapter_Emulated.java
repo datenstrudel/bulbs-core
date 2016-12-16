@@ -10,12 +10,14 @@ import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbBridgeHwException;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbState;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbsPlatform;
 import net.datenstrudel.bulbs.shared.domain.model.color.ColorRGB;
+import org.apache.el.util.ReflectionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.util.ReflectionUtils;
 
+import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
@@ -205,9 +207,10 @@ public class BulbBridgeHardwareAdapter_Emulated implements BulbBridgeHardwareAda
                 return input.getId().sameValueAs(bulbId);
             }
         }, null);
-        
-        ReflectionTestUtils.setField(bulb, "state", state);
-        
+
+        final Field stateField = ReflectionUtils.findField(BulbState.class, "state");
+        ReflectionUtils.makeAccessible(stateField);
+        ReflectionUtils.setField(stateField, bulb, state);
     }
     
     //~ Private Artifact(s) ////////////////////////////////////////////////////

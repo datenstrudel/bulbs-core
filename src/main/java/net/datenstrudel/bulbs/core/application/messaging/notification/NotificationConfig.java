@@ -36,8 +36,8 @@ public class NotificationConfig {
     public ConnectionFactory rabbitConnectionFactory(
             @Value("${rabbitMq.connection.host}") String host,
             @Value("${rabbitMq.connection.port}") Integer port,
-            @Value("${rabbitMq.connection.username}") String username,
-            @Value("${rabbitMq.connection.password}") String password
+            @Value("${rabbitMq.connection.username:}") String username,
+            @Value("${rabbitMq.connection.password:}") String password
     ) {
         CachingConnectionFactory connectionFactory =
             new CachingConnectionFactory(host, port);
