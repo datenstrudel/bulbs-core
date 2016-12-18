@@ -19,19 +19,19 @@ public interface ActuatorDomainService {
      * sent to the underlying hardware shall be limited.
      * @param command 
      */
-    public void executeDeferred(AbstractActuatorCmd command);
+    void executeDeferred(AbstractActuatorCmd command);
     /**
      * Immediately executes the given <code>command</code>.
      * @param command 
      * @throws net.datenstrudel.bulbs.shared.domain.model.bulb.BulbBridgeHwException
      */
-    public void execute(AbstractActuatorCmd command)throws BulbBridgeHwException;
-    public void execute(Collection<? extends AbstractActuatorCmd> command)throws BulbBridgeHwException;
+    void execute(AbstractActuatorCmd command)throws BulbBridgeHwException;
+    void execute(Collection<? extends AbstractActuatorCmd> command)throws BulbBridgeHwException;
     
     //~ Command Specific /////////////////////////////////////////////////////
-    public void execute(BulbActuatorCommand bulbCommand)throws BulbBridgeHwException;
-    public void execute(GroupActuatorCommand groupCommand)throws BulbBridgeHwException;
-    public void execute(PresetActuatorCommand presetCommand)throws BulbBridgeHwException;
-    public void execute(ActuationCancelCommand cancelCommand)throws BulbBridgeHwException;
+    void execute(BulbActuatorCommand bulbCommand)throws BulbBridgeHwException;
+    void execute(GroupActuatorCommand groupCommand)throws BulbBridgeHwException;
+    void execute(PresetActuatorCommand presetCommand)throws BulbBridgeHwException;
+    void execute(ActuationCancelCommand cancelCommand)throws BulbBridgeHwException;
 
 }

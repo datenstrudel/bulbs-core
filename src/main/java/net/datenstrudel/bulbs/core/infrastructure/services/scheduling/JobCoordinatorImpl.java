@@ -17,8 +17,10 @@ public class JobCoordinatorImpl implements JobCoordinator {
 
     //~ Member(s) //////////////////////////////////////////////////////////////
     private static final Logger log = LoggerFactory.getLogger(JobCoordinatorImpl.class);
+
     @Autowired
     private SchedulerFactoryBean schedulerFactory;
+
     private Scheduler scheduler;
     
     //~ Construction ///////////////////////////////////////////////////////////
@@ -59,6 +61,7 @@ public class JobCoordinatorImpl implements JobCoordinator {
         }
         
     }
+
     @Override
     public void unSchedule(String jobId){
         if(!isScheduled(jobId))return ;
@@ -68,6 +71,7 @@ public class JobCoordinatorImpl implements JobCoordinator {
             throw new RuntimeException(ex.getMessage(), ex);
         }
     }
+
     @Override
     public boolean isScheduled(String jobId){
         try {

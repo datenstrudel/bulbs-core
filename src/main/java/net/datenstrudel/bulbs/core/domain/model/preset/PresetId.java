@@ -38,9 +38,9 @@ public class PresetId implements ValueObject<PresetId>, Serializable {
     
     @Override
     public boolean sameValueAs(PresetId other) {
-        if(other == null)return false;
-        if(!this.presetUuid.equals(other.presetUuid))return false;
-        if(!this.creator.equals(other.creator))return false;
+        if(other == null) return false;
+        if(!this.presetUuid.equals(other.presetUuid)) return false;
+        if(!this.creator.equals(other.creator)) return false;
         return true;
     }
     @Override

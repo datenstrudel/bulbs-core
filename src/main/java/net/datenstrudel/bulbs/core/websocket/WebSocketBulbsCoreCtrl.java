@@ -17,7 +17,9 @@ import net.datenstrudel.bulbs.shared.domain.model.client.bulb.DtoActuationCancel
 import net.datenstrudel.bulbs.shared.domain.model.client.bulb.DtoBulbActuatorCmd;
 import net.datenstrudel.bulbs.shared.domain.model.client.group.DtoGroupActuatorCmd;
 import net.datenstrudel.bulbs.shared.domain.model.client.preset.DtoPresetActuatorCmd;
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -46,14 +48,14 @@ public class WebSocketBulbsCoreCtrl {
 
     //~ Member(s) //////////////////////////////////////////////////////////////
     private static final Logger log = LoggerFactory.getLogger(WebSocketBulbsCoreCtrl.class);
+
     @Autowired
     private ActuatorService actuatorService;
+
     @Autowired
     private DtoConverterRegistry converterFactory;
-    
-    //~ Construction ///////////////////////////////////////////////////////////
-    
-    //~ Method(s) //////////////////////////////////////////////////////////////
+
+
     /**
      * Client must call <code>/core/bulbs/actuation</code> due to app destination 
      * prefix is set to <code>core</code> - see WebSocketConfig for more details
@@ -140,6 +142,5 @@ public class WebSocketBulbsCoreCtrl {
             log.error(ex.getMessage(), ex);
         }
 	}
-    //~ Private Artifact(s) ////////////////////////////////////////////////////
 
 }

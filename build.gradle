@@ -1,24 +1,33 @@
-buildscript{
+buildscript {
     repositories {
         mavenCentral()
+        jcenter()
+        maven { url 'http://repo.spring.io/plugins-release' }
     }
-    dependencies{
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.2.3.RELEASE")
+    dependencies {
+        classpath "org.springframework.build.gradle:propdeps-plugin:${springGradlePropDepPlugin}"
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
         classpath 'org.ajoberstar:gradle-git:1.1.0'
     }
 }
-
-
-import org.ajoberstar.grgit.*
-import org.apache.tools.ant.filters.ReplaceTokens
 
 plugins {
     id "com.eriwen.gradle.js" version "1.12.1"
     id "com.eriwen.gradle.css" version "1.11.1"
 }
+
+import org.ajoberstar.grgit.Grgit
+import org.apache.tools.ant.filters.ReplaceTokens
+
 apply plugin: 'java'
 apply plugin: 'maven'
-apply plugin: 'spring-boot'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'idea'
+
+apply plugin: 'propdeps'
+apply plugin: 'propdeps-maven'
+apply plugin: 'propdeps-idea'
+apply plugin: 'propdeps-eclipse'
 
 group = 'net.datenstrudel.bulbs'
 archivesBaseName = "bulbs-core"
@@ -33,33 +42,34 @@ def getBranchName() {
     def rev = repo.head().id
     return rev
 }
-ext{
+
+ext {
     springVersion = '4.1.0.RELEASE'
-    springBootVersion = '1.1.9.RELEASE'
     revision = getBranchName()
+    buildNumber = project.hasProperty('buildNumber') ? project.getProperty('buildNumber') : '[build unknown]'
+    buildPlatform = project.hasProperty('buildPlatform') ? project.getProperty('buildPlatform') : 'x86'
 
     jsSrcDir = "src/main/resources/static/bulbsCore/js"
     cssSrcDir = "src/main/resources/static/bulbsCore/css"
 }
 
+apply from: 'docker.gradle'
+
 sourceSets {
     integTest {
-        java.srcDir file('src/integration-test/java')
-        resources.srcDir file('src/integration-test/resources')
+        java.srcDir file('src/integTest/java')
+        resources.srcDir file('src/integTest/resources')
         compileClasspath += main.output + test.output
         runtimeClasspath += main.output + compileClasspath
+        compileClasspath += sourceSets.main.runtimeClasspath
     }
 }
 
-task integTest(type: Test) {
-    testClassesDir = sourceSets.integTest.output.classesDir
-    classpath = sourceSets.integTest.runtimeClasspath
-    jvmArgs '-Duser.timezone=UTC'
+configurations {
+    integTestCompile
+    integTestCompile.extendsFrom(testCompile)
 }
 
-test{
-    jvmArgs '-Duser.timezone=UTC'
-}
 bootRun {
     jvmArgs = ["-Duser.timezone=UTC"]
 }
@@ -77,90 +87,58 @@ repositories {
 }
 
 dependencies {
+    compile group: 'net.datenstrudel.bulbs', name: 'bulbs-shared', version: '1.3-SNAPSHOT'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter', version: springBootVersion
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: springBootVersion
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: springBootVersion
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-mongodb', version: springBootVersion
     compile(group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: springBootVersion) {
         exclude(module: 'spring-jdbc')
     }
-    compile group: 'net.datenstrudel.bulbs', name: 'bulbs-shared', version: '1.3-SNAPSHOT'
-    compile group: 'javax.persistence', name: 'persistence-api', version: '1.0'
-    compile group: 'javax.inject', name: 'javax.inject', version: '1'
-    compile(group: 'org.springframework', name: 'spring-context', version: springVersion) {
-        exclude(module: 'commons-logging')
-    }
-    compile group: 'org.springframework', name: 'spring-messaging', version: springVersion
-    compile group: 'org.springframework', name: 'spring-context-support', version: springVersion
-    compile group: 'org.springframework', name: 'spring-web', version: springVersion
-    compile group: 'org.springframework', name: 'spring-webmvc', version: springVersion
-    compile group: 'org.springframework', name: 'spring-websocket', version: springVersion
-    compile group: 'javax.websocket', name: 'javax.websocket-api', version: '1.0'
-    compile group: 'org.projectreactor', name: 'reactor-core', version: '1.0.0.RELEASE'
-    compile group: 'org.springframework.data', name: 'spring-data-mongodb', version: '1.5.4.RELEASE'
-    compile group: 'org.springframework', name: 'spring-aspects', version: springVersion
-    compile group: 'org.springframework', name: 'spring-aop', version: springVersion
-    compile group: 'org.springframework.amqp', name: 'spring-rabbit', version: '1.2.0.RELEASE'
-    compile group: 'org.springframework', name: 'spring-test', version: '4.0.3.RELEASE'
+    compile("org.springframework.boot:spring-boot-starter-amqp:${springBootVersion}")
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-websocket', version: springBootVersion
+    compile group: 'org.springframework', name: 'spring-context-support'
+    optional "org.springframework.boot:spring-boot-configuration-processor:${springBootVersion}"
     compile group: 'org.quartz-scheduler', name: 'quartz', version: '2.2.0'
-    compile group: 'org.hibernate', name: 'hibernate-validator', version: '4.3.1.Final'
-    compile group: 'org.apache.httpcomponents', name: 'httpclient-cache', version: '4.3'
-    compile group: 'org.apache.httpcomponents', name: 'httpcore', version: '4.3'
-    compile(group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.3') {
-        exclude(module: 'commons-logging')
-    }
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.1'
     compile group: 'com.google.code.gson', name: 'gson', version: '2.2.4'
-    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.2'
     compile group: 'org.aspectj', name: 'aspectjrt', version: '1.8.0.RELEASE'
     compile group: 'org.aspectj', name: 'aspectjtools', version: '1.8.0.RELEASE'
     compile group: 'commons-io', name: 'commons-io', version: '1.2'
     compile group: 'org.mongeez', name: 'mongeez', version: '0.9.3'
     compile group: 'com.mangofactory', name: 'swagger-springmvc', version: '1.0.0'
-    testCompile(group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: springBootVersion) {
-        exclude(module: 'commons-logging')
-    }
-    testCompile group: 'org.hamcrest', name: 'hamcrest-all', version: '1.3'
-    testCompile group: 'junit', name: 'junit', version: '4.10'
+
+    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: springBootVersion
     testCompile group: 'org.easymock', name: 'easymock', version: '3.2'
     testCompile group: 'org.easymock', name: 'easymockclassextension', version: '3.2'
-    testCompile group: 'org.mockito', name: 'mockito-all', version: '1.10.16'
-    testCompile group: 'cglib', name: 'cglib-nodep', version: '2.2'
-    testCompile group: 'org.objenesis', name: 'objenesis', version: '1.2'
-    compile group: 'javax.servlet', name: 'javax.servlet-api', version: '3.1.0'
 
     integTestCompile sourceSets.main.output
-    integTestCompile configurations.testCompile
     integTestCompile sourceSets.test.output
+    integTestCompile configurations.testCompile
     integTestRuntime configurations.testRuntime
 }
 
-configurations.all {
-    resolutionStrategy.eachDependency { DependencyResolveDetails details ->
-        if (details.requested.group == 'org.apache.tomcat.embed') {
-            details.useVersion '8.0.8'
-        }
-    }
+task integTest(type: Test) {
+    group = 'verification'
+    testClassesDir = sourceSets.integTest.output.classesDir
+    classpath = sourceSets.integTest.runtimeClasspath
+    jvmArgs '-Duser.timezone=UTC'
+    systemProperty 'user.timezone', 'UTC'
+    include '**/*IT*'
+    include '**/*AT*'
 }
 
-processResources {
-    exclude '**/*.properties'
+test {
+    exclude '**/*IT*'
+    systemProperty 'user.timezone', 'UTC'
+    jvmArgs '-Duser.timezone=UTC'
 }
 
-task('filterCopy', type: Copy) {
-    from "src/main/resources"
-    into "${buildDir}/resources/main"
-    include '**/*.properties'
-    filter ReplaceTokens, tokens: [
-            "application.version": project.property("version"),
-            "project.archivesBaseName": project.property("archivesBaseName"),
-            "project.description": project.property("description"),
-            "project.version"    : project.property("version"),
-            "project.revision"   : project.property("revision")
-    ]
+tasks.withType(Test) {
+    reports.html.destination = file("${reporting.baseDir}/${name}")
 }
-processResources.dependsOn filterCopy
 
-//~ Javascript resource processing
+//~ Javascript resource processing /////////////////////////////////////////////////
 combineJs {
     source = [
             "${jsSrcDir}/lib/angular.js",
@@ -183,9 +161,10 @@ combineJs {
             "${jsSrcDir}/appCore/widgets/LinechartSelector.js",
             "${jsSrcDir}/appCore/widgets/SliderBar.js"
     ]
-    source.each{ logger.info ("$it") }
+    source.each { logger.info("$it") }
     dest = file("${buildDir}/resources/main/static/bulbsCore/js/bulbs-core-webApp.js")
 }
+
 minifyJs {
     source = combineJs
     dest = file("${buildDir}/resources/main/static/bulbsCore/js/bulbs-core-webApp.min.js")
@@ -196,16 +175,14 @@ minifyJs {
         compilerOptions.languageIn = "ECMASCRIPT5"
     }
 }
-processResources.dependsOn minifyJs
-assemble.dependsOn minifyJs
 
 //~ CSS resource processing
 combineCss {
     source = [
-        "${cssSrcDir}/lib/bootstrap/bootstrap.css",
-        "${cssSrcDir}/lib/iconmoon/style.css",
-        "${cssSrcDir}/core/app.css",
-        "${cssSrcDir}/identity/login.css"
+            "${cssSrcDir}/lib/bootstrap/bootstrap.css",
+            "${cssSrcDir}/lib/iconmoon/style.css",
+            "${cssSrcDir}/core/app.css",
+            "${cssSrcDir}/identity/login.css"
     ]
     dest = file("${buildDir}/resources/main/static/bulbsCore/css/bulbs-core-styles.css")
 }
@@ -218,6 +195,25 @@ minifyCss {
     }
 }
 
-processResources.dependsOn minifyCss
+assemble.dependsOn minifyJs
 assemble.dependsOn minifyCss
+
+processResources {
+    filesMatching('**/application.properties') {
+        filter ReplaceTokens, tokens: [
+                "application.version"     : project.property("version"),
+                "project.archivesBaseName": project.property("archivesBaseName"),
+                "project.description"     : project.property("description"),
+                "project.version"         : project.property("version"),
+                "project.revision"        : project.property("revision"),
+                "project.buildNumber"     : project.property("buildNumber")
+        ]
+    }
+    doLast{
+        minifyJs
+        minifyCss
+    }
+}
+
+compileJava.dependsOn(processResources)
 

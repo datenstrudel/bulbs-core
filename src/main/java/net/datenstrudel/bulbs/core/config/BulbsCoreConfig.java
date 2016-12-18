@@ -4,9 +4,14 @@ import net.datenstrudel.bulbs.core.infrastructure.PersistenceConfig;
 import net.datenstrudel.bulbs.core.infrastructure.SerializerConfig;
 import net.datenstrudel.bulbs.core.infrastructure.monitoring.MonitoringConfig;
 import net.datenstrudel.bulbs.core.infrastructure.services.InfrastructureServicesConfig;
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -20,8 +25,7 @@ import javax.annotation.PostConstruct;
  */
 @Configuration
 @EnableScheduling
-@PropertySource("classpath:/bulbs-core-config.properties")
-@Import({ 
+@Import({
     PersistenceConfig.class,
     SerializerConfig.class,
     InfrastructureServicesConfig.class,

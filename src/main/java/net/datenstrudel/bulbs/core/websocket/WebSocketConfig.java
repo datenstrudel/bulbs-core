@@ -13,10 +13,9 @@ import org.springframework.messaging.converter.MessageConverter;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.messaging.support.ChannelInterceptor;
+import org.springframework.web.socket.config.annotation.AbstractWebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
-import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
-import org.springframework.web.socket.config.annotation.WebSocketTransportRegistration;
 import org.springframework.web.socket.server.standard.TomcatRequestUpgradeStrategy;
 import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
 
@@ -29,7 +28,7 @@ import java.util.List;
         },
         excludeFilters = @ComponentScan.Filter(Configuration.class))
 @EnableWebSocketMessageBroker
-public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
 
     @Autowired
     CounterService counterService;
@@ -92,10 +91,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         reg.taskExecutor().corePoolSize(1);
         reg.taskExecutor().maxPoolSize(2);
         reg.taskExecutor().queueCapacity(180);
-    }
-    @Override
-    public void configureWebSocketTransport(WebSocketTransportRegistration registry) {
-        registry.setSendTimeLimit(2500);
     }
 
     @Bean

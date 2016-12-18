@@ -2,7 +2,9 @@ package net.datenstrudel.bulbs.core.security.config;
 
 import net.datenstrudel.bulbs.core.application.services.BulbsContextUserService;
 import net.datenstrudel.bulbs.core.web.filter.PreAuthenticationProcessingFilter;
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.autoconfigure.ManagementServerProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -40,7 +42,7 @@ public class SecurityConfig {
     }
 
     @Configuration
-    @Profile(value = "development")
+    @Profile(value = "!production")
     @EnableWebSecurity
     @Order(ManagementServerProperties.ACCESS_OVERRIDE_ORDER)
     public static class WebSecurityConfigDevel extends WebSecurityConfigurerAdapter {
