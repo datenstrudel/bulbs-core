@@ -10,4 +10,4 @@ services:
   - rabbitmq
 
 install: true
-script: gradle clean build -Dspring.profiles.active=travisci
+script: gradlew clean build integTest -Dspring.profiles.active=travisci
