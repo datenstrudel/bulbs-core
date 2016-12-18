@@ -9,5 +9,10 @@ services:
   - mongodb
   - rabbitmq
 
+addons:
+  hosts:
+    - MONGODB_HOST
+    - RABBITMQ_HOST
+
 install: true
 script: ./gradlew clean build integTest -Dspring.profiles.active=travisci
