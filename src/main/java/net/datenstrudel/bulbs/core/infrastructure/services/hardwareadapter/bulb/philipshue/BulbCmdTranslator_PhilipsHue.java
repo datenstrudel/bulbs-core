@@ -3,7 +3,12 @@ package net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
 import com.google.gson.reflect.TypeToken;
-import net.datenstrudel.bulbs.core.domain.model.bulb.*;
+import net.datenstrudel.bulbs.core.domain.model.bulb.Bulb;
+import net.datenstrudel.bulbs.core.domain.model.bulb.BulbBridge;
+import net.datenstrudel.bulbs.core.domain.model.bulb.BulbBridgeId;
+import net.datenstrudel.bulbs.core.domain.model.bulb.BulbId;
+import net.datenstrudel.bulbs.core.domain.model.bulb.HwResponse;
+import net.datenstrudel.bulbs.core.domain.model.bulb.InvocationResponse;
 import net.datenstrudel.bulbs.core.domain.model.identity.BulbsContextUserId;
 import net.datenstrudel.bulbs.core.domain.model.identity.BulbsPrincipal;
 import net.datenstrudel.bulbs.core.domain.model.identity.BulbsPrincipalState;
@@ -21,7 +26,11 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * 
@@ -32,7 +41,7 @@ public class BulbCmdTranslator_PhilipsHue implements BulbCmdTranslator_HTTP {
     //~ Member(s) //////////////////////////////////////////////////////////////
     private final Gson gson = new Gson();
     
-    private static final Map<String,Object> EMPTY_URL_VARS = new HashMap<>();
+    private static final Map<String, Object> EMPTY_URL_VARS = new HashMap<>();
     //~ Construction ///////////////////////////////////////////////////////////
     public BulbCmdTranslator_PhilipsHue() {
     }

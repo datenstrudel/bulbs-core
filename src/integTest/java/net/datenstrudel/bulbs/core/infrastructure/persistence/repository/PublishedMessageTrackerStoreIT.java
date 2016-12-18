@@ -1,15 +1,12 @@
 package net.datenstrudel.bulbs.core.infrastructure.persistence.repository;
 
-import net.datenstrudel.bulbs.core.TestConfig;
+import net.datenstrudel.bulbs.core.AbstractBulbsIT;
 import net.datenstrudel.bulbs.core.application.messaging.eventStore.PublishedMessageTracker;
 import net.datenstrudel.bulbs.core.application.messaging.eventStore.PublishedMessageTrackerStore;
-import net.datenstrudel.bulbs.core.infrastructure.PersistenceConfig;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.Arrays;
 
@@ -19,20 +16,16 @@ import static org.hamcrest.Matchers.is;
 /**
  * Created by Thomas Wendzinski.
  */
-@ContextConfiguration(
-        initializers = TestConfig.class,
-        classes = {
-                PersistenceConfig.class,
-                TestConfig.class
-        })
-@org.junit.runner.RunWith(SpringJUnit4ClassRunner.class)
-public class PublishedMessageTrackerStoreIT {
+public class PublishedMessageTrackerStoreIT extends AbstractBulbsIT{
 
     @Autowired
     private PublishedMessageTrackerStore instance;
+
     @Autowired
     private MongoTemplate mongo;
+
     private static boolean initialized = false;
+
 
     @Before
     public void setUp() {

@@ -1,6 +1,6 @@
 package net.datenstrudel.bulbs.core.infrastructure.persistence.repository;
 
-import net.datenstrudel.bulbs.core.TestConfig;
+import net.datenstrudel.bulbs.core.AbstractBulbsIT;
 import net.datenstrudel.bulbs.core.domain.model.bulb.BulbActuatorCommand;
 import net.datenstrudel.bulbs.core.domain.model.bulb.BulbBridgeId;
 import net.datenstrudel.bulbs.core.domain.model.bulb.BulbId;
@@ -11,20 +11,14 @@ import net.datenstrudel.bulbs.core.domain.model.identity.BulbsContextUserId;
 import net.datenstrudel.bulbs.core.domain.model.preset.Preset;
 import net.datenstrudel.bulbs.core.domain.model.preset.PresetId;
 import net.datenstrudel.bulbs.core.domain.model.preset.PresetRepository;
-import net.datenstrudel.bulbs.core.infrastructure.PersistenceConfig;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbState;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.CommandPriority;
 import net.datenstrudel.bulbs.shared.domain.model.color.ColorRGB;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.ArrayList;
@@ -37,28 +31,17 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 /**
- *
  * @author Thomas Wendzinski
  */
-@ContextConfiguration(
-    initializers = TestConfig.class,
-    classes = {
-        PersistenceConfig.class,
-        TestConfig.class
-    })
-@RunWith(SpringJUnit4ClassRunner.class)
-public class PresetRepositoryImplIT {
-    
-    private static final Logger log = LoggerFactory.getLogger(PresetRepositoryImplIT.class);
+public class PresetRepositoryImplIT extends AbstractBulbsIT {
     
     @Autowired
-    PresetRepository instance;
+    private PresetRepository instance;
+
     @Autowired
     private MongoTemplate mongo;
+
     private static boolean initialized = false;
-    
-    public PresetRepositoryImplIT() {
-    }
     
     @Before
     public void setUp() {

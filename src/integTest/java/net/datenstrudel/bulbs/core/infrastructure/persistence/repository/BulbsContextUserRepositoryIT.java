@@ -1,37 +1,31 @@
 package net.datenstrudel.bulbs.core.infrastructure.persistence.repository;
 
-import net.datenstrudel.bulbs.core.IntegrationTest;
-import net.datenstrudel.bulbs.core.TestConfig;
-import net.datenstrudel.bulbs.core.domain.model.identity.*;
-import net.datenstrudel.bulbs.core.infrastructure.PersistenceConfig;
+import net.datenstrudel.bulbs.core.AbstractBulbsIT;
+import net.datenstrudel.bulbs.core.domain.model.identity.BulbsContextUser;
+import net.datenstrudel.bulbs.core.domain.model.identity.BulbsContextUserId;
+import net.datenstrudel.bulbs.core.domain.model.identity.BulbsContextUserRepository;
+import net.datenstrudel.bulbs.core.domain.model.identity.BulbsPrincipal;
+import net.datenstrudel.bulbs.core.domain.model.identity.BulbsPrincipalState;
 import net.datenstrudel.bulbs.shared.domain.model.identity.AppId;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.UUID;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-@ContextConfiguration(
-        initializers = TestConfig.class,
-        classes = {
-                PersistenceConfig.class,
-                TestConfig.class
-        })
-@RunWith(SpringJUnit4ClassRunner.class)
-@Category(IntegrationTest.class)
-public class BulbsContextUserRepositoryIT {
+public class BulbsContextUserRepositoryIT extends AbstractBulbsIT{
 
     @Autowired
     BulbsContextUserRepository instance;
+
     @Autowired
     private MongoTemplate mongo;
+
     private static boolean initialized = false;
 
     @Before

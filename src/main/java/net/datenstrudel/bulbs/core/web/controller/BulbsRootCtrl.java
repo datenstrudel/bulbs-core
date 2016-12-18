@@ -30,27 +30,27 @@ public class BulbsRootCtrl {
     private Environment environment;
 
     @RequestMapping("/")
-    public void index( HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        if(isDevelopment == null) isDevelopment = determineStage();
-        if(isDevelopment){
+    public void index(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        if (isDevelopment == null) isDevelopment = determineStage();
+        if (isDevelopment) {
             log.debug("Minfied version enforced: " + forceminifiedVersion);
         }
-        if(!isDevelopment || forceminifiedVersion){
+        if (!isDevelopment || forceminifiedVersion) {
             req.getRequestDispatcher(TARGET_APP_MINIFIED).forward(req, resp);
             return;
-        }else{
+        } else {
             req.getRequestDispatcher(TARGET_APP_NOT_MINIFIED).forward(req, resp);
             return;
         }
     }
 
-    private boolean determineStage(){
+    private boolean determineStage() {
         String[] activeProfiles = environment.getActiveProfiles();
         log.info("Profiles detected: " + Arrays.toString(activeProfiles));
 
-        if(activeProfiles == null) throw new IllegalStateException("Aplication stated without any profile specified");
-        for(String el : activeProfiles){
-            if("development".equals(el)){
+        if (activeProfiles == null) throw new IllegalStateException("Aplication stated without any profile specified");
+        for (String el : activeProfiles) {
+            if ("development".equals(el)) {
                 return true;
             }
         }

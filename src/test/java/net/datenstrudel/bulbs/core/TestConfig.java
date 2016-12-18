@@ -1,6 +1,5 @@
 package net.datenstrudel.bulbs.core;
 
-import net.datenstrudel.bulbs.core.domain.model.bulb.BulbsHwService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.actuate.metrics.CounterService;
@@ -18,26 +17,19 @@ import java.io.IOException;
 import static org.mockito.Mockito.mock;
 
 /**
- *
  * @author Thomas Wendzinski
  */
 @Configuration
-public class TestConfig implements ApplicationContextInitializer<ConfigurableApplicationContext>{
+public class TestConfig implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 
     //~ Member(s) //////////////////////////////////////////////////////////////
     private static final Logger log = LoggerFactory.getLogger(TestConfig.class);
-    private static final String TEST_PROPERTIES_PATH = 
-            "classpath:/application-test.properties";
-    
+    private static final String TEST_PROPERTIES_PATH =
+            "classpath:/application-itest.properties";
+
     //~ Construction ///////////////////////////////////////////////////////////
-    
+
     //~ Method(s) //////////////////////////////////////////////////////////////
-//    @Bean(name = "bulbsHwService")
-//    public BulbsHwService bulbsHwService_mk(){
-////        BulbsHwService res = EasyMock.createStrictMock(BulbsHwService.class);
-////        return res;
-//        return mock(BulbsHwService.class);
-//    }
     @Bean
     public CounterService counterService_mk() {
         CounterService res = mock(CounterService.class);
@@ -54,12 +46,11 @@ public class TestConfig implements ApplicationContextInitializer<ConfigurableApp
         log.info("INIT TestConfig");
         //~ Load (test overriding) property resource(s) to be registered in environment with highest precedence!
         ConfigurableEnvironment env = ctx.getEnvironment();
-        
-        Resource runtimeProps = ctx.getResource(
-                TEST_PROPERTIES_PATH);
-        try{
+
+        Resource runtimeProps = ctx.getResource(TEST_PROPERTIES_PATH);
+        try {
             env.getPropertySources().addFirst(new ResourcePropertySource(runtimeProps));
-        }catch(IOException ioex){
+        } catch (IOException ioex) {
             throw new Error(ioex);
         }
     }

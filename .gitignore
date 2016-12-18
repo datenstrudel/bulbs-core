@@ -4,8 +4,8 @@ BulbsCore/target/**
 BulbsShared/target/**
 **/*.iml
 src/main/resources/META-INF/tomcat-bulbs.keystore
-target
+target/
 .vagrant
 .gradle
-doc/wiki
-build
+doc/wiki/
+build/

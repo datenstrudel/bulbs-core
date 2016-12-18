@@ -1,53 +1,31 @@
 package net.datenstrudel.bulbs.core.infrastructure.services.scheduling;
 
-import net.datenstrudel.bulbs.core.TestConfig;
-import net.datenstrudel.bulbs.core.config.BulbsCoreConfig;
-import net.datenstrudel.bulbs.core.infrastructure.services.InfrastructureServicesConfig;
-import org.junit.Before;
-import org.junit.BeforeClass;
+import net.datenstrudel.bulbs.core.AbstractBulbsIT;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.time.ZoneId;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  *
  * @author Thomas Wendzinski
  */
-@ContextConfiguration(
-initializers = TestConfig.class,
-classes = {
-    TestConfig.class,
-    BulbsCoreConfig.class,
-    InfrastructureServicesConfig.class
-})
-@RunWith(SpringJUnit4ClassRunner.class)
-public class JobCoordinatorImplIT {
+public class JobCoordinatorImplIT extends AbstractBulbsIT {
     
     private static final Logger log = LoggerFactory.getLogger(JobCoordinatorImplIT.class);
+
     @Autowired
     private JobCoordinatorImpl instance;
             
-    public JobCoordinatorImplIT() {
-    }
-    
-    @BeforeClass
-    public static void setUpClass() {
-    }
-    @Before
-    public void setUp() {
-    }
-
     @Test
     public void testSchedule() throws Exception{
         System.out.println("schedule");

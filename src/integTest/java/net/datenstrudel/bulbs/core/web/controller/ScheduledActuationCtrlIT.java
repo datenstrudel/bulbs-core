@@ -1,32 +1,25 @@
 package net.datenstrudel.bulbs.core.web.controller;
 
+import net.datenstrudel.bulbs.core.AbstractBulbsWebIT;
 import net.datenstrudel.bulbs.core.TestUtil;
-import net.datenstrudel.bulbs.core.application.facade.DtoConverterRegistry;
 import net.datenstrudel.bulbs.core.application.facade.ModelFacadeOutPort;
-import net.datenstrudel.bulbs.core.application.services.ScheduledActuationService;
-import net.datenstrudel.bulbs.core.testConfigs.WebTestConfig;
 import net.datenstrudel.bulbs.shared.domain.model.client.scheduling.DtoScheduledActuation;
 import net.datenstrudel.bulbs.shared.domain.model.scheduling.PointInTimeTrigger;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -36,50 +29,37 @@ import java.util.List;
 import static net.datenstrudel.bulbs.core.web.controller.ControllerTestUtil.getTestPrincipal;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
-
 /**
- *
  * @author Thomas Wendzinski
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@WebAppConfiguration()
-@EnableWebMvc
-@ContextConfiguration(classes = {
-    ScheduledActuationCtrlIT.Cfg.class,
-    WebTestConfig.class
-})
-public class ScheduledActuationCtrlIT {
-    
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
+public class ScheduledActuationCtrlIT extends AbstractBulbsWebIT {
+
     private static final Logger log = LoggerFactory.getLogger(ScheduledActuationCtrlIT.class);
 
     @Autowired
     private WebApplicationContext wac;
     private MockMvc mockMvc;
 
-    @Autowired
+    @MockBean
     private ModelFacadeOutPort outPort;
 
     @Before
     public void setUp() {
-        // Process mock annotations
         MockitoAnnotations.initMocks(this);
-        // Setup Spring test in standalone mode
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(wac)
-                .build(); // standaloneSetup(instance).build();
+        this.mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
     }
 
     @Test
     public void scheduledActuationsByUser() throws Exception {
-        System.out.println("findOne");
         final DtoScheduledActuation schedAct = new DtoScheduledActuation("test_Id", false, new Date(), false, "test_SchedName", new Date(), new ArrayList<>(), new PointInTimeTrigger(new Date(), "CET"));
 
         when(outPort.outputAsSet(DtoScheduledActuation.class)).thenReturn(
-                new HashSet<DtoScheduledActuation>(){{
+                new HashSet<DtoScheduledActuation>() {{
                     add(schedAct);
                 }}
         );
@@ -93,16 +73,16 @@ public class ScheduledActuationCtrlIT {
         List<DtoScheduledActuation> dtoScheduledActuation = TestUtil.jacksonDeserializeList(DtoScheduledActuation.class, serializedRes);
         assertThat(dtoScheduledActuation.get(0), is(schedAct));
     }
+
     @Test
     public void setNewTrigger_emptyStartAtFails() throws Exception {
-        System.out.println("findOne");
         final DtoScheduledActuation schedAct = new DtoScheduledActuation(
                 "test_Id", false, new Date(), false, "test_SchedName", new Date(), new ArrayList<>(),
                 new PointInTimeTrigger(new Date(), "CET"));
         ReflectionTestUtils.setField(schedAct.getTrigger(), "startAt", null); // !
 
         when(outPort.outputAsSet(DtoScheduledActuation.class)).thenReturn(
-                new HashSet<DtoScheduledActuation>(){{
+                new HashSet<DtoScheduledActuation>() {{
                     add(schedAct);
                 }}
         );
@@ -118,10 +98,9 @@ public class ScheduledActuationCtrlIT {
 
     //    @Test
     public void testCreateAndActivate() throws Exception {
-        System.out.println("createAndActivate");
         DtoScheduledActuation dtoNewSchedule = null;
         Authentication authentication = null;
-        
+
 ////        MvcResult mvcRes = 
 //        this.mockMvc.perform( post("/core/schedules/")
 //                .content("{}")
@@ -136,16 +115,16 @@ public class ScheduledActuationCtrlIT {
 //                
 //        .andExpect(status().isOk())
 //        .andExpect(content().contentType("application/json"));
-        
+
 //        this.mockMvc.perform( get("/core/schedules/tesstId")
 //                .accept(MediaType.APPLICATION_JSON)
 //        )
 //        .andExpect(status().isOk())
 //        .andExpect(content().contentType("application/json"));
-                
-        
+
+
 //        .andExpect(jsonPath("$.name").value("Lee"));
-        
+
 //        
 //        DtoScheduledActuation expResult = null;
 //        DtoScheduledActuation result = instance.createAndActivate(dtoNewSchedule, authentication);
@@ -154,24 +133,4 @@ public class ScheduledActuationCtrlIT {
 //        fail("The test case is a prototype.");
     }
 
-    @Configuration
-    public static class Cfg{
-        @Bean
-        public ScheduledActuationCtrl scheduledActuationCtrl() {
-            return new ScheduledActuationCtrl();
-        }
-        @Bean
-        public ModelFacadeOutPort modelPort() {
-            return mock(ModelFacadeOutPort.class);
-        }
-        @Bean
-        public DtoConverterRegistry converterFactory() {
-            return mock(DtoConverterRegistry.class);
-        }
-        @Bean
-        public ScheduledActuationService scheduledActuationService() {
-            return mock(ScheduledActuationService.class);
-        }
-    }
-    
 }

@@ -1,12 +1,11 @@
 package net.datenstrudel.bulbs.core.websocket;
 
+import net.datenstrudel.bulbs.core.AbstractBulbsWebIT;
 import net.datenstrudel.bulbs.core.TestUtil;
-import net.datenstrudel.bulbs.core.application.facade.DtoConverterRegistry;
 import net.datenstrudel.bulbs.core.application.services.ActuatorService;
 import net.datenstrudel.bulbs.core.domain.model.bulb.BulbActuatorCommand;
 import net.datenstrudel.bulbs.core.domain.model.identity.AppIdCore;
 import net.datenstrudel.bulbs.core.domain.model.identity.BulbsContextUser;
-import net.datenstrudel.bulbs.core.testConfigs.WebTestConfig;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbState;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.CommandPriority;
 import net.datenstrudel.bulbs.shared.domain.model.client.bulb.DtoBulbActuatorCmd;
@@ -14,22 +13,16 @@ import net.datenstrudel.bulbs.shared.domain.model.color.ColorRGB;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.metrics.CounterService;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import java.util.LinkedList;
 
@@ -37,25 +30,20 @@ import static net.datenstrudel.bulbs.core.web.controller.ControllerTestUtil.getT
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@WebAppConfiguration()
-@EnableWebMvc
-@ContextConfiguration(classes = {
-        WebSocketBulbsCoreCtrlIT.Cfg.class,
-        WebTestConfig.class,
-        WebSocketConfig.class
-})
-public class WebSocketBulbsCoreCtrlIT {
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
+public class WebSocketBulbsCoreCtrlIT extends AbstractBulbsWebIT {
 
-    MockMvc mockMvc;
+    private MockMvc mockMvc;
 
     @Autowired
     private WebApplicationContext wac;
-    @Autowired
-    ActuatorService actuatorService;
+
+    @MockBean
+    private ActuatorService actuatorService;
 
     @Before
     public void setUp() {
@@ -108,7 +96,7 @@ public class WebSocketBulbsCoreCtrlIT {
 
     }
 
-    public DtoBulbActuatorCmd newBulbCmd(){
+    public DtoBulbActuatorCmd newBulbCmd() {
         LinkedList<BulbState> states = new LinkedList<>();
         states.add(new BulbState(new ColorRGB(1, 2, 3), true, 10));
         return new DtoBulbActuatorCmd(
@@ -117,26 +105,5 @@ public class WebSocketBulbsCoreCtrlIT {
                 CommandPriority.standard(),
                 states, true);
     }
-
-    @Configuration
-    public static class Cfg{
-        @Bean
-        public WebSocketBulbsCoreCtrl webSocketBulbsCoreCtrl() {
-            return new WebSocketBulbsCoreCtrl();
-        }
-        @Bean
-        public ActuatorService actuatorService() {
-            return mock(ActuatorService.class);
-        }
-        @Bean
-        public DtoConverterRegistry converterFactory() {
-            return mock(DtoConverterRegistry.class);
-        }
-        @Bean
-        public CounterService counterService() {
-            return mock(CounterService.class);
-        }
-    }
-
 
 }

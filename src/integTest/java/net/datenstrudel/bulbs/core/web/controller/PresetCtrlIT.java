@@ -1,14 +1,13 @@
 package net.datenstrudel.bulbs.core.web.controller;
 
 
+import net.datenstrudel.bulbs.core.AbstractBulbsWebIT;
 import net.datenstrudel.bulbs.core.TestUtil;
 import net.datenstrudel.bulbs.core.application.facade.DtoConverter;
 import net.datenstrudel.bulbs.core.application.facade.DtoConverterRegistry;
 import net.datenstrudel.bulbs.core.application.facade.ModelFacadeOutPort;
-import net.datenstrudel.bulbs.core.application.services.PresetService;
 import net.datenstrudel.bulbs.core.domain.model.bulb.AbstractActuatorCmd;
 import net.datenstrudel.bulbs.core.domain.model.identity.AppIdCore;
-import net.datenstrudel.bulbs.core.testConfigs.WebTestConfig;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbState;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.CommandPriority;
 import net.datenstrudel.bulbs.shared.domain.model.client.bulb.DtoAbstractActuatorCmd;
@@ -17,23 +16,16 @@ import net.datenstrudel.bulbs.shared.domain.model.client.preset.DtoPreset;
 import net.datenstrudel.bulbs.shared.domain.model.color.ColorHSB;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockitoAnnotations;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -42,28 +34,23 @@ import java.util.List;
 import static net.datenstrudel.bulbs.core.web.controller.ControllerTestUtil.getTestPrincipal;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@WebAppConfiguration()
-@EnableWebMvc
-@ContextConfiguration(classes = {
-        PresetCtrlIT.Cfg.class,
-        WebTestConfig.class
-})
-public class PresetCtrlIT {
-
-    private static final Logger log = LoggerFactory.getLogger(PresetCtrlIT.class);
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
+public class PresetCtrlIT extends AbstractBulbsWebIT{
 
     @Autowired
     private WebApplicationContext wac;
     private MockMvc mockMvc;
 
-    @Autowired
+    @MockBean
     private ModelFacadeOutPort outPort;
-    @Autowired
-    DtoConverterRegistry converterFactory;
+
+    @MockBean
+    private DtoConverterRegistry converterFactory;
 
     @Before
     public void setUp() {
@@ -111,24 +98,4 @@ public class PresetCtrlIT {
         assertThat(entityOut.getPresetId(), is(entityIn.getPresetId()) );
     }
 
-    @Configuration
-    public static class Cfg{
-        @Bean
-        public PresetCtrl presetCtrl() {
-            return new PresetCtrl();
-        }
-        @Bean
-        public PresetService presetService() {
-            return mock(PresetService.class);
-        }
-
-        @Bean
-        public ModelFacadeOutPort modelPort() {
-            return mock(ModelFacadeOutPort.class);
-        }
-        @Bean
-        public DtoConverterRegistry converterFactory() {
-            return mock(DtoConverterRegistry.class);
-        }
-    }
 }

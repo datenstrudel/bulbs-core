@@ -1,7 +1,6 @@
 package net.datenstrudel.bulbs.core.infrastructure.services.hardwareadapter.bulb.lifx;
 
-import net.datenstrudel.bulbs.core.TestConfig;
-import net.datenstrudel.bulbs.core.config.BulbsCoreConfig;
+import net.datenstrudel.bulbs.core.AbstractBulbsIT;
 import net.datenstrudel.bulbs.core.domain.model.bulb.BulbBridgeId;
 import net.datenstrudel.bulbs.core.domain.model.bulb.BulbId;
 import net.datenstrudel.bulbs.core.domain.model.identity.AppIdCore;
@@ -15,36 +14,29 @@ import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbsPlatform;
 import net.datenstrudel.bulbs.shared.domain.model.color.ColorHSB;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 /**
  * Created by Thomas Wendzinski.
  */
 
-@ContextConfiguration(
-        initializers = TestConfig.class,
-        classes = {
-                BulbsCoreConfig.class,
-                TestConfig.class
-        })
-@RunWith(SpringJUnit4ClassRunner.class)
-public class BulbBridgeHardwareAdapter_LifxIT {
+public class BulbBridgeHardwareAdapter_LifxIT extends AbstractBulbsIT{
 
     @Autowired
-    BulbBridgeHardwareAdapter_LIFX hwAdapter;
+    private BulbBridgeHardwareAdapter_LIFX hwAdapter;
 
-    UdpLifxMessageTransportManager mk_transport;
+    private UdpLifxMessageTransportManager mk_transport;
 
     @Before
     public void before() {

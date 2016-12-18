@@ -1,6 +1,5 @@
 package net.datenstrudel.bulbs.core.application.messaging.notification;
 
-import net.datenstrudel.bulbs.core.IntegrationTest;
 import net.datenstrudel.bulbs.core.TestConfig;
 import net.datenstrudel.bulbs.core.application.ApplicationLayerConfig;
 import net.datenstrudel.bulbs.core.application.messaging.eventStore.DomainEventStore;
@@ -8,27 +7,22 @@ import net.datenstrudel.bulbs.core.application.messaging.notification.handling.R
 import net.datenstrudel.bulbs.core.application.messaging.notification.handling.identiy.BulbsPrincipalInitLinkEstablishedHandler;
 import net.datenstrudel.bulbs.core.application.messaging.notification.infrastructure.NotificationServiceRabbitMq;
 import net.datenstrudel.bulbs.core.config.BulbsCoreConfig;
-import net.datenstrudel.bulbs.core.domain.model.identity.BulbsPrincipal;
-import net.datenstrudel.bulbs.core.domain.model.identity.BulbsPrincipalState;
 import net.datenstrudel.bulbs.core.domain.model.messaging.DomainEvent;
 import net.datenstrudel.bulbs.core.domain.model.messaging.DomainEventPublisher;
 import net.datenstrudel.bulbs.core.domain.model.messaging.DomainEventSubscriber;
 import net.datenstrudel.bulbs.core.security.config.SecurityConfig;
-import net.datenstrudel.bulbs.core.testConfigs.WebTestConfig;
+import net.datenstrudel.bulbs.core.web.config.WebConfig;
 import net.datenstrudel.bulbs.core.websocket.WebSocketConfig;
 import net.datenstrudel.bulbs.shared.domain.model.bulb.BulbState;
-import net.datenstrudel.bulbs.shared.domain.model.identity.AppId;
-import org.junit.Before;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Date;
 import java.util.Objects;
@@ -37,44 +31,36 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
- *
  * @author Thomas Wendzinski
  */
-@SpringApplicationConfiguration(
-    initializers = TestConfig.class,
-    classes = {
-        TestConfig.class,
-        WebTestConfig.class,
-        BulbsCoreConfig.class,
-        ApplicationLayerConfig.class,
-        SecurityConfig.class,
-        WebSocketConfig.class
-})
-@RunWith(SpringJUnit4ClassRunner.class)
-@WebAppConfiguration
-@Category(IntegrationTest.class)
+@SpringBootTest(
+        classes = {
+                TestConfig.class,
+                WebConfig.class,
+                BulbsCoreConfig.class,
+                ApplicationLayerConfig.class,
+                SecurityConfig.class,
+                WebSocketConfig.class
+        }, webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+@RunWith(SpringRunner.class)
+@TestPropertySource("classpath:application-itest.properties")
 public class NotificationServiceRabbitMq_RabbitMqExchangeListenerIT
-        extends RabbitMqExchangeListener{
-    
+        extends RabbitMqExchangeListener {
+
     private static final Logger log = LoggerFactory.getLogger(NotificationServiceRabbitMq_RabbitMqExchangeListenerIT.class);
+
     @Autowired
     @Qualifier(value = "coreInternalNotificationService")
     private NotificationServiceRabbitMq instance;
-    
+
     @Autowired
     @Qualifier(value = "domainEventStore")
     private DomainEventStore eventStore;
+
     @Autowired
     private BulbsPrincipalInitLinkEstablishedHandler listener;
-    
+
     private volatile boolean invocationSucceeded = false;
-    
-    public NotificationServiceRabbitMq_RabbitMqExchangeListenerIT() {
-    }
-    
-    @Before
-    public void setUp() {
-    }
 
     @Test
     public void testPublishNotifications() {
@@ -88,21 +74,16 @@ public class NotificationServiceRabbitMq_RabbitMqExchangeListenerIT
                 return DomainEvent.class;
             }
         });
-        BulbsPrincipal bulbsPrincipal = new BulbsPrincipal(
-                "testUsername", new AppId("testAppType"), 
-                "testBridgeId", BulbsPrincipalState.PENDING);
-        
-        DomainEventPublisher.instance().publish(
-                new TestEvent(null, "domainIdTest", new Date()));
-//        DomainEventPublisher.instance().publish(
-//                new BulbsPrincipalInitLinkEstablished(UUID.randomUUID(), bulbsPrincipal));
-        
+
+        DomainEventPublisher.instance().publish(new TestEvent(null, "domainIdTest", new Date()));
+
         try {
             Thread.sleep(5000l);
-        } catch (InterruptedException ex) {}
+        } catch (InterruptedException ex) {
+        }
         assertTrue(invocationSucceeded);
     }
-    
+
     @Override
     protected String topicName() {
         return Exchanges.EXCHANGE_TOPIC__BUBLS_CORE;
@@ -113,12 +94,12 @@ public class NotificationServiceRabbitMq_RabbitMqExchangeListenerIT
     }
     @Override
     protected void filteredDispatch(String type, String message) {
-        log.info(" [ <- ] Retrieved message with containing type["+type+"]");
+        log.info(" [ <- ] Retrieved message with containing type[" + type + "]");
         assertEquals(TestEvent.class.getName(), type);
         invocationSucceeded = true;
     }
 
-    private static final class TestEvent implements DomainEvent{
+    private static final class TestEvent implements DomainEvent {
 
         private BulbState state;
         private String domainId;

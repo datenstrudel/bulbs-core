@@ -4,18 +4,23 @@ import net.datenstrudel.bulbs.core.application.messaging.eventStore.DomainEventS
 import net.datenstrudel.bulbs.core.application.messaging.eventStore.PublishedMessageTrackerStore;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
-import static org.easymock.EasyMock.createNiceMock;
+import static org.mockito.Mockito.mock;
+
 
 @Configuration
 public class TestNotificationConfig {
 
     @Bean
+    @Primary
     public PublishedMessageTrackerStore notificationConfigMock(){
-        return createNiceMock(PublishedMessageTrackerStore.class);
+        return mock(PublishedMessageTrackerStore.class);
     }
+
     @Bean
+    @Primary
     public DomainEventStore domainEventStoreMock(){
-        return createNiceMock(DomainEventStore.class);
+        return mock(DomainEventStore.class);
     }
 }

@@ -3,9 +3,12 @@ package net.datenstrudel.bulbs.core.domain.model.scheduling;
 import net.datenstrudel.bulbs.core.domain.model.bulb.AbstractActuatorCmd;
 import net.datenstrudel.bulbs.shared.domain.model.Entity;
 import net.datenstrudel.bulbs.shared.domain.model.scheduling.Trigger;
-import org.springframework.data.annotation.Id;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 
 /**
  *
@@ -55,8 +58,7 @@ public class ScheduledActuation extends Entity<ScheduledActuation, ScheduledActu
         if(this.isActive(coordinator)){
             coordinator.unSchedule(this.id.getUuid());
         }
-        coordinator.schedule(this.id.getUuid(), trigger.toCronExpression(),
-                new ScheduledActuationExecutor(id, id.getCreator(), name));
+        coordinator.schedule(this.id.getUuid(), trigger.toCronExpression(), new ScheduledActuationExecutor(id, id.getCreator(), name));
         //TODO: Fire SchedulerStatusChangedEvent!
     }
     public void deActivate(JobCoordinator coordinator){

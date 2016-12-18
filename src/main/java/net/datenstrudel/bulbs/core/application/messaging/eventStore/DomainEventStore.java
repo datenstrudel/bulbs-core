@@ -11,13 +11,15 @@ import java.util.List;
 public interface DomainEventStore {
 
     //~ Method(s) //////////////////////////////////////////////////////////////
-    public Long nextIdentity();
-    public StoredEvent loadById(Long id);
-    public List<StoredEvent> loadAllStoredEventsSince(
-            long mostRecentPublishedStoredEventId);
-    public Long store(DomainEvent event);
-    
-    public DomainEvent fromStoredEvent(StoredEvent in);
+    Long nextIdentity();
+
+    StoredEvent loadById(Long id);
+
+    List<StoredEvent> loadAllStoredEventsSince(long mostRecentPublishedStoredEventId);
+
+    Long store(DomainEvent event);
+
+    DomainEvent fromStoredEvent(StoredEvent in);
     
 
 }

@@ -1,52 +1,47 @@
 package net.datenstrudel.bulbs.core.infrastructure.persistence.repository;
 
-import net.datenstrudel.bulbs.core.TestConfig;
+import net.datenstrudel.bulbs.core.AbstractBulbsIT;
 import net.datenstrudel.bulbs.core.domain.model.bulb.BulbBridgeId;
 import net.datenstrudel.bulbs.core.domain.model.bulb.BulbId;
 import net.datenstrudel.bulbs.core.domain.model.group.BulbGroup;
 import net.datenstrudel.bulbs.core.domain.model.group.BulbGroupId;
 import net.datenstrudel.bulbs.core.domain.model.group.BulbGroupRepository;
 import net.datenstrudel.bulbs.core.domain.model.identity.BulbsContextUserId;
-import net.datenstrudel.bulbs.core.infrastructure.PersistenceConfig;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
 
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 /**
  *
  * @author Thomas Wendzinski
  */
-@ContextConfiguration(
-    initializers = TestConfig.class,
-    classes = {
-        PersistenceConfig.class,
-        TestConfig.class
-    })
-@RunWith(SpringJUnit4ClassRunner.class)
-public class BulbGroupRepositoryImplIT {
+public class BulbGroupRepositoryImplIT extends AbstractBulbsIT {
     
     private static final Logger log = LoggerFactory.getLogger(BulbGroupRepositoryImplIT.class);
     
     @Autowired
-    BulbGroupRepository instance;
+    private BulbGroupRepository instance;
+
     @Autowired
     private MongoTemplate mongo;
+
     private static boolean initialized = false;
-    
-    public BulbGroupRepositoryImplIT() {
-    }
     
     @Before
     public void setUp() {

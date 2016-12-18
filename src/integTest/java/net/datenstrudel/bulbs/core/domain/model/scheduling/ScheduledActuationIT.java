@@ -1,169 +1,79 @@
 package net.datenstrudel.bulbs.core.domain.model.scheduling;
 
-import junit.framework.Assert;
-import net.datenstrudel.bulbs.core.TestConfig;
-import net.datenstrudel.bulbs.core.application.services.ScheduledActuationService;
-import net.datenstrudel.bulbs.core.config.BulbsCoreConfig;
-import net.datenstrudel.bulbs.core.domain.model.bulb.AbstractActuatorCmd;
+import net.datenstrudel.bulbs.core.AbstractBulbsIT;
+import net.datenstrudel.bulbs.core.application.services.ScheduledActuationServiceImpl;
 import net.datenstrudel.bulbs.core.domain.model.identity.BulbsContextUserId;
 import net.datenstrudel.bulbs.core.domain.model.preset.PresetActuatorCommand;
-import net.datenstrudel.bulbs.core.infrastructure.services.InfrastructureServicesConfig;
-import net.datenstrudel.bulbs.core.testConfigs.ScheduledActuationIntegrationTestConfig;
 import net.datenstrudel.bulbs.shared.domain.model.scheduling.PointInTimeTrigger;
 import net.datenstrudel.bulbs.shared.domain.model.scheduling.Trigger;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.annotation.DirtiesContext;
 
 import java.time.ZoneId;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
-import java.util.LinkedList;
-import java.util.Set;
 
-import static org.easymock.EasyMock.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+
 
 /**
- *
  * @author Thomas Wendzinski
  */
-@ContextConfiguration(
-initializers = TestConfig.class,
-classes = {
-        TestConfig.class,
-        BulbsCoreConfig.class,
-        InfrastructureServicesConfig.class,
-        ScheduledActuationIntegrationTestConfig.class
-      }
-)
-@RunWith(SpringJUnit4ClassRunner.class)
-public class ScheduledActuationIT {
+@DirtiesContext
+public class ScheduledActuationIT extends AbstractBulbsIT {
+
+    public static final ZoneId TZ_ID = ZoneId.of("Europe/Berlin");
+
+    @MockBean
+    private ScheduledActuationServiceImpl mk_actService;
 
     @Autowired
-    ScheduledActuationService mk_actService;
-    @Autowired 
-    JobCoordinator jobCoordinator;
-    
-    public ScheduledActuationIT() {
-    }
-    
-    @BeforeClass
-    public static void setUpClass() {
-    }
-    
+    private JobCoordinator jobCoordinator;
+
     @Before
     public void setUp() {
         reset(mk_actService);
     }
 
     @Test
-    public void testActivate() throws Exception{
-        System.out.println("activate");
-        ZoneId tzId = ZoneId.of("Europe/Berlin");
-        ScheduledActuation instance = new ScheduledActuation(
-                new ScheduledActuationId("testActivate_schedActId", 
-                        new BulbsContextUserId("testActivate_useruuid")), 
-                "testActivate_schedActName", true);
-        instance.setNewStates(new LinkedList<AbstractActuatorCmd>(){{
-            add(new PresetActuatorCommand(null, DISABLE_CLASS_MOCKING, null, null, true));
-        }}, 
-                jobCoordinator);
-        Date trigger_ = new Date(new Date().getTime() + 1000l);
-        Trigger trigger = new PointInTimeTrigger(trigger_, tzId.toString());
-//        Date trigger = Date.from(trigger_.toInstant().atZone(ZoneId.of(instance.getTimezoneId())).toLocalDateTime().toInstant(ZoneOffset.UTC));
-        System.out.println("Trigger: " + trigger_);
-        instance.defineTrigger(trigger, jobCoordinator);
-        mk_actService.execute(instance.getId().getCreator(), instance.getId());
-        expectLastCall().once();
-        replay(mk_actService);
+    public void activate_ShouldScheduleAndTrigger() throws Exception {
+        ScheduledActuation instance = givenScheduledActuationWithTrigger();
         instance.activate(jobCoordinator);
         Thread.sleep(1100l);
-        verify(mk_actService);
+        verify(mk_actService).execute(instance.getId().getCreator(), instance.getId());
     }
-    @Test
-    public void testDeActivate() throws Exception{
-        System.out.println("activate");
-        ZoneId tzId = ZoneId.of("Europe/Berlin");
-        ScheduledActuation instance = new ScheduledActuation(
-                new ScheduledActuationId("testDeActivate_schedActId", 
-                        new BulbsContextUserId("testDeActivate_useruuid")), 
-                "testDeActivate_schedActName", true);
-        instance.setNewStates(new LinkedList<AbstractActuatorCmd>(){{
-            add(new PresetActuatorCommand(null, DISABLE_CLASS_MOCKING, null, null, true));
-        }}, 
-                jobCoordinator);
-        Date trigger_ = new Date(new Date().getTime() + 1000l);
-        Trigger trigger = new PointInTimeTrigger(trigger_, tzId.toString());
-//        Date trigger = Date.from(trigger_.toInstant().atZone(ZoneId.of(instance.getTimezoneId())).toLocalDateTime().toInstant(ZoneOffset.UTC));
-        System.out.println("Trigger: " + trigger_);
-        instance.defineTrigger(trigger, jobCoordinator);
-        mk_actService.execute(isA(BulbsContextUserId.class), isA(ScheduledActuationId.class));
-        
-        // TODO: make sure test fails when next call is detected!!
-        final  boolean[] testDeActivate_failed = {false};
-        
-        expectLastCall().andStubDelegateTo(new ScheduledActuationService() {
-            @Override
-            public void modifyTrigger(BulbsContextUserId userId, ScheduledActuationId actId, Trigger newTrigger) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
 
-            @Override
-            public void execute(BulbsContextUserId userId, ScheduledActuationId actId) {
-                testDeActivate_failed[0] = true;
-            }
-            @Override
-            public Set<ScheduledActuation> loadAllByUser(BulbsContextUserId userId) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-            @Override
-            public void remove(BulbsContextUserId userId, ScheduledActuationId actId) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-            @Override
-            public void activate(BulbsContextUserId userId, ScheduledActuationId actId) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-            @Override
-            public void deactivate(BulbsContextUserId userId, ScheduledActuationId actId) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-            @Override
-            public void modifyName(BulbsContextUserId userId, ScheduledActuationId actId, String newName) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-            @Override
-            public void modifyStates(BulbsContextUserId userId, ScheduledActuationId actId, Collection<AbstractActuatorCmd> newStates) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-            @Override
-            public ScheduledActuation loadById(BulbsContextUserId userId, ScheduledActuationId id) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-            @Override
-            public ScheduledActuation create(BulbsContextUserId userId, String name, boolean removeAfterExecution) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-            @Override
-            public ScheduledActuation create(BulbsContextUserId userId, String name, Trigger trigger, boolean removeAfterExecution) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-            @Override
-            public ScheduledActuation createAndActivate(BulbsContextUserId userId, String name, Trigger trigger, boolean removeAfterExecution, Collection<AbstractActuatorCmd> states) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-        });
-        replay(mk_actService);
+    @Test
+    public void testDeActivate() throws Exception {
+        ScheduledActuation instance = givenScheduledActuationWithTrigger();
+
         instance.activate(jobCoordinator);
         instance.deActivate(jobCoordinator);
+
         Thread.sleep(1100l);
-        verify(mk_actService);
-        Assert.assertTrue( !testDeActivate_failed[0]);
+        verify(mk_actService, never()).execute(any(BulbsContextUserId.class), any(ScheduledActuationId.class));
     }
 
-    
+    private ScheduledActuation givenScheduledActuationWithTrigger() {
+        ScheduledActuation res = new ScheduledActuation(
+                new ScheduledActuationId("testActivate_schedActId",
+                        new BulbsContextUserId("testActivate_useruuid")),
+                "testActivate_schedActName", true);
+
+        res.setNewStates(Collections.singletonList(new PresetActuatorCommand(null, "test_apiKex", null, null, true)),
+                jobCoordinator);
+
+        Date triggerTime = new Date(new Date().getTime() + 1000l);
+        Trigger trigger = new PointInTimeTrigger(triggerTime, TZ_ID.toString());
+
+        res.defineTrigger(trigger, jobCoordinator);
+        return res;
+    }
+
 }

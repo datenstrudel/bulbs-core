@@ -1,4 +1,4 @@
-package net.datenstrudel.bulbs.core.main;
+package net.datenstrudel.bulbs.core;
 
 import net.datenstrudel.bulbs.core.application.ApplicationLayerConfig;
 import net.datenstrudel.bulbs.core.config.BulbsCoreConfig;
@@ -7,21 +7,21 @@ import net.datenstrudel.bulbs.core.web.config.SwaggerConfig;
 import net.datenstrudel.bulbs.core.web.config.WebConfig;
 import net.datenstrudel.bulbs.core.websocket.WebSocketConfig;
 import org.apache.catalina.connector.Connector;
-import org.apache.coyote.http11.AbstractHttp11Protocol;
 import org.apache.coyote.http11.Http11NioProtocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.embedded.EmbeddedServletContainerFactory;
-import org.springframework.boot.context.embedded.ErrorPage;
 import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainerFactory;
+import org.springframework.boot.web.servlet.ErrorPage;
 import org.springframework.boot.web.support.SpringBootServletInitializer;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.http.HttpStatus;
@@ -33,10 +33,18 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 @Configuration
-@EnableAutoConfiguration( exclude = {DataSourceAutoConfiguration.class})
-public class Main extends SpringBootServletInitializer {
+@SpringBootApplication(exclude = DataSourceAutoConfiguration.class)
+@Import({
+        BulbsCoreConfig.class,
+        ApplicationLayerConfig.class,
+        SecurityConfig.class,
+        WebConfig.class,
+        WebSocketConfig.class,
+        SwaggerConfig.class
+        })
+public class BulbsCoreApp extends SpringBootServletInitializer {
 
-    public static final Logger log = LoggerFactory.getLogger(Main.class);
+    public static final Logger log = LoggerFactory.getLogger(BulbsCoreApp.class);
 
     @Value("${sslKeystorePath:}")
     private String pathToKeystore;
@@ -46,31 +54,12 @@ public class Main extends SpringBootServletInitializer {
     private String sslKeyAlias;
 
     public static void main(String[] args) {
-        ApplicationContext ctx = new SpringApplicationBuilder()
-                .sources(
-                        BulbsCoreConfig.class,
-                        ApplicationLayerConfig.class,
-                        SecurityConfig.class,
-                        WebConfig.class,
-                        WebSocketConfig.class,
-                        SwaggerConfig.class,
-                        Main.class
-                )
-                .web(true)
-                .run(args);
-
-        String[] beanNames = ctx.getBeanDefinitionNames();
-        log.info("COUNT beans loaded: " + beanNames.length);
-        beanNames = null;
-//        Arrays.sort(beanNames);
-//        for (String beanName : beanNames) {
-//            System.out.println(beanName);
-//        }
-
+        SpringApplication.run(BulbsCoreApp.class, args);
     }
+
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-        application.sources(Main.class);
+        application.sources(BulbsCoreApp.class);
         return super.configure(application);
     }
 
@@ -102,18 +91,6 @@ public class Main extends SpringBootServletInitializer {
     private void applyStageIndependendContainerConfig(TomcatEmbeddedServletContainerFactory factory){
         factory.setContextPath("");
         factory.addErrorPages(new ErrorPage(HttpStatus.NOT_FOUND, "/errorpages/404.html"));
-
-        //~ Enable compression
-        factory.addConnectorCustomizers(connector -> {
-            AbstractHttp11Protocol ph = (AbstractHttp11Protocol) connector.getProtocolHandler();
-            ph.setCompression("on");
-            ph.setCompressionMinSize(2048);
-            String mimeTypes = ph.getCompressableMimeTypes();
-            mimeTypes += "," + "application/javascript";
-            mimeTypes += "," + "text/css";
-            ph.setCompressableMimeTypes(mimeTypes);
-            log.info("Compressable MimeTypes applied: {} ", mimeTypes);
-        });
     }
 
     private Connector createSslConnector() {

@@ -10,16 +10,12 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.converter.MessageConverter;
-import org.springframework.messaging.handler.invocation.HandlerMethodArgumentResolver;
-import org.springframework.messaging.handler.invocation.HandlerMethodReturnValueHandler;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.web.socket.config.annotation.AbstractWebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
-import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
-import org.springframework.web.socket.config.annotation.WebSocketTransportRegistration;
 import org.springframework.web.socket.server.standard.TomcatRequestUpgradeStrategy;
 import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
 
@@ -96,21 +92,6 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
         reg.taskExecutor().maxPoolSize(2);
         reg.taskExecutor().queueCapacity(180);
     }
-
-//    @Override
-//    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
-//
-//    }
-
-//    @Override
-//    public void addReturnValueHandlers(List<HandlerMethodReturnValueHandler> returnValueHandlers) {
-//
-//    }
-//
-//    @Override
-//    public void configureWebSocketTransport(WebSocketTransportRegistration registry) {
-//        registry.setSendTimeLimit(2500);
-//    }
 
     @Bean
     public DefaultHandshakeHandler handshakeHandler() {

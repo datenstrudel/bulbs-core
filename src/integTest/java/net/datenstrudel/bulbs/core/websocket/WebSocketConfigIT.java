@@ -1,23 +1,18 @@
 package net.datenstrudel.bulbs.core.websocket;
 
-import net.datenstrudel.bulbs.core.TestConfig;
-import net.datenstrudel.bulbs.core.application.ApplicationLayerConfig;
-import net.datenstrudel.bulbs.core.config.BulbsCoreConfig;
+import net.datenstrudel.bulbs.core.AbstractBulbsWebIT;
 import net.datenstrudel.bulbs.core.domain.model.identity.BulbsContextUser;
-import net.datenstrudel.bulbs.core.main.Main;
-import net.datenstrudel.bulbs.core.security.config.SecurityConfig;
 import net.datenstrudel.bulbs.core.util.IdentityUtil;
-import net.datenstrudel.bulbs.core.util.IdentityUtlConfig;
-import net.datenstrudel.bulbs.core.web.config.WebConfig;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.IntegrationTest;
-import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.http.HttpHeaders;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.web.socket.*;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.web.socket.CloseStatus;
+import org.springframework.web.socket.WebSocketHandler;
+import org.springframework.web.socket.WebSocketHttpHeaders;
+import org.springframework.web.socket.WebSocketMessage;
+import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.sockjs.client.SockJsClient;
 import org.springframework.web.socket.sockjs.client.Transport;
@@ -32,35 +27,23 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.fail;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@WebAppConfiguration()
-@SpringApplicationConfiguration(
-        initializers = {TestConfig.class},
-        classes = {
-                Main.class,
-                IdentityUtlConfig.class,
-                SecurityConfig.class,
-                BulbsCoreConfig.class,
-                WebConfig.class,
-                ApplicationLayerConfig.class,
-                WebSocketConfig.class,
-                IdentityUtlConfig.class,
-        }
-)
-@IntegrationTest("server.port:9092")
-public class WebSocketConfigIT {
+@DirtiesContext
+public class WebSocketConfigIT extends AbstractBulbsWebIT {
 
     @Autowired
     IdentityUtil identityUtil;
 
     volatile boolean connectionSucessful = false;
 
+    @LocalServerPort
+    int port;
+
     @Test
     public void coreWebsocketsRequestUpdatePossible() throws InterruptedException, URISyntaxException {
         BulbsContextUser testUser = identityUtil.createNewTestUser("test_credentials");
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add("Auth", testUser.getApiKey());
-        WebSocketHttpHeaders headers = new WebSocketHttpHeaders(httpHeaders );
+        WebSocketHttpHeaders headers = new WebSocketHttpHeaders(httpHeaders);
 
         List<Transport> transports = new ArrayList<>(2);
         // Due to we just provide a transport containing a StandardWebSocketClient, we make sure whether
@@ -87,7 +70,7 @@ public class WebSocketConfigIT {
             public boolean supportsPartialMessages() {
                 return false;
             }
-        }, headers, new URI("http://localhost:9092/core/websockets"));
+        }, headers, new URI("http://localhost:" + port + "/core/websockets"));
 
         Thread.sleep(3000l);
         assertThat(connectionSucessful, is(Boolean.TRUE));
