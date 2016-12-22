@@ -157,6 +157,7 @@ public class BulbBridgeHardwareAdapter_REST implements BulbBridgeHardwareAdapter
         ResponseEntity<String> resp = executeHttpCmd(cmd, cmdTranslator);
         return cmdTranslator.responseFromHardwareInvocation(resp.getBody());
     }
+
     @Override
     public HwResponse removeBulbsPrincipal(
             BulbBridgeAddress address,

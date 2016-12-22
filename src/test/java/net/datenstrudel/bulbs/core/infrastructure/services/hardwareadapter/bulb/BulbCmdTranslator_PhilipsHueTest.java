@@ -230,7 +230,7 @@ public class BulbCmdTranslator_PhilipsHueTest {
         HttpCommand expResult = new HttpCommand(
                 "http://localhost:0/api", 
                 HttpMethod.POST, 
-                new HttpEntity<>("{\"devicetype\":\"test_deviceType\",\"username\":\"test_username\"}"), 
+                new HttpEntity<>("{\"devicetype\":\"test_deviceType#a_device\"}"),
                 new HashMap<String, Object>());
         HttpCommand result = instance.toCreateBulbsPrincipalCmd(T_BRIDGE_ADDRESS, T_PRINCIPAL);
         assertEquals(expResult, result);

@@ -11,6 +11,7 @@ import net.datenstrudel.bulbs.shared.domain.model.identity.AppId;
 import org.slf4j.Logger; import org.slf4j.LoggerFactory;import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -87,11 +88,15 @@ public class BulbBridgeDomainServiceImpl implements BulbBridgeDomainService{
         BulbsPrincipal finalPrincipal;
         BulbsPrincipal tmpPrincipal = userService
                 .bulbsPrincipalInstanceForNewBridge( AppIdCore.instance() );
+
         log.info(" -- Try to create new " + tmpPrincipal + "at given address .. ");
-        InvocationResponse resp_pcpl = bulbsHwService.createBulbsPrincipal(localAddress, tmpPrincipal, platform);
+        InvocationResponse resp_principal = bulbsHwService.createBulbsPrincipal(localAddress, tmpPrincipal, platform);
         log.info(" -- .. SUCCEEDED.");
-        
-        log.info(" -- Try to read bridge data from hardware ..");
+
+        final Optional<String> createdUsername = resp_principal.getValueFromParsedResponse("username", String.class);
+        createdUsername.ifPresent(tmpPrincipal::setUsername);
+
+            log.info(" -- Try to read bridge data from hardware ..");
         BulbBridge freshBridge = bulbsHwService.bridgeFromHwInterface(
                 localAddress, bridgeRepository.nextIdentity(), tmpPrincipal, user.getBulbsContextUserlId(), platform);
         log.info(" -- .. Object read: " + freshBridge);

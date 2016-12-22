@@ -10,7 +10,6 @@ import java.util.Objects;
 /**
  *
  * @author Thomas Wendzinski
- * @deprecated - use {@link InvocationResponse instead!}
  */
 public class HwResponse implements ValueObject<HwResponse>{
 

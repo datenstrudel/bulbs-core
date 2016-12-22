@@ -137,8 +137,6 @@ public class BulbCmdTranslator_PhilipsHue implements BulbCmdTranslator_HTTP {
                     new AppId(principalObj.get("name")), 
                     bridgeId.getUuId(),
                     BulbsPrincipalState.REGISTERED
-//                    principalObj.get("last use day"), 
-//                    principalObj.get("create date"), 
                     )
             );
         }
@@ -152,23 +150,25 @@ public class BulbCmdTranslator_PhilipsHue implements BulbCmdTranslator_HTTP {
                 new TypeToken<List<Map<String, Object>>>(){}.getType());
         return new HwResponse(d, httpStatuscode);
     }
+
     @Override
     public InvocationResponse responseFromHardwareInvocation(String json){
-        List<Map<String, Object>> d = gson.fromJson(
-                json, 
-                new TypeToken<List<Map<String, Object>>>(){}.getType());
+        List<Map<String, Object>> d = gson.fromJson(json, new TypeToken<List<Map<String, Object>>>(){}.getType());
         Map<String, Object> respObj = d.iterator().next();
         if(respObj.containsKey("success")){
             Map<String, String> successObj = (Map<String, String>) respObj.get("success");
             return new InvocationResponse(
                     "" + successObj.keySet().iterator().next() + " : " 
                     + "" + ((Object)successObj.values().iterator().next()), 
-                    false );
+                    false,
+                    (Map) successObj
+                    );
         }else if(respObj.containsKey("error")){
             return errorMessageJsonToResponse(d);
         }
         throw new IllegalStateException("JSON Response from hardware not supported by BulbCmdTranslator: " + json);
     }
+
     @Override
     public InvocationResponse checkResponseForError(String json){
         try{
@@ -239,8 +239,7 @@ public class BulbCmdTranslator_PhilipsHue implements BulbCmdTranslator_HTTP {
                 HttpMethod.POST, 
                 new HttpEntity<>( gson.toJson( 
                     new HashMap<String, Object>(2){{
-                            put("username",   principal.getUsername());
-                            put("devicetype", principal.getAppId().getUniqueAppName());
+                            put("devicetype", principal.getAppId().getUniqueAppName() + "#a_device");
                     }}, 
                     new TypeToken<Map<String, Object>>(){}.getType())), 
                 EMPTY_URL_VARS );
