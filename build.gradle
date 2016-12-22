@@ -198,6 +198,9 @@ minifyCss {
 assemble.dependsOn minifyJs
 assemble.dependsOn minifyCss
 
+processResources.dependsOn minifyJs
+processResources.dependsOn minifyCss
+
 processResources {
     filesMatching('**/application.properties') {
         filter ReplaceTokens, tokens: [
@@ -208,10 +211,6 @@ processResources {
                 "project.revision"        : project.property("revision"),
                 "project.buildNumber"     : project.property("buildNumber")
         ]
-    }
-    doLast{
-        minifyJs
-        minifyCss
     }
 }
 
